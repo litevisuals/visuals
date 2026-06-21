@@ -45,7 +45,7 @@ local Localization = {
         ActiveBuild = "АКТИВЕН", Speedhack = "Speedhack", WalkSpeed = "Скорость бега",
         Fly = "Fly (WASD)", FlySpeed = "Скорость полета", SpinBot = "Spin Bot", SpinSpeed = "Скорость вращения",
         Noclip = "Noclip", Fling = "Orbit Fling (Улет врага)", Esp = "Neon ESP (Wallhack)", EspNames = "ESP Никнеймы", 
-        EspMM2 = "ESP Роли (MM2 Мардер)", Fov = "FOV (Растяг)", Widget = "Мини-виджет (Stats)", 
+        EspMM2 = "ESP Роли (MM2 Раннее)", Fov = "FOV (Растяг)", Widget = "Мини-виджет (Stats)", 
         ActiveList = "Список включенного", Rainbow = "Rainbow Glow", LangBtn = "Язык: RU", 
         Graphics = "Улучшенная графика (RTX)", Magnet = "Магнит пуль (Hitbox Expand)"
     },
@@ -54,7 +54,7 @@ local Localization = {
         ActiveBuild = "ACTIVE BUILD", Speedhack = "Speedhack", WalkSpeed = "Walk Speed",
         Fly = "Fly (WASD)", FlySpeed = "Fly Speed", SpinBot = "Spin Bot", SpinSpeed = "Spin Speed",
         Noclip = "Noclip", Fling = "Orbit Fling (Nearest)", Esp = "Neon ESP (Wallhack)", EspNames = "ESP Names", 
-        EspMM2 = "ESP Roles (MM2)", Fov = "FOV Tracker", Widget = "Stats Widget (Drag)", 
+        EspMM2 = "ESP Roles (MM2 Early)", Fov = "FOV Tracker", Widget = "Stats Widget (Drag)", 
         ActiveList = "Active Mods Widget", Rainbow = "Rainbow Glow", LangBtn = "Lang: EN", 
         Graphics = "Enhance Graphics (RTX)", Magnet = "Bullet Magnet (Hitbox Expand)"
     }
@@ -279,12 +279,14 @@ local magnetSlider = createAttachedSlider(MainTab, "Magnet", 2, 50, 10, function
 local espFolder = Instance.new("Folder", Screen); espFolder.Name = "ESP"
 
 local function checkMM2Role(player)
-    local char = player.Character; local bp = player:FindFirstChild("Backpack")
-    local isMurderer = (char and char:FindFirstChild("Knife")) or (bp and bp:FindFirstChild("Knife"))
-    local isSheriff = (char and (char:FindFirstChild("Gun") or char:FindFirstChild("Revolver"))) or (bp and (bp:FindFirstChild("Gun") or bp:FindFirstChild("Revolver")))
+    local char = player.Character
+    local bp = player:FindFirstChild("Backpack")
     
-    if isMurderer then return Color3.fromRGB(255, 0, 0), "MURDER" end 
-    if isSheriff then return Color3.fromRGB(0, 0, 255), "SHERIFF" end 
+    local hasKnife = (char and char:FindFirstChild("Knife")) or (bp and bp:FindFirstChild("Knife"))
+    local hasGun = (char and (char:FindFirstChild("Gun") or char:FindFirstChild("Revolver"))) or (bp and (bp:FindFirstChild("Gun") or bp:FindFirstChild("Revolver")))
+    
+    if hasKnife then return Color3.fromRGB(255, 0, 0), "MURDER" end 
+    if hasGun then return Color3.fromRGB(0, 0, 255), "SHERIFF" end 
     return nil, "INNOCENT"
 end
 
