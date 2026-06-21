@@ -274,16 +274,78 @@ local noclipLoop = nil; createToggle(MainTab, "Noclip", false, function(state) n
 
 createToggle(MainTab, "Fling", false, function(state) flingEnabled = state end)
 
-local magnetSlider = createAttachedSlider(MainTab, "Magnet", 2, 50, 10, function(val) magnetSize = val end); magnetSlider.Visible = false; createToggle(MainTab, "Magnet", false, function(state) magnetEnabled = state; magnetSlider.Visible = state end)
+-- ОБНОВЛЕННЫЙ БЛОК МАГНИТА ХИТБОКСОВ С ПОЛНЫМ УПРАВЛЕНИЕМ И СБРОСОМ
+local magnetSlider; 
+magnetSlider, _ = createAttachedSlider(MainTab, "Magnet", 2, 50, 10, function(val) 
+    magnetSize = val 
+end)
+magnetSlider.Visible = false
+
+createToggle(MainTab, "Magnet", false, function(state) 
+    magnetEnabled = state
+    magnetSlider.Visible = state
+    if not state then
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                local hrp = p.Character.HumanoidRootPart
+                hrp.Size = Vector3.new(2, 2, 1)
+                hrp.Transparency = 0
+                hrp.Material = Enum.Material.Plastic
+            end
+        end
+    end
+end)
 
 local espFolder = Instance.new("Folder", Screen); espFolder.Name = "ESP"
 
+-- УЛУЧШЕННЫЙ СКАНЕР РОЛЕЙ ДЛЯ MM2 ДО НАЧАЛА МАТЧА
 local function checkMM2Role(player)
     local char = player.Character
     local bp = player:FindFirstChild("Backpack")
+    local pgui = player:FindFirstChild("PlayerGui")
     
     local hasKnife = (char and char:FindFirstChild("Knife")) or (bp and bp:FindFirstChild("Knife"))
     local hasGun = (char and (char:FindFirstChild("Gun") or char:FindFirstChild("Revolver"))) or (bp and (bp:FindFirstChild("Gun") or bp:FindFirstChild("Revolver")))
+    
+    if not hasKnife and not hasGun then
+        local function checkTools(container)
+            if not container then return end
+            for _, item in pairs(container:GetChildren()) do
+                if item:IsA("Tool") then
+                    local name = item.Name:lower()
+                    if name:find("knife") or name:find("нож") or name:find("slasher") then
+                        hasKnife = true
+                    elseif name:find("gun") or name:find("revolver") or name:find("pistol") or name:find("пест") then
+                        hasGun = true
+                    end
+                end
+            end
+        end
+        checkTools(bp)
+        checkTools(char)
+    end
+
+    if not hasKnife and not hasGun then
+        local roleAttr = player:GetAttribute("Role") or player:GetAttribute("RoleValue") or (char and char:GetAttribute("Role"))
+        if roleAttr then
+            local strRole = tostring(roleAttr):lower()
+            if strRole:find("murder") or strRole:find("murderer") then hasKnife = true
+            elseif strRole:find("sheriff") then hasGun = true end
+        end
+    end
+
+    if not hasKnife and not hasGun and pgui then
+        for _, v in pairs(pgui:GetDescendants()) do
+            if v:IsA("StringValue") or v:IsA("ObjectValue") then
+                local name = v.Name:lower()
+                if name:find("role") then
+                    local val = tostring(v.Value):lower()
+                    if val:find("murder") then hasKnife = true
+                    elseif val:find("sheriff") then hasGun = true end
+                end
+            end
+        end
+    end
     
     if hasKnife then return Color3.fromRGB(255, 0, 0), "MURDER" end 
     if hasGun then return Color3.fromRGB(0, 0, 255), "SHERIFF" end 
