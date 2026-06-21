@@ -1,15 +1,12 @@
--- ========================================================
--- LITE VISUALS (ULTIMATE FINAL + ORBIT FLING)
--- ========================================================
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
 local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
 local TargetGui = (gethui and gethui()) or LocalPlayer:WaitForChild("PlayerGui")
 local Stats = game:GetService("Stats")
-local LocalPlayer = Players.LocalPlayer
 
 local function tween(obj, props, time, style)
     local tInfo = TweenInfo.new(time or 0.25, style or Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
@@ -37,13 +34,11 @@ if TargetGui:FindFirstChild("LiteVisuals") then TargetGui.LiteVisuals:Destroy() 
 local Screen = Instance.new("ScreenGui", TargetGui)
 Screen.Name = "LiteVisuals"; Screen.ResetOnSpawn = false
 
--- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 local currentLang = "RU"
 local activeMods = {} 
 local flySpeed, walkSpeed, spinSpeed, magnetSize = 50, 16, 40, 10
 local isMenuOpen, noclipEnabled, espEnabled, espNames, espMM2, rgbEffectsEnabled, graphicsEnabled, magnetEnabled, spinEnabled, flingEnabled = true, false, false, false, false, false, false, false, false, false
 
--- СЛОВАРЬ (ЛОКАЛИЗАЦИЯ)
 local Localization = {
     RU = {
         MainTab = "Читы", VisualsTab = "Визуалы", SettingsTab = "Настройки", ActiveModsTitle = "АКТИВНО:",
@@ -74,7 +69,6 @@ local function updateLanguage(lang)
     end
 end
 
--- === ОСНОВНОЙ ИНТЕРФЕЙС ===
 local MainCanvas = Instance.new("CanvasGroup", Screen)
 MainCanvas.Size = UDim2.new(0, 520, 0, 330); MainCanvas.Position = UDim2.new(0.5, -260, 0.5, -165); MainCanvas.BackgroundTransparency = 1; MainCanvas.ClipsDescendants = false
 local Main = Instance.new("Frame", MainCanvas)
@@ -182,7 +176,6 @@ local function createAttachedSlider(parent, textKey, min, max, default, callback
     return frame, function(value) slideFill.Size = UDim2.new(math.clamp((value - min) / (max - min), 0, 1), 0, 1, 0); valLabel.Text = tostring(value) end
 end
 
--- === ВИДЖЕТЫ ===
 local DragWidget = Instance.new("Frame", Screen)
 DragWidget.Size = UDim2.new(0, 190, 0, 65); DragWidget.Position = UDim2.new(0.1, 0, 0.1, 0); DragWidget.BackgroundColor3 = Color3.fromRGB(12, 12, 14); DragWidget.Visible = false; Instance.new("UICorner", DragWidget).CornerRadius = UDim.new(0, 6)
 local WidgetStroke = Instance.new("UIStroke", DragWidget); WidgetStroke.Color = Color3.fromRGB(30, 30, 35)
@@ -198,7 +191,6 @@ local ALTitle = Instance.new("TextLabel", ActiveListWidget); ALTitle.Size = UDim
 ActiveListText = Instance.new("TextLabel", ActiveListWidget); ActiveListText.Size = UDim2.new(1, -20, 1, -30); ActiveListText.Position = UDim2.new(0, 10, 0, 25); ActiveListText.BackgroundTransparency = 1; ActiveListText.Font = Enum.Font.Gotham; ActiveListText.TextColor3 = Color3.new(1,1,1); ActiveListText.TextSize = 11; ActiveListText.TextXAlignment = Enum.TextXAlignment.Left; ActiveListText.TextYAlignment = Enum.TextYAlignment.Top
 makeDraggable(ActiveListWidget, ActiveListWidget)
 
--- === ОБНОВЛЕНИЕ ДАННЫХ ===
 RunService.RenderStepped:Connect(function(dt)
     local fps = math.floor(1 / dt); SideFPSLabel.Text = "FPS: " .. fps; WidgetFps.Text = "FPS: " .. fps; SideTimeLabel.Text = "TIME: " .. os.date("%H:%M")
     local s, pingValue = pcall(function() return math.floor(Stats.Network.ServerToClientPing:GetValue() * 1000) end); WidgetPing.Text = "PING: " .. (s and pingValue or "0") .. " ms"
@@ -206,50 +198,39 @@ RunService.RenderStepped:Connect(function(dt)
     else MainStroke.Color = Color3.fromRGB(32, 32, 36); WidgetStroke.Color = Color3.fromRGB(30, 30, 35); ALStroke.Color = Color3.fromRGB(50, 50, 55); StatusIndicator.BackgroundColor3 = Color3.fromRGB(75, 255, 100) end
 end)
 
--- === ХАОС УПРАВЛЕНИЕ (ФЛИНГ, МАГНИТ, КРУТИЛКА) ===
 local orbitAngle = 0
 RunService.Stepped:Connect(function()
     local char = LocalPlayer.Character; local hrp = char and char:FindFirstChild("HumanoidRootPart")
     if hrp then
-        -- Магнит
         if magnetEnabled then
             for _, p in pairs(Players:GetPlayers()) do
                 if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                    p.Character.HumanoidRootPart.Size = Vector3.new(magnetSize, magnetSize, magnetSize)
-                    p.Character.HumanoidRootPart.Transparency = 0.7; p.Character.HumanoidRootPart.CanCollide = false
+                    local targetHrp = p.Character.HumanoidRootPart
+                    targetHrp.Size = Vector3.new(magnetSize, magnetSize, magnetSize)
+                    targetHrp.Transparency = 0.7
+                    targetHrp.Material = Enum.Material.ForceField
+                    targetHrp.CanCollide = false
                 end
             end
         end
-        -- Крутилка
         if spinEnabled then hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(spinSpeed), 0) end
         
-        -- ORBIT FLING (Таргет на ближайшего)
         if flingEnabled then
             local target = nil
             local minDist = math.huge
-            -- Ищем ближайшего игрока
             for _, p in pairs(Players:GetPlayers()) do
                 if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
                     local dist = (p.Character.HumanoidRootPart.Position - hrp.Position).Magnitude
-                    if dist < minDist then
-                        minDist = dist
-                        target = p
-                    end
+                    if dist < minDist then minDist = dist; target = p end
                 end
             end
-            
-            -- Если нашли кого-то близко, начинаем орбиту
             if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-                orbitAngle = orbitAngle + 0.6 -- Скорость вращения вокруг игрока
+                orbitAngle = orbitAngle + 0.6
                 local tHrp = target.Character.HumanoidRootPart
-                local offset = Vector3.new(math.cos(orbitAngle) * 2.5, 0, math.sin(orbitAngle) * 2.5) -- Радиус орбиты 2.5 стада
-                
-                -- Отключаем коллизию своего тела, чтобы пройти сквозь защиту и багнуть физику
+                local offset = Vector3.new(math.cos(orbitAngle) * 2.5, 0, math.sin(orbitAngle) * 2.5)
                 for _, part in pairs(char:GetChildren()) do
                     if part:IsA("BasePart") then part.CanCollide = false end
                 end
-                
-                -- Накручиваем бешеную скорость и привязываем позицию
                 hrp.Velocity = Vector3.new(50000, 50000, 50000)
                 hrp.CFrame = tHrp.CFrame + offset
             end
@@ -257,7 +238,6 @@ RunService.Stepped:Connect(function()
     end
 end)
 
--- === ОСНОВНЫЕ ЧИТЫ (МЕЙН) ===
 local walkSlider, setWalk = createAttachedSlider(MainTab, "WalkSpeed", 16, 150, 16, function(val) walkSpeed = val; if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then LocalPlayer.Character.Humanoid.WalkSpeed = val end end)
 walkSlider.Visible = false; createToggle(MainTab, "Speedhack", false, function(state) walkSlider.Visible = state; if state then if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then LocalPlayer.Character.Humanoid.WalkSpeed = walkSpeed end else if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then LocalPlayer.Character.Humanoid.WalkSpeed = 16 end end end)
 
@@ -292,39 +272,74 @@ spinSlider.Visible = false; createToggle(MainTab, "SpinBot", false, function(sta
 
 local noclipLoop = nil; createToggle(MainTab, "Noclip", false, function(state) noclipEnabled = state; if noclipEnabled then noclipLoop = RunService.Stepped:Connect(function() if LocalPlayer.Character then for _, part in pairs(LocalPlayer.Character:GetChildren()) do if part:IsA("BasePart") then part.CanCollide = false end end end end) else if noclipLoop then noclipLoop:Disconnect() end end end)
 
--- ТОТ САМЫЙ FLING
 createToggle(MainTab, "Fling", false, function(state) flingEnabled = state end)
 
 local magnetSlider = createAttachedSlider(MainTab, "Magnet", 2, 50, 10, function(val) magnetSize = val end); magnetSlider.Visible = false; createToggle(MainTab, "Magnet", false, function(state) magnetEnabled = state; magnetSlider.Visible = state end)
 
--- === ВИЗУАЛЫ ===
 local espFolder = Instance.new("Folder", Screen); espFolder.Name = "ESP"
+
 local function checkMM2Role(player)
-    local char = player.Character; local bp = player:FindFirstChild("Backpack"); local isMurderer = (char and char:FindFirstChild("Knife")) or (bp and bp:FindFirstChild("Knife")); local isSheriff = (char and char:FindFirstChild("Gun") or char:FindFirstChild("Revolver")) or (bp and bp:FindFirstChild("Gun") or bp:FindFirstChild("Revolver"))
-    if isMurderer then return Color3.fromRGB(255, 30, 30), "MURDERER" end if isSheriff then return Color3.fromRGB(30, 80, 255), "SHERIFF" end return Color3.fromRGB(30, 255, 30), "INNOCENT"
+    local char = player.Character; local bp = player:FindFirstChild("Backpack")
+    local isMurderer = (char and char:FindFirstChild("Knife")) or (bp and bp:FindFirstChild("Knife"))
+    local isSheriff = (char and (char:FindFirstChild("Gun") or char:FindFirstChild("Revolver"))) or (bp and (bp:FindFirstChild("Gun") or bp:FindFirstChild("Revolver")))
+    
+    if isMurderer then return Color3.fromRGB(255, 0, 0), "MURDER" end 
+    if isSheriff then return Color3.fromRGB(0, 0, 255), "SHERIFF" end 
+    return nil, "INNOCENT"
 end
+
 local function applyESP(player)
     if player == LocalPlayer then return end
     local function init()
         local char = player.Character; if not char or espFolder:FindFirstChild(player.Name) then return end
-        local high = Instance.new("Highlight", espFolder); high.Name = player.Name; high.Adornee = char; high.FillTransparency = 0.6
-        local bill = Instance.new("BillboardGui", espFolder); bill.Name = player.Name.."_TXT"; bill.Adornee = char:WaitForChild("Head"); bill.Size = UDim2.new(0, 100, 0, 40); bill.StudsOffset = Vector3.new(0, 2.5, 0); bill.AlwaysOnTop = true
+        
+        local high = Instance.new("Highlight", espFolder)
+        high.Name = player.Name; high.Adornee = char; high.FillTransparency = 0.5; high.OutlineTransparency = 0
+        
+        local bill = Instance.new("BillboardGui", espFolder); bill.Name = player.Name.."_TXT"; bill.Adornee = char:WaitForChild("Head"); bill.Size = UDim2.new(0, 120, 0, 40); bill.StudsOffset = Vector3.new(0, 3, 0); bill.AlwaysOnTop = true
         local txt = Instance.new("TextLabel", bill); txt.Size = UDim2.new(1,0,1,0); txt.BackgroundTransparency = 1; txt.Font = Enum.Font.GothamBold; txt.TextSize = 10; txt.TextStrokeTransparency = 0; txt.TextColor3 = Color3.new(1,1,1)
+        
         local c; c = RunService.RenderStepped:Connect(function()
-            if not espEnabled or not char or char.Humanoid.Health <= 0 then c:Disconnect(); high:Destroy(); bill:Destroy(); return end
-            local color, role = Color3.fromRGB(0, 255, 235), ""; if espMM2 then color, role = checkMM2Role(player) end; high.FillColor = color; local finalText = ""; if espNames then finalText = player.Name .. "\n" end; if espMM2 then finalText = finalText .. "[" .. role .. "]" end
-            txt.Text = finalText; txt.TextColor3 = color; bill.Enabled = (espNames or espMM2)
+            if not espEnabled or not char or not char:FindFirstChild("Humanoid") or char.Humanoid.Health <= 0 then 
+                c:Disconnect(); high:Destroy(); bill:Destroy(); return 
+            end
+            
+            local color
+            local mm2Color, role = checkMM2Role(player)
+            
+            if espMM2 and mm2Color then
+                color = mm2Color
+            else
+                local t = tick()
+                local wave = (math.sin(t * 2) + 1) / 2
+                local purple = Color3.fromRGB(138, 43, 226)
+                local cyan = Color3.fromRGB(0, 191, 255)
+                color = purple:Lerp(cyan, wave)
+            end
+            
+            high.FillColor = color
+            high.OutlineColor = color
+            
+            local finalText = ""
+            if espNames then finalText = player.Name .. "\n" end
+            if espMM2 and role ~= "INNOCENT" then finalText = finalText .. "[" .. role .. "]" end
+            
+            txt.Text = finalText
+            txt.TextColor3 = color
+            bill.Enabled = (espNames or (espMM2 and role ~= "INNOCENT"))
         end)
     end
     player.CharacterAdded:Connect(init); if player.Character then init() end
 end
 
 createToggle(VisualsTab, "Esp", false, function(state) espEnabled = state; if state then for _, p in pairs(Players:GetPlayers()) do applyESP(p) end; Players.PlayerAdded:Connect(applyESP) else espFolder:ClearAllChildren() end end)
-createToggle(VisualsTab, "EspNames", false, function(state) espNames = state end); createToggle(VisualsTab, "EspMM2", false, function(state) espMM2 = state end); createAttachedSlider(VisualsTab, "Fov", 70, 120, 70, function(val) Camera.FieldOfView = val end)
+createToggle(VisualsTab, "EspNames", false, function(state) espNames = state end)
+createToggle(VisualsTab, "EspMM2", false, function(state) espMM2 = state end)
+createAttachedSlider(VisualsTab, "Fov", 70, 120, 70, function(val) Camera.FieldOfView = val end)
+
 local defaultLighting = {Ambient = Lighting.Ambient, Brightness = Lighting.Brightness, GlobalShadows = Lighting.GlobalShadows}; local CC = Instance.new("ColorCorrectionEffect", Lighting); CC.Enabled = false; CC.Saturation = 0.3; CC.Contrast = 0.1; local Bloom = Instance.new("BloomEffect", Lighting); Bloom.Enabled = false; Bloom.Intensity = 0.3
 createToggle(VisualsTab, "Graphics", false, function(state) graphicsEnabled = state; CC.Enabled = state; Bloom.Enabled = state; if state then Lighting.Ambient = Color3.fromRGB(150, 150, 150); Lighting.Brightness = 2; Lighting.GlobalShadows = true else Lighting.Ambient = defaultLighting.Ambient; Lighting.Brightness = defaultLighting.Brightness; Lighting.GlobalShadows = defaultLighting.GlobalShadows end end)
 
--- === НАСТРОЙКИ ===
 local LangFrame = Instance.new("Frame", SettingsTab); LangFrame.Size = UDim2.new(0.95, 0, 0, 40); LangFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 24); Instance.new("UICorner", LangFrame).CornerRadius = UDim.new(0, 6); Instance.new("UIStroke", LangFrame).Color = Color3.fromRGB(28, 28, 32)
 local LangBtn = Instance.new("TextButton", LangFrame); LangBtn.Size = UDim2.new(1, 0, 1, 0); LangBtn.BackgroundTransparency = 1; LangBtn.Font = Enum.Font.GothamBold; LangBtn.TextColor3 = Color3.fromRGB(90, 160, 255); LangBtn.TextSize = 12; registerText(LangBtn, "LangBtn")
 LangBtn.MouseButton1Click:Connect(function() if currentLang == "RU" then updateLanguage("EN") else updateLanguage("RU") end; TopTitle.Text = Localization[currentLang][TabButtons[1].Visible and "MainTab" or "SettingsTab"]; updateActiveMods() end)
@@ -338,4 +353,4 @@ local function toggleMenu()
     else MainCanvas.Visible = true; MainCanvas:TweenSize(UDim2.new(0, 520, 0, 330), "Out", "Back", 0.3, true); isMenuOpen = true end
 end
 UserInputService.InputBegan:Connect(function(i, gp) if not gp and i.KeyCode == Enum.KeyCode.LeftAlt then toggleMenu() end end)
-print("Orbit Fling загружен. Берегись, сервер!")
+print("Lite Visuals updated successfully.")
