@@ -18,21 +18,21 @@ end
 local function makeDraggable(clickObj, dragObj)
     local drag, dragStart, sPos
     clickObj.InputBegan:Connect(function(i) 
-        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then drag = true; dragStart = i.Position; sPos = dragObj.Position end 
+        if i.UserInputType == Enum.UserInputType.MouseButton1 then drag = true; dragStart = i.Position; sPos = dragObj.Position end 
     end)
     UserInputService.InputChanged:Connect(function(i) 
-        if drag and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then 
+        if drag and i.UserInputType == Enum.UserInputType.MouseMovement then 
             local delta = i.Position - dragStart
             dragObj.Position = UDim2.new(sPos.X.Scale, sPos.X.Offset + delta.X, sPos.Y.Scale, sPos.Y.Offset + delta.Y)
         end 
     end)
-    UserInputService.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then drag = false end end)
+    UserInputService.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then drag = false end end)
 end
 
-if TargetGui:FindFirstChild("LiteVisuals") then TargetGui.LiteVisuals:Destroy() end
+if TargetGui:FindFirstChild("LiteVisuals_PC") then TargetGui.LiteVisuals_PC:Destroy() end
 
 local Screen = Instance.new("ScreenGui", TargetGui)
-Screen.Name = "LiteVisuals"; Screen.ResetOnSpawn = false
+Screen.Name = "LiteVisuals_PC"; Screen.ResetOnSpawn = false
 
 local currentLang = "RU"
 local activeMods = {} 
@@ -42,8 +42,8 @@ local isMenuOpen, noclipEnabled, espEnabled, espNames, espMM2, rgbEffectsEnabled
 local Localization = {
     RU = {
         MainTab = "Читы", VisualsTab = "Визуалы", SettingsTab = "Настройки", ActiveModsTitle = "АКТИВНО:",
-        ActiveBuild = "АКТИВЕН", Speedhack = "Speedhack", WalkSpeed = "Скорость бега",
-        Fly = "Fly (WASD)", FlySpeed = "Скорость полета", SpinBot = "Spin Bot", SpinSpeed = "Скорость вращения",
+        ActiveBuild = "АКТИВЕН (ПК)", Speedhack = "Speedhack", WalkSpeed = "Скорость бега",
+        Fly = "Fly (Свободный полет)", FlySpeed = "Скорость полета", SpinBot = "Spin Bot", SpinSpeed = "Скорость вращения",
         Noclip = "Noclip", Fling = "Orbit Fling (Улет врага)", Esp = "Neon ESP (Wallhack)", EspNames = "ESP Никнеймы", 
         EspMM2 = "ESP Роли (MM2 Раннее)", Fov = "FOV (Растяг)", Widget = "Мини-виджет (Stats)", 
         ActiveList = "Список включенного", Rainbow = "Rainbow Glow", LangBtn = "Язык: RU", 
@@ -51,8 +51,8 @@ local Localization = {
     },
     EN = {
         MainTab = "Main Hacks", VisualsTab = "Visuals", SettingsTab = "Settings", ActiveModsTitle = "ACTIVE MODS:",
-        ActiveBuild = "ACTIVE BUILD", Speedhack = "Speedhack", WalkSpeed = "Walk Speed",
-        Fly = "Fly (WASD)", FlySpeed = "Fly Speed", SpinBot = "Spin Bot", SpinSpeed = "Spin Speed",
+        ActiveBuild = "ACTIVE BUILD (PC)", Speedhack = "Speedhack", WalkSpeed = "Walk Speed",
+        Fly = "Fly (Omnidirectional)", FlySpeed = "Fly Speed", SpinBot = "Spin Bot", SpinSpeed = "Spin Speed",
         Noclip = "Noclip", Fling = "Orbit Fling (Nearest)", Esp = "Neon ESP (Wallhack)", EspNames = "ESP Names", 
         EspMM2 = "ESP Roles (MM2 Early)", Fov = "FOV Tracker", Widget = "Stats Widget (Drag)", 
         ActiveList = "Active Mods Widget", Rainbow = "Rainbow Glow", LangBtn = "Lang: EN", 
@@ -165,11 +165,13 @@ local function createAttachedSlider(parent, textKey, min, max, default, callback
     local slideBg = Instance.new("TextButton", frame); slideBg.Size = UDim2.new(1, -28, 0, 4); slideBg.Position = UDim2.new(0, 14, 0, 28); slideBg.Text = ""; slideBg.BackgroundColor3 = Color3.fromRGB(32, 32, 38); Instance.new("UICorner", slideBg).CornerRadius = UDim.new(1, 0)
     local slideFill = Instance.new("Frame", slideBg); slideFill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0); slideFill.BackgroundColor3 = Color3.fromRGB(95, 95, 115); Instance.new("UICorner", slideFill).CornerRadius = UDim.new(1, 0)
     local dragging = false
+    
     local function update(input)
         local pos = math.clamp((input.Position.X - slideBg.AbsolutePosition.X) / slideBg.AbsoluteSize.X, 0, 1)
         local val = math.floor(min + ((max - min) * pos))
         slideFill.Size = UDim2.new(pos, 0, 1, 0); valLabel.Text = tostring(val); pcall(callback, val)
     end
+    
     slideBg.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then dragging = true; update(i) end end)
     UserInputService.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end end)
     UserInputService.InputChanged:Connect(function(i) if dragging and i.UserInputType == Enum.UserInputType.MouseMovement then update(i) end end)
@@ -194,8 +196,12 @@ makeDraggable(ActiveListWidget, ActiveListWidget)
 RunService.RenderStepped:Connect(function(dt)
     local fps = math.floor(1 / dt); SideFPSLabel.Text = "FPS: " .. fps; WidgetFps.Text = "FPS: " .. fps; SideTimeLabel.Text = "TIME: " .. os.date("%H:%M")
     local s, pingValue = pcall(function() return math.floor(Stats.Network.ServerToClientPing:GetValue() * 1000) end); WidgetPing.Text = "PING: " .. (s and pingValue or "0") .. " ms"
-    if rgbEffectsEnabled then local rainbowColor = Color3.fromHSV((tick() % 4) / 4, 0.6, 1); MainStroke.Color = rainbowColor; WidgetStroke.Color = rainbowColor; ALStroke.Color = rainbowColor; StatusIndicator.BackgroundColor3 = rainbowColor
-    else MainStroke.Color = Color3.fromRGB(32, 32, 36); WidgetStroke.Color = Color3.fromRGB(30, 30, 35); ALStroke.Color = Color3.fromRGB(50, 50, 55); StatusIndicator.BackgroundColor3 = Color3.fromRGB(75, 255, 100) end
+    if rgbEffectsEnabled then 
+        local rainbowColor = Color3.fromHSV((tick() % 4) / 4, 0.6, 1)
+        MainStroke.Color = rainbowColor; WidgetStroke.Color = rainbowColor; ALStroke.Color = rainbowColor; StatusIndicator.BackgroundColor3 = rainbowColor
+    else 
+        MainStroke.Color = Color3.fromRGB(32, 32, 36); WidgetStroke.Color = Color3.fromRGB(30, 30, 35); ALStroke.Color = Color3.fromRGB(50, 50, 55); StatusIndicator.BackgroundColor3 = Color3.fromRGB(75, 255, 100)
+    end
 end)
 
 local orbitAngle = 0
@@ -242,28 +248,43 @@ local walkSlider, setWalk = createAttachedSlider(MainTab, "WalkSpeed", 16, 150, 
 walkSlider.Visible = false; createToggle(MainTab, "Speedhack", false, function(state) walkSlider.Visible = state; if state then if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then LocalPlayer.Character.Humanoid.WalkSpeed = walkSpeed end else if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then LocalPlayer.Character.Humanoid.WalkSpeed = 16 end end end)
 
 local flySlider, setFly = createAttachedSlider(MainTab, "FlySpeed", 20, 150, 50, function(val) flySpeed = val end)
-flySlider.Visible = false; local flyLoop, keysPressed = nil, {}
+flySlider.Visible = false; local flyLoop = nil
+
 createToggle(MainTab, "Fly", false, function(state)
     local char = LocalPlayer.Character; flySlider.Visible = state
     if state then
-        if not char or not char:FindFirstChild("HumanoidRootPart") then return end
-        local bv = Instance.new("BodyVelocity", char.HumanoidRootPart); bv.Name = "LVFlyBV"; bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+        if not char or not char:FindFirstChild("HumanoidRootPart") or not char:FindFirstChild("Humanoid") then return end
+        
+        local bv = Instance.new("BodyVelocity", char.HumanoidRootPart); bv.Name = "LVFlyBV"; bv.MaxForce = Vector3.new(9e9, 9e9, 9e9); bv.Velocity = Vector3.new(0,0,0)
         local bg = Instance.new("BodyGyro", char.HumanoidRootPart); bg.Name = "LVFlyBG"; bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9); bg.P = 9e4
-        UserInputService.InputBegan:Connect(function(i, gp) if not gp then keysPressed[i.KeyCode] = true end end)
-        UserInputService.InputEnded:Connect(function(i) keysPressed[i.KeyCode] = nil end)
+        
         flyLoop = RunService.RenderStepped:Connect(function()
-            if not char:FindFirstChild("HumanoidRootPart") or not bv.Parent then return end
-            bg.CFrame = Camera.CFrame; local direction = Vector3.new(0, 0, 0)
-            if keysPressed[Enum.KeyCode.W] then direction = direction + Camera.CFrame.LookVector end
-            if keysPressed[Enum.KeyCode.S] then direction = direction - Camera.CFrame.LookVector end
-            if keysPressed[Enum.KeyCode.A] then direction = direction - Camera.CFrame.RightVector end
-            if keysPressed[Enum.KeyCode.D] then direction = direction + Camera.CFrame.RightVector end
-            bv.Velocity = direction.Magnitude > 0 and direction.Unit * flySpeed or Vector3.new(0,0,0)
+            local currentHrp = char:FindFirstChild("HumanoidRootPart")
+            if not currentHrp or not bv.Parent then return end
+            
+            bg.CFrame = Camera.CFrame
+            local moveVector = Vector3.new(0,0,0)
+            
+            -- Чтение WASD раскладки ПК
+            if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveVector = moveVector + Camera.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveVector = moveVector - Camera.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveVector = moveVector - Camera.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveVector = moveVector + Camera.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveVector = moveVector + Vector3.new(0, 1, 0) end
+            if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then moveVector = moveVector - Vector3.new(0, 1, 0) end
+            
+            if moveVector.Magnitude > 0 then
+                bv.Velocity = moveVector.Unit * flySpeed
+            else
+                bv.Velocity = Vector3.new(0, 0.1, 0)
+            end
         end)
     else
         if flyLoop then flyLoop:Disconnect() end
-        if char and char:FindFirstChild("HumanoidRootPart") then if char.HumanoidRootPart:FindFirstChild("LVFlyBV") then char.HumanoidRootPart.LVFlyBV:Destroy() end if char.HumanoidRootPart:FindFirstChild("LVFlyBG") then char.HumanoidRootPart.LVFlyBG:Destroy() end end
-        keysPressed = {}
+        if char and char:FindFirstChild("HumanoidRootPart") then 
+            if char.HumanoidRootPart:FindFirstChild("LVFlyBV") then char.HumanoidRootPart.LVFlyBV:Destroy() end 
+            if char.HumanoidRootPart:FindFirstChild("LVFlyBG") then char.HumanoidRootPart.LVFlyBG:Destroy() end 
+        end
     end
 end)
 
@@ -274,11 +295,8 @@ local noclipLoop = nil; createToggle(MainTab, "Noclip", false, function(state) n
 
 createToggle(MainTab, "Fling", false, function(state) flingEnabled = state end)
 
--- ОБНОВЛЕННЫЙ БЛОК МАГНИТА ХИТБОКСОВ С ПОЛНЫМ УПРАВЛЕНИЕМ И СБРОСОМ
 local magnetSlider; 
-magnetSlider, _ = createAttachedSlider(MainTab, "Magnet", 2, 50, 10, function(val) 
-    magnetSize = val 
-end)
+magnetSlider, _ = createAttachedSlider(MainTab, "Magnet", 2, 50, 10, function(val) magnetSize = val end)
 magnetSlider.Visible = false
 
 createToggle(MainTab, "Magnet", false, function(state) 
@@ -288,65 +306,17 @@ createToggle(MainTab, "Magnet", false, function(state)
         for _, p in pairs(Players:GetPlayers()) do
             if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
                 local hrp = p.Character.HumanoidRootPart
-                hrp.Size = Vector3.new(2, 2, 1)
-                hrp.Transparency = 0
-                hrp.Material = Enum.Material.Plastic
+                hrp.Size = Vector3.new(2, 2, 1); hrp.Transparency = 0; hrp.Material = Enum.Material.Plastic
             end
         end
     end
 end)
 
 local espFolder = Instance.new("Folder", Screen); espFolder.Name = "ESP"
-
--- УЛУЧШЕННЫЙ СКАНЕР РОЛЕЙ ДЛЯ MM2 ДО НАЧАЛА МАТЧА
 local function checkMM2Role(player)
-    local char = player.Character
-    local bp = player:FindFirstChild("Backpack")
-    local pgui = player:FindFirstChild("PlayerGui")
-    
+    local char = player.Character; local bp = player:FindFirstChild("Backpack"); local pgui = player:FindFirstChild("PlayerGui")
     local hasKnife = (char and char:FindFirstChild("Knife")) or (bp and bp:FindFirstChild("Knife"))
     local hasGun = (char and (char:FindFirstChild("Gun") or char:FindFirstChild("Revolver"))) or (bp and (bp:FindFirstChild("Gun") or bp:FindFirstChild("Revolver")))
-    
-    if not hasKnife and not hasGun then
-        local function checkTools(container)
-            if not container then return end
-            for _, item in pairs(container:GetChildren()) do
-                if item:IsA("Tool") then
-                    local name = item.Name:lower()
-                    if name:find("knife") or name:find("нож") or name:find("slasher") then
-                        hasKnife = true
-                    elseif name:find("gun") or name:find("revolver") or name:find("pistol") or name:find("пест") then
-                        hasGun = true
-                    end
-                end
-            end
-        end
-        checkTools(bp)
-        checkTools(char)
-    end
-
-    if not hasKnife and not hasGun then
-        local roleAttr = player:GetAttribute("Role") or player:GetAttribute("RoleValue") or (char and char:GetAttribute("Role"))
-        if roleAttr then
-            local strRole = tostring(roleAttr):lower()
-            if strRole:find("murder") or strRole:find("murderer") then hasKnife = true
-            elseif strRole:find("sheriff") then hasGun = true end
-        end
-    end
-
-    if not hasKnife and not hasGun and pgui then
-        for _, v in pairs(pgui:GetDescendants()) do
-            if v:IsA("StringValue") or v:IsA("ObjectValue") then
-                local name = v.Name:lower()
-                if name:find("role") then
-                    local val = tostring(v.Value):lower()
-                    if val:find("murder") then hasKnife = true
-                    elseif val:find("sheriff") then hasGun = true end
-                end
-            end
-        end
-    end
-    
     if hasKnife then return Color3.fromRGB(255, 0, 0), "MURDER" end 
     if hasGun then return Color3.fromRGB(0, 0, 255), "SHERIFF" end 
     return nil, "INNOCENT"
@@ -356,41 +326,19 @@ local function applyESP(player)
     if player == LocalPlayer then return end
     local function init()
         local char = player.Character; if not char or espFolder:FindFirstChild(player.Name) then return end
-        
-        local high = Instance.new("Highlight", espFolder)
-        high.Name = player.Name; high.Adornee = char; high.FillTransparency = 0.5; high.OutlineTransparency = 0
-        
+        local high = Instance.new("Highlight", espFolder); high.Name = player.Name; high.FillTransparency = 0.5; high.OutlineTransparency = 0
         local bill = Instance.new("BillboardGui", espFolder); bill.Name = player.Name.."_TXT"; bill.Adornee = char:WaitForChild("Head"); bill.Size = UDim2.new(0, 120, 0, 40); bill.StudsOffset = Vector3.new(0, 3, 0); bill.AlwaysOnTop = true
         local txt = Instance.new("TextLabel", bill); txt.Size = UDim2.new(1,0,1,0); txt.BackgroundTransparency = 1; txt.Font = Enum.Font.GothamBold; txt.TextSize = 10; txt.TextStrokeTransparency = 0; txt.TextColor3 = Color3.new(1,1,1)
         
         local c; c = RunService.RenderStepped:Connect(function()
-            if not espEnabled or not char or not char:FindFirstChild("Humanoid") or char.Humanoid.Health <= 0 then 
-                c:Disconnect(); high:Destroy(); bill:Destroy(); return 
-            end
-            
-            local color
-            local mm2Color, role = checkMM2Role(player)
-            
-            if espMM2 and mm2Color then
-                color = mm2Color
-            else
-                local t = tick()
-                local wave = (math.sin(t * 2) + 1) / 2
-                local purple = Color3.fromRGB(138, 43, 226)
-                local cyan = Color3.fromRGB(0, 191, 255)
-                color = purple:Lerp(cyan, wave)
-            end
-            
-            high.FillColor = color
-            high.OutlineColor = color
-            
+            if not espEnabled or not char or not char:FindFirstChild("Humanoid") or char.Humanoid.Health <= 0 then c:Disconnect(); high:Destroy(); bill:Destroy(); return end
+            local color; local mm2Color, role = checkMM2Role(player)
+            if espMM2 and mm2Color then color = mm2Color else local t = tick(); local wave = (math.sin(t * 2) + 1) / 2; color = Color3.fromRGB(138, 43, 226):Lerp(Color3.fromRGB(0, 191, 255), wave) end
+            high.FillColor = color; high.OutlineColor = color
             local finalText = ""
             if espNames then finalText = player.Name .. "\n" end
             if espMM2 and role ~= "INNOCENT" then finalText = finalText .. "[" .. role .. "]" end
-            
-            txt.Text = finalText
-            txt.TextColor3 = color
-            bill.Enabled = (espNames or (espMM2 and role ~= "INNOCENT"))
+            txt.Text = finalText; txt.TextColor3 = color; bill.Enabled = (espNames or (espMM2 and role ~= "INNOCENT"))
         end)
     end
     player.CharacterAdded:Connect(init); if player.Character then init() end
@@ -401,8 +349,8 @@ createToggle(VisualsTab, "EspNames", false, function(state) espNames = state end
 createToggle(VisualsTab, "EspMM2", false, function(state) espMM2 = state end)
 createAttachedSlider(VisualsTab, "Fov", 70, 120, 70, function(val) Camera.FieldOfView = val end)
 
-local defaultLighting = {Ambient = Lighting.Ambient, Brightness = Lighting.Brightness, GlobalShadows = Lighting.GlobalShadows}; local CC = Instance.new("ColorCorrectionEffect", Lighting); CC.Enabled = false; CC.Saturation = 0.3; CC.Contrast = 0.1; local Bloom = Instance.new("BloomEffect", Lighting); Bloom.Enabled = false; Bloom.Intensity = 0.3
-createToggle(VisualsTab, "Graphics", false, function(state) graphicsEnabled = state; CC.Enabled = state; Bloom.Enabled = state; if state then Lighting.Ambient = Color3.fromRGB(150, 150, 150); Lighting.Brightness = 2; Lighting.GlobalShadows = true else Lighting.Ambient = defaultLighting.Ambient; Lighting.Brightness = defaultLighting.Brightness; Lighting.GlobalShadows = defaultLighting.GlobalShadows end end)
+local defaultLighting = {Ambient = Lighting.Ambient, Brightness = Lighting.Brightness, GlobalShadows = Lighting.GlobalShadows}; local CC = Instance.new("ColorCorrectionEffect", Lighting); CC.Saturation = 0.3; CC.Contrast = 0.1; local Bloom = Instance.new("BloomEffect", Lighting); Bloom.Intensity = 0.3
+createToggle(VisualsTab, "Graphics", false, function(state) CC.Enabled = state; Bloom.Enabled = state; if state then Lighting.Ambient = Color3.fromRGB(150, 150, 150); Lighting.Brightness = 2; Lighting.GlobalShadows = true else Lighting.Ambient = defaultLighting.Ambient; Lighting.Brightness = defaultLighting.Brightness; Lighting.GlobalShadows = defaultLighting.GlobalShadows end end)
 
 local LangFrame = Instance.new("Frame", SettingsTab); LangFrame.Size = UDim2.new(0.95, 0, 0, 40); LangFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 24); Instance.new("UICorner", LangFrame).CornerRadius = UDim.new(0, 6); Instance.new("UIStroke", LangFrame).Color = Color3.fromRGB(28, 28, 32)
 local LangBtn = Instance.new("TextButton", LangFrame); LangBtn.Size = UDim2.new(1, 0, 1, 0); LangBtn.BackgroundTransparency = 1; LangBtn.Font = Enum.Font.GothamBold; LangBtn.TextColor3 = Color3.fromRGB(90, 160, 255); LangBtn.TextSize = 12; registerText(LangBtn, "LangBtn")
@@ -416,5 +364,6 @@ local function toggleMenu()
     if isMenuOpen then MainCanvas:TweenSize(UDim2.new(0, 520, 0, 0), "Out", "Quart", 0.3, true, function() MainCanvas.Visible = false end); isMenuOpen = false
     else MainCanvas.Visible = true; MainCanvas:TweenSize(UDim2.new(0, 520, 0, 330), "Out", "Back", 0.3, true); isMenuOpen = true end
 end
+
 UserInputService.InputBegan:Connect(function(i, gp) if not gp and i.KeyCode == Enum.KeyCode.LeftAlt then toggleMenu() end end)
-print("Lite Visuals updated successfully.")
+print("LiteVisuals PC Edition Loaded. Press LeftAlt to open.")
