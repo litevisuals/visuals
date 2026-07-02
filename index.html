@@ -3,72 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сканирование...</title>
+    <title>Тест батареи</title>
     <style>
-        body { margin: 0; background: black; color: white; font-family: sans-serif; overflow: hidden; text-align: center; }
-        .screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; box-sizing: border-box; }
-        .hidden { display: none !important; }
-        
-        /* Белая вспышка на весь экран */
-        .flash {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; opacity: 0; z-index: 999; pointer-events: none;
-        }
-        .flash-active { animation: flash-anim 0.4s ease-out; }
-        @keyframes flash-anim {
-            0% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-
-        /* Контейнер для "твоего" фото */
-        .photo-container {
-            width: 250px; height: 350px;
-            border: 3px solid red; border-radius: 10px;
-            margin-top: 20px; background-size: cover; background-position: center;
-            /* Размытие, чтобы скрыть, что на фото чужой человек */
-            filter: blur(8px) contrast(1.2);
-        }
+        body { background: #000; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
+        .hidden { display: none; }
+        .battery-icon { width: 100px; height: 50px; border: 4px solid #fff; border-radius: 5px; position: relative; margin: 20px auto; }
+        .battery-level { height: 100%; background: #ff3333; width: 100%; transition: width 1s; }
     </style>
 </head>
 <body>
 
-    <div class="flash" id="flash-effect"></div>
-
-    <div class="screen" id="step-1">
-        <h2>Анализ вашего профиля</h2>
-        <p>Нажмите кнопку, чтобы запустить проверку уровня интеллекта по лицу.</p>
-        <button id="start-btn" style="padding: 15px 30px; font-size: 18px; border-radius: 25px; border: none; background: #00ff00; font-weight: bold;">НАЧАТЬ</button>
+    <div id="intro">
+        <h2>Идет калибровка аккумулятора...</h2>
+        <p id="real-battery">Считывание данных датчика...</p>
+        <button id="start-btn" style="padding: 10px 20px; font-size: 16px;">Запустить тест</button>
     </div>
 
-    <div class="screen hidden" id="step-2">
-        <h1 style="color: red;">⚠️ ДОСТУП ПЕРЕХВАЧЕН ⚠️</h1>
-        <p>Ваше фото успешно сделано и отправлено в базу данных.</p>
-        
-        <div class="photo-container" style="background-image: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300');"></div>
-        
-        <p style="color: #666; font-size: 12px; margin-top: 20px;">Удаление временных файлов через 5 секунд...</p>
+    <div id="prank" class="hidden">
+        <h1 style="color: #ff3333;">⚠️ КРИТИЧЕСКИЙ СБОЙ ПИТАНИЯ</h1>
+        <div class="battery-icon"><div id="level" class="battery-level"></div></div>
+        <h2 id="countdown">Заряд: 1%</h2>
+        <p>Завершение работы Android / iOS через 5 секунд...</p>
     </div>
 
     <script>
         const startBtn = document.getElementById('start-btn');
-        const flash = document.getElementById('flash-effect');
-        
+        let currentBattery = 100;
+
+        // Запрашиваем реальный заряд батареи у браузера
+        if (navigator.getBattery) {
+            navigator.getBattery().then(function(battery) {
+                currentBattery = Math.floor(battery.level * 100);
+                document.getElementById('real-battery').innerText = `Ваш текущий заряд: ${currentBattery}%`;
+            });
+        }
+
         startBtn.addEventListener('click', () => {
-            // Эмитируем звук затвора (если на телефоне включен звук)
-            const audio = new Audio('https://www.soundjay.com/mechanical/camera-shutter-click-01.mp3');
-            audio.play().catch(() => {}); // Игнорим ошибку, если браузер блокирует звук без активности
+            document.getElementById('intro').classList.add('hidden');
+            document.getElementById('prank').classList.remove('hidden');
+            
+            const levelBar = document.getElementById('level');
+            // Резко сбрасываем полоску заряда до минимума
+            setTimeout(() => { levelBar.style.width = '1%'; }, 100);
 
-            // Включаем вспышку
-            flash.classList.add('flash-active');
-
-            // Переключаем экран
-            document.getElementById('step-1').classList.add('hidden');
-            document.getElementById('step-2').classList.remove('hidden');
-
-            // Через 6 секунд "удаляем" всё (просто закрываем или очищаем страницу)
-            setTimeout(() => {
-                document.body.innerHTML = "<div class='screen'><h1>ПРАНК! 😉</h1><p>Никакие данные не собирались, камера не включалась. Безопасность браузера обойти нельзя!</p></div>";
-            }, 6000);
+            let seconds = 5;
+            const timer = setInterval(() => {
+                seconds--;
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                    // Вместо выключения показываем развязку
+                    document.body.innerHTML = "<h1 style='color:#00ff00'>ПРАНК! 😂</h1><p>Твой телефон в порядке, зарядка по-прежнему на уровне " + currentBattery + "%!</p>";
+                } else {
+                    document.getElementById('countdown').innerText = `Заряд: 1% (Выключение через ${seconds} сек)`;
+                }
+            }, 1000);
         });
     </script>
 </body>
