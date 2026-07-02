@@ -1,18 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Внимание!</title>
-    <script>
-        // Этот цикл будет запускаться бесконечно при открытии страницы
-        while(true) {
-            alert("⚠️ Критическая ошибка системы! Телефон перегревается!");
-            alert("🤖 Обнаружен вирус-пожиратель обоев!");
-            alert("Пожалуйста, поцелуйте экран для разблокировки.");
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚠️ Угроза безопасности!</title>
+    <style>
+        body {
+            background-color: #111;
+            color: #fff;
+            font-family: sans-serif;
+            text-align: center;
+            padding: 30px 15px;
+            overflow: hidden; /* Чтобы кнопка не улетала за пределы экрана со скроллом */
         }
-    </script>
+        .warning { color: #ff3333; font-size: 24px; font-weight: bold; }
+        #run-btn {
+            position: absolute;
+            left: 35%;
+            top: 60%;
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #00cc44;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 5px 15px rgba(0,204,68,0.4);
+            transition: all 0.1s ease;
+        }
+    </style>
 </head>
-<body style="background-color: black; color: red; text-align: center; font-family: sans-serif; padding-top: 50px;">
-    <h1>Идет сканирование системы...</h1>
+<body>
+    <p class="warning">⚠️ ВНИМАНИЕ! ⚠️</p>
+    <p>Обнаружен вирус: <b>"Жадина-Говядина"</b>.</p>
+    <p>Память забита на 99.9%. Нажмите кнопку ниже для очистки.</p>
+
+    <button id="run-btn">ОЧИСТИТЬ</button>
+
+    <script>
+        const btn = document.getElementById('run-btn');
+        
+        // На телефонах ловим touchstart (касание) вместо mouseover
+        btn.addEventListener('touchstart', moveButton);
+        btn.addEventListener('mouseover', moveButton);
+
+        function moveButton(e) {
+            e.preventDefault(); // Отменяем стандартный клик, если успел
+            
+            // Вычисляем случайные координаты внутри экрана смартфона
+            const maxWidth = window.innerWidth - btn['offsetWidth'] - 20;
+            const maxHeight = window.innerHeight - btn['offsetHeight'] - 20;
+            
+            const randomX = Math.max(10, Math.floor(Math.random() * maxWidth));
+            const randomY = Math.max(150, Math.floor(Math.random() * maxHeight)); // Оставляем место сверху под текст
+            
+            btn.style.left = randomX + 'px';
+            btn.style.top = randomY + 'px';
+        }
+
+        // Если друг проявит чудеса реакции и всё-таки нажмет:
+        btn.addEventListener('click', () => {
+            alert('Ладно, ладно, ты победил! Это был пранк :)');
+        });
+    </script>
 </body>
 </html>
