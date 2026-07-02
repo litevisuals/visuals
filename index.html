@@ -3,105 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Пройди тест: Какой ты котик? 🐾</title>
+    <title>Интересная статья</title>
     <style>
+        /* Применяем трансформации ко всему телу страницы */
         body {
             margin: 0;
-            padding: 0;
-            background: #f0f2f5;
-            font-family: sans-serif;
-            overflow: hidden;
-            height: 100vh;
-        }
-        /* Обычный милый сайт */
-        .cute-site {
             padding: 20px;
-            text-align: center;
-            transition: transform 1.5s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 1s;
-        }
-        .btn {
-            background: #ff6b6b;
-            color: white;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 25px;
-            font-size: 18px;
-            margin-top: 20px;
-        }
-        /* Хакерский слой под ним */
-        .matrix-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: black;
-            color: #00ff00;
-            font-family: monospace;
-            padding: 15px;
+            font-family: sans-serif;
+            background: #ffffff;
+            color: #333;
+            line-height: 1.6;
+            transition: filter 0.1s ease, transform 0.1s ease;
+            height: 100vh;
             box-sizing: border-box;
-            z-index: -1;
-            font-size: 14px;
-            white-space: pre-line;
         }
-        /* Класс для падения вниз */
-        .fall-down {
-            transform: translateY(120vh) rotate(15deg);
-            opacity: 0.7;
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        h1 { color: #111; }
+        .alert-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
-    <div class="matrix-bg" id="matrix">
-        [SYSTEM OVERRIDE INITIATED]...<br>
-        > Downloading critical data...<br>
-        > Deleting System32 (just kidding, android folder)...<br>
-    </div>
+<div class="container" id="content">
+    <h1>Почему утренний кофе вреден?</h1>
+    <p>Ученые провели масштабное исследование и выяснили, что привычка пить кофе сразу после пробуждения может негативно влиять на уровень кортизола в крови...</p>
+    <p>Чтобы прочитать полную версию исследования и посмотреть графики, нажмите кнопку ниже для подтверждения возраста.</p>
+    
+    <button class="alert-btn" id="init-btn">Открыть графики (18+)</button>
+</div>
 
-    <div class="cute-site" id="site">
-        <h1>🐱 Узнай, какой ты котик!</h1>
-        <p>Ответь всего на 3 вопроса и получи милую аватарку.</p>
-        <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=300" style="width:80%; border-radius:15px;" alt="cat">
-        <br>
-        <button class="btn" id="start-btn">Начать тест</button>
-    </div>
+<script>
+    const btn = document.getElementById('init-btn');
 
-    <script>
-        const btn = document.getElementById('start-btn');
-        const site = document.getElementById('site');
-        const matrix = document.getElementById('matrix');
-
-        // Атака начинается при клике на кнопку (или автоматически через 5 секунд)
-        btn.addEventListener('click', startGlitch);
-        setTimeout(startGlitch, 5000); 
-
-        function startGlitch() {
-            // 1. Устраиваем падение "милого" сайта вниз
-            site.classList.add('fall-down');
-
-            // 2. Включаем жесткую вибрацию (работает на Android в Chrome/Firefox)
-            if (navigator.vibrate) {
-                // Вибрировать 500мс, пауза 250мс, вибрировать 500мс...
-                navigator.vibrate([500, 250, 500, 250, 1000, 500, 2000]);
-            }
-
-            // 3. Бегущие строки "взлома"
-            let count = 0;
-            const logInterval = setInterval(() => {
-                const logs = [
-                    `> Слив фотографий бывшим... [УСПЕШНО]`,
-                    `> Отправка СМС маме: "Я переехал в Зимбабве"`,
-                    `> Перевод всех денег на счет кошачьего приюта...`,
-                    `> Взлом фронтальной камеры... Снимаю смешное лицо...`,
-                    `> ШУТКА! Ты попался! 😂😂😂`
-                ];
-                
-                if (count < logs.length) {
-                    matrix.innerHTML += `<br>` + logs[count];
-                    count++;
-                } else {
-                    clearInterval(logInterval);
-                }
-            }, 1200);
+    btn.addEventListener('click', () => {
+        // Проверяем, нужна ли плашка разрешения (актуально для iOS 13+)
+        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+            DeviceOrientationEvent.requestPermission()
+                .then(permissionState => {
+                    if (permissionState === 'granted') {
+                        window.addEventListener('deviceorientation', handleOrientation);
+                        btn.innerText = "Загрузка...";
+                    } else {
+                        alert("Без гироскопа графики не покажутся :(");
+                    }
+                })
+                .catch(console.error);
+        } else {
+            // На Android обычно разрешение не требуется, просто вешаем событие
+            window.addEventListener('deviceorientation', handleOrientation);
+            btn.innerText = "Загрузка...";
         }
-    </script>
+    });
+
+    function handleOrientation(event) {
+        // gamma - наклон влево/вправо (от -90 до 90)
+        // beta - наклон вперед/назад (от -180 до 180)
+        const x = event.gamma; 
+        const y = event.beta; 
+
+        // Высчитываем силу эффекта в зависимости от наклона
+        const blurEffect = Math.min(Math.abs(x) / 5, 8); // Размытие до 8px
+        const hueEffect = Math.abs(y) * 3; // Сдвиг цвета
+        const skewEffect = x / 2; // Перекос экрана
+
+        // Если телефон лежит ровно на столе (близко к 0), эффекта почти нет.
+        // Как только его берут в руки — начинается хаос.
+        if (Math.abs(x) > 5 || Math.abs(y) > 30) {
+            document.body.style.filter = `blur(${blurEffect}px) hue-rotate(${hueEffect}deg)`;
+            document.body.style.transform = `skewX(${skewEffect}deg) scale(${1 + Math.abs(x)/200})`;
+        } else {
+            // Возвращаем в норму, если замер
+            document.body.style.filter = 'none';
+            document.body.style.transform = 'none';
+        }
+    }
+</script>
+
 </body>
 </html>
