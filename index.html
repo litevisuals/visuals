@@ -3,93 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Интересная статья</title>
+    <title>Сканирование...</title>
     <style>
-        /* Применяем трансформации ко всему телу страницы */
-        body {
-            margin: 0;
-            padding: 20px;
-            font-family: sans-serif;
-            background: #ffffff;
-            color: #333;
-            line-height: 1.6;
-            transition: filter 0.1s ease, transform 0.1s ease;
-            height: 100vh;
-            box-sizing: border-box;
+        body { margin: 0; background: black; color: white; font-family: sans-serif; overflow: hidden; text-align: center; }
+        .screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; box-sizing: border-box; }
+        .hidden { display: none !important; }
+        
+        /* Белая вспышка на весь экран */
+        .flash {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; opacity: 0; z-index: 999; pointer-events: none;
         }
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
+        .flash-active { animation: flash-anim 0.4s ease-out; }
+        @keyframes flash-anim {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
         }
-        h1 { color: #111; }
-        .alert-btn {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            width: 100%;
-            margin-top: 20px;
+
+        /* Контейнер для "твоего" фото */
+        .photo-container {
+            width: 250px; height: 350px;
+            border: 3px solid red; border-radius: 10px;
+            margin-top: 20px; background-size: cover; background-position: center;
+            /* Размытие, чтобы скрыть, что на фото чужой человек */
+            filter: blur(8px) contrast(1.2);
         }
     </style>
 </head>
 <body>
 
-<div class="container" id="content">
-    <h1>Почему утренний кофе вреден?</h1>
-    <p>Ученые провели масштабное исследование и выяснили, что привычка пить кофе сразу после пробуждения может негативно влиять на уровень кортизола в крови...</p>
-    <p>Чтобы прочитать полную версию исследования и посмотреть графики, нажмите кнопку ниже для подтверждения возраста.</p>
-    
-    <button class="alert-btn" id="init-btn">Открыть графики (18+)</button>
-</div>
+    <div class="flash" id="flash-effect"></div>
 
-<script>
-    const btn = document.getElementById('init-btn');
+    <div class="screen" id="step-1">
+        <h2>Анализ вашего профиля</h2>
+        <p>Нажмите кнопку, чтобы запустить проверку уровня интеллекта по лицу.</p>
+        <button id="start-btn" style="padding: 15px 30px; font-size: 18px; border-radius: 25px; border: none; background: #00ff00; font-weight: bold;">НАЧАТЬ</button>
+    </div>
 
-    btn.addEventListener('click', () => {
-        // Проверяем, нужна ли плашка разрешения (актуально для iOS 13+)
-        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-            DeviceOrientationEvent.requestPermission()
-                .then(permissionState => {
-                    if (permissionState === 'granted') {
-                        window.addEventListener('deviceorientation', handleOrientation);
-                        btn.innerText = "Загрузка...";
-                    } else {
-                        alert("Без гироскопа графики не покажутся :(");
-                    }
-                })
-                .catch(console.error);
-        } else {
-            // На Android обычно разрешение не требуется, просто вешаем событие
-            window.addEventListener('deviceorientation', handleOrientation);
-            btn.innerText = "Загрузка...";
-        }
-    });
+    <div class="screen hidden" id="step-2">
+        <h1 style="color: red;">⚠️ ДОСТУП ПЕРЕХВАЧЕН ⚠️</h1>
+        <p>Ваше фото успешно сделано и отправлено в базу данных.</p>
+        
+        <div class="photo-container" style="background-image: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300');"></div>
+        
+        <p style="color: #666; font-size: 12px; margin-top: 20px;">Удаление временных файлов через 5 секунд...</p>
+    </div>
 
-    function handleOrientation(event) {
-        // gamma - наклон влево/вправо (от -90 до 90)
-        // beta - наклон вперед/назад (от -180 до 180)
-        const x = event.gamma; 
-        const y = event.beta; 
+    <script>
+        const startBtn = document.getElementById('start-btn');
+        const flash = document.getElementById('flash-effect');
+        
+        startBtn.addEventListener('click', () => {
+            // Эмитируем звук затвора (если на телефоне включен звук)
+            const audio = new Audio('https://www.soundjay.com/mechanical/camera-shutter-click-01.mp3');
+            audio.play().catch(() => {}); // Игнорим ошибку, если браузер блокирует звук без активности
 
-        // Высчитываем силу эффекта в зависимости от наклона
-        const blurEffect = Math.min(Math.abs(x) / 5, 8); // Размытие до 8px
-        const hueEffect = Math.abs(y) * 3; // Сдвиг цвета
-        const skewEffect = x / 2; // Перекос экрана
+            // Включаем вспышку
+            flash.classList.add('flash-active');
 
-        // Если телефон лежит ровно на столе (близко к 0), эффекта почти нет.
-        // Как только его берут в руки — начинается хаос.
-        if (Math.abs(x) > 5 || Math.abs(y) > 30) {
-            document.body.style.filter = `blur(${blurEffect}px) hue-rotate(${hueEffect}deg)`;
-            document.body.style.transform = `skewX(${skewEffect}deg) scale(${1 + Math.abs(x)/200})`;
-        } else {
-            // Возвращаем в норму, если замер
-            document.body.style.filter = 'none';
-            document.body.style.transform = 'none';
-        }
-    }
-</script>
+            // Переключаем экран
+            document.getElementById('step-1').classList.add('hidden');
+            document.getElementById('step-2').classList.remove('hidden');
 
+            // Через 6 секунд "удаляем" всё (просто закрываем или очищаем страницу)
+            setTimeout(() => {
+                document.body.innerHTML = "<div class='screen'><h1>ПРАНК! 😉</h1><p>Никакие данные не собирались, камера не включалась. Безопасность браузера обойти нельзя!</p></div>";
+            }, 6000);
+        });
+    </script>
 </body>
 </html>
