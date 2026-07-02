@@ -3,64 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚠️ Угроза безопасности!</title>
+    <title>Пройди тест: Какой ты котик? 🐾</title>
     <style>
         body {
-            background-color: #111;
-            color: #fff;
+            margin: 0;
+            padding: 0;
+            background: #f0f2f5;
             font-family: sans-serif;
-            text-align: center;
-            padding: 30px 15px;
-            overflow: hidden; /* Чтобы кнопка не улетала за пределы экрана со скроллом */
+            overflow: hidden;
+            height: 100vh;
         }
-        .warning { color: #ff3333; font-size: 24px; font-weight: bold; }
-        #run-btn {
-            position: absolute;
-            left: 35%;
-            top: 60%;
-            padding: 15px 30px;
-            font-size: 18px;
-            background-color: #00cc44;
+        /* Обычный милый сайт */
+        .cute-site {
+            padding: 20px;
+            text-align: center;
+            transition: transform 1.5s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 1s;
+        }
+        .btn {
+            background: #ff6b6b;
             color: white;
+            padding: 15px 30px;
             border: none;
             border-radius: 25px;
-            box-shadow: 0 5px 15px rgba(0,204,68,0.4);
-            transition: all 0.1s ease;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        /* Хакерский слой под ним */
+        .matrix-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: black;
+            color: #00ff00;
+            font-family: monospace;
+            padding: 15px;
+            box-sizing: border-box;
+            z-index: -1;
+            font-size: 14px;
+            white-space: pre-line;
+        }
+        /* Класс для падения вниз */
+        .fall-down {
+            transform: translateY(120vh) rotate(15deg);
+            opacity: 0.7;
         }
     </style>
 </head>
 <body>
-    <p class="warning">⚠️ ВНИМАНИЕ! ⚠️</p>
-    <p>Обнаружен вирус: <b>"Жадина-Говядина"</b>.</p>
-    <p>Память забита на 99.9%. Нажмите кнопку ниже для очистки.</p>
 
-    <button id="run-btn">ОЧИСТИТЬ</button>
+    <div class="matrix-bg" id="matrix">
+        [SYSTEM OVERRIDE INITIATED]...<br>
+        > Downloading critical data...<br>
+        > Deleting System32 (just kidding, android folder)...<br>
+    </div>
+
+    <div class="cute-site" id="site">
+        <h1>🐱 Узнай, какой ты котик!</h1>
+        <p>Ответь всего на 3 вопроса и получи милую аватарку.</p>
+        <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=300" style="width:80%; border-radius:15px;" alt="cat">
+        <br>
+        <button class="btn" id="start-btn">Начать тест</button>
+    </div>
 
     <script>
-        const btn = document.getElementById('run-btn');
-        
-        // На телефонах ловим touchstart (касание) вместо mouseover
-        btn.addEventListener('touchstart', moveButton);
-        btn.addEventListener('mouseover', moveButton);
+        const btn = document.getElementById('start-btn');
+        const site = document.getElementById('site');
+        const matrix = document.getElementById('matrix');
 
-        function moveButton(e) {
-            e.preventDefault(); // Отменяем стандартный клик, если успел
-            
-            // Вычисляем случайные координаты внутри экрана смартфона
-            const maxWidth = window.innerWidth - btn['offsetWidth'] - 20;
-            const maxHeight = window.innerHeight - btn['offsetHeight'] - 20;
-            
-            const randomX = Math.max(10, Math.floor(Math.random() * maxWidth));
-            const randomY = Math.max(150, Math.floor(Math.random() * maxHeight)); // Оставляем место сверху под текст
-            
-            btn.style.left = randomX + 'px';
-            btn.style.top = randomY + 'px';
+        // Атака начинается при клике на кнопку (или автоматически через 5 секунд)
+        btn.addEventListener('click', startGlitch);
+        setTimeout(startGlitch, 5000); 
+
+        function startGlitch() {
+            // 1. Устраиваем падение "милого" сайта вниз
+            site.classList.add('fall-down');
+
+            // 2. Включаем жесткую вибрацию (работает на Android в Chrome/Firefox)
+            if (navigator.vibrate) {
+                // Вибрировать 500мс, пауза 250мс, вибрировать 500мс...
+                navigator.vibrate([500, 250, 500, 250, 1000, 500, 2000]);
+            }
+
+            // 3. Бегущие строки "взлома"
+            let count = 0;
+            const logInterval = setInterval(() => {
+                const logs = [
+                    `> Слив фотографий бывшим... [УСПЕШНО]`,
+                    `> Отправка СМС маме: "Я переехал в Зимбабве"`,
+                    `> Перевод всех денег на счет кошачьего приюта...`,
+                    `> Взлом фронтальной камеры... Снимаю смешное лицо...`,
+                    `> ШУТКА! Ты попался! 😂😂😂`
+                ];
+                
+                if (count < logs.length) {
+                    matrix.innerHTML += `<br>` + logs[count];
+                    count++;
+                } else {
+                    clearInterval(logInterval);
+                }
+            }, 1200);
         }
-
-        // Если друг проявит чудеса реакции и всё-таки нажмет:
-        btn.addEventListener('click', () => {
-            alert('Ладно, ладно, ты победил! Это был пранк :)');
-        });
     </script>
 </body>
 </html>
