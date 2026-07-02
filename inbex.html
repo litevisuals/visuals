@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гостевой дом «Sea Near» (Море Рядом) | Анапа</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1a5f7a;
+            text-decoration: none;
+        }
+        .logo span {
+            color: #f28b24;
+        }
+        nav a {
+            text-decoration: none;
+            color: #555;
+            margin-left: 20px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        nav a:hover {
+            color: #1a5f7a;
+        }
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=1200&q=80') no-repeat center center/cover;
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 20px;
+        }
+        .hero p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto 30px auto;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #f28b24;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background-color: #d77618;
+        }
+        .main-content {
+            padding: 50px 0;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 28px;
+            color: #1a5f7a;
+            margin-bottom: 40px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        .card-img {
+            height: 200px;
+            background-color: #ddd;
+            background-size: cover;
+            background-position: center;
+        }
+        .card-content {
+            padding: 20px;
+        }
+        .card-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #1a5f7a;
+        }
+        .price {
+            font-size: 18px;
+            color: #f28b24;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        .features-box {
+            background-color: #eef5f7;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 50px;
+        }
+        .features-box h3 {
+            margin-bottom: 15px;
+            color: #1a5f7a;
+        }
+        .features-box ul {
+            list-style-type: none;
+        }
+        .features-box li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 25px;
+        }
+        .features-box li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #2e7d32;
+            font-weight: bold;
+        }
+        .features-box li.warning::before {
+            content: "⚠";
+            color: #c62828;
+        }
+        
+        /* Имитация ИИ Чат-виджета прямо на странице */
+        .ai-chat-container {
+            border: 2px solid #1a5f7a;
+            border-radius: 10px;
+            background: white;
+            max-width: 600px;
+            margin: 40px auto;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .ai-chat-header {
+            background-color: #1a5f7a;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        .ai-chat-header .status {
+            width: 10px;
+            height: 10px;
+            background-color: #4caf50;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: inline-block;
+        }
+        .ai-chat-body {
+            padding: 20px;
+            height: 300px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+        .message {
+            margin-bottom: 15px;
+            max-width: 85%;
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+        .message.bot {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            margin-right: auto;
+        }
+        .message.user-demo {
+            background-color: #f1f1f1;
+            color: #333;
+            margin-left: auto;
+            text-align: right;
+            border-bottom-right-radius: 0;
+        }
+        .ai-chat-input-area {
+            display: flex;
+            border-top: 1px solid #ddd;
+            padding: 10px;
+            background: #fff;
+        }
+        .ai-chat-input-area input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+        }
+        .ai-chat-input-area button {
+            background: #1a5f7a;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            margin-left: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        footer {
+            background-color: #222;
+            color: #ccc;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-wrap">
+            <a href="#" class="logo">Sea <span>Near</span></a>
+            <nav>
+                <a href="#rooms">Номера</a>
+                <a href="#about">О нас</a>
+                <a href="#ai-support">ИИ-Поддержка</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Гостевой дом «Sea Near»</h1>
+            <p>Уютный отдых на первой линии Высокого берега в Анапе. Номера со своими кухнями, бассейн во дворе и потрясающие закаты.</p>
+            <a href="#ai-support" class="btn">Спросить ИИ о свободных датах</a>
+        </div>
+    </section>
+
+    <div class="container main-content">
+        
+        <section id="rooms">
+            <h2 class="section-title">Наши номера</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=400&q=80')"></div>
+                    <div class="card-content">
+                        <div class="card-title">Студия с мини-кухней</div>
+                        <p>2-3 спальных места. Идеально для пар и семей с ребенком. Собственная плита, посуда, холодильник и кондиционер.</p>
+                        <div class="price">от 3 000 руб. / ночь</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=400&q=80')"></div>
+                    <div class="card-content">
+                        <div class="card-title">Семейный Люкс</div>
+                        <p>4-5 мест. Две комнаты, полноценный кухонный уголок, балкон с видом во двор или на море.</p>
+                        <div class="price">от 4 500 руб. / ночь</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="features-box">
+            <h3>Полезная информация для гостей:</h3>
+            <ul>
+                <li><strong>Море рядом:</strong> Всего 3 минуты пешком до оборудованного спуска на галечный пляж «Высокий берег».</li>
+                <li><strong>Бассейн:</strong> Большой чистый открытый бассейн с шезлонгами прямо на территории гостевого дома.</li>
+                <li><strong>Инфраструктура:</strong> В 5 минутах ходьбы живописный парк «Ореховая роща», столовые и магазины.</li>
+                <li class="warning"><strong>Парковка:</strong> Места перед зданием предоставляются бесплатно, но в июле и августе их количество строго ограничено. Пожалуйста, согласуйте приезд на авто заранее!</li>
+            </ul>
+        </section>
+
+        <section id="ai-support">
+            <h2 class="section-title">Онлайн ИИ-Консультант</h2>
+            <p style="text-align: center; margin-bottom: 20px;">Наш умный бот ответит на любые вопросы в реальном времени. Напиши ему в чате ниже!</p>
+            
+            <div class="ai-chat-container">
+                <div class="ai-chat-header">
+                    <span class="status"></span>
+                    <span>Ассистент Sea Near (ИИ)</span>
+                </div>
+                <div class="ai-chat-body">
+                    <div class="message bot">
+                        Привет! Я виртуальный помощник отеля «Sea Near» на Таманской 64. Знаю всё про бассейн, пляж, наши кухни и бронирование. Какой вопрос вас интересует?
+                    </div>
+                    <div class="message user-demo">
+                        Здравствуйте! Расскажите, далеко ли идти до моря и какая там глубина?
+                    </div>
+                    <div class="message bot">
+                        Мы находимся на первой линии Высокого берега! До набережной и оборудованного спуска к пляжу всего 2-3 минуты пешком. Пляж здесь галечный, море чистое, глубина начинается довольно быстро, что очень нравится любителям поплавать.
+                    </div>
+                </div>
+                <div class="ai-chat-input-area">
+                    <input type="text" placeholder="Введите ваш вопрос (например: есть ли места на парковке?)...">
+                    <button>Отправить</button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Гостевой дом «Sea Near». Анапа, ул. Таманская, д. 64.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
