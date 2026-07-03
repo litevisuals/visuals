@@ -18,40 +18,27 @@
             padding: 16px;
         }
 
-        /* ЧИСТАЯ ПРЕМbackground КАРТОЧКА */
+        /* Карточка один в один по форме из PulseVisuals */
         .main-card {
             width: 100%;
-            max-width: 360px;
+            max-width: 380px;
             background: #111116;
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 24px;
-            padding: 30px 24px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            padding: 35px 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
         }
 
-        .header-row { 
-            text-align: center;
-            margin-bottom: 32px; 
-        }
+        .form-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+        .form-subtitle { font-size: 13px; color: #62627a; margin-bottom: 28px; }
 
-        .form-title { 
-            font-size: 26px; 
-            font-weight: 800; 
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            background: linear-gradient(180deg, #ffffff 0%, #a0a0ab 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* Инпуты */
-        .input-group { margin-bottom: 16px; }
+        .input-group { position: relative; margin-bottom: 16px; }
         .input-group input {
             width: 100%;
             background: #17171f;
             border: 1px solid rgba(255, 255, 255, 0.02);
             border-radius: 14px;
-            padding: 18px;
+            padding: 18px 50px 18px 18px;
             color: #fff;
             font-size: 14px;
             outline: none;
@@ -59,51 +46,42 @@
         }
         .input-group input:focus { border-color: #5b57ef; background: #1a1a26; }
         
-        /* Фикс автозаполнения */
-        .input-group input:-webkit-autofill,
-        .input-group input:-webkit-autofill:hover, 
-        .input-group input:-webkit-autofill:focus {
+        /* Защита от стандартного желтого фона браузера */
+        .input-group input:-webkit-autofill {
             -webkit-box-shadow: 0 0 0 1000px #17171f inset !important;
             -webkit-text-fill-color: #ffffff !important;
         }
 
-        /* БЛОК КНОПОК */
-        .buttons-holder {
-            margin-top: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        .eye-icon { 
+            position: absolute; right: 18px; top: 50%; transform: translateY(-50%); 
+            color: #4e4e5e; cursor: pointer; font-size: 16px; user-select: none;
         }
 
-        .btn-main {
+        /* Кнопка "Войти" */
+        .btn-submit {
             width: 100%;
+            background: linear-gradient(135deg, #5b57ef 0%, #3b37c7 100%);
+            color: #ffffff;
             border: none;
             padding: 18px;
             border-radius: 14px;
             font-size: 15px;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.15s;
-            text-align: center;
-        }
-
-        /* Кнопка Войти (Фиолетовый Град) */
-        .btn-login {
-            background: linear-gradient(135deg, #5b57ef 0%, #3b37c7 100%);
-            color: #ffffff;
             box-shadow: 0 6px 20px rgba(91, 87, 239, 0.25);
+            transition: all 0.15s;
+            margin-top: 8px;
+            margin-bottom: 24px;
         }
-        .btn-login:active { transform: scale(0.98); opacity: 0.95; }
+        .btn-submit:active { transform: scale(0.98); opacity: 0.95; }
 
-        /* Кнопка Регистрации (Матовая Темная) */
-        .btn-register {
-            background: #1c1c24;
-            color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-        }
-        .btn-register:active { transform: scale(0.98); background: #23232d; }
+        /* Нижние ссылки */
+        .footer-links { display: flex; justify-content: space-between; font-size: 13px; }
+        .link-secondary { color: #525266; text-decoration: none; cursor: pointer; }
+        .link-secondary span { color: #a2a2bd; transition: color 0.2s; }
+        .link-secondary:hover span { color: #fff; }
 
-        /* ИНТЕРФЕЙС ПОСЛЕ ВХОДА */
+        /* Личный кабинет (после авторизации) */
         #client-area { display: none; text-align: center; }
         .welcome-text { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
         .user-email { font-size: 13px; color: #525266; margin-bottom: 30px; font-family: monospace; }
@@ -122,30 +100,31 @@
 
     <div class="main-card">
         <div id="auth-area">
-            <div class="header-row">
-                <div class="form-title">Litevisuals</div>
+            <div class="form-title" id="form-title">Авторизация</div>
+            <div class="form-subtitle" id="form-subtitle">Войди, чтобы попасть в свой профиль</div>
+
+            <div class="input-group">
+                <input type="email" id="email" placeholder="Email">
             </div>
 
             <div class="input-group">
-                <input type="email" id="email" placeholder="Введите ваш Email">
+                <input type="password" id="password" placeholder="Пароль">
+                <span class="eye-icon" onclick="togglePassword()">👁</span>
             </div>
 
-            <div class="input-group">
-                <input type="password" id="password" placeholder="Введите пароль">
-            </div>
+            <button class="btn-submit" id="submit-btn" onclick="handleAuth()">Войти</button>
 
-            <div class="buttons-holder">
-                <button class="btn-main btn-login" onclick="login()">Войти в аккаунт</button>
-                <button class="btn-main btn-register" onclick="register()">Создать аккаунт</button>
+            <div class="footer-links">
+                <div class="link-secondary" onclick="toggleMode()"><span id="switch-txt">Нет аккаунта? Регистрация</span></div>
+                <div class="link-secondary"><span>Забыл пароль</span></div>
             </div>
         </div>
 
         <div id="client-area">
             <div class="welcome-text">Доступ получен</div>
             <div class="user-email" id="user-display-email">...</div>
-            
-            <button class="btn-main btn-login" onclick="copyScript()">Скопировать скрипт</button>
-            <button class="btn-main btn-register" style="margin-top: 12px; background: rgba(255,255,255,0.02); color:#62627a;" onclick="logout()">Выйти</button>
+            <button class="btn-submit" onclick="copyScript()">Скопировать скрипт</button>
+            <button class="btn-submit" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); margin-top:0; color:#62627a;" onclick="logout()">Выйти из профиля</button>
         </div>
     </div>
 
@@ -153,16 +132,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // Твоя рабочая связка с Supabase
         const SUPABASE_URL = "https://ycvvuszmrydfuyuaavpk.supabase.co";
-        // Замени строчку ниже на свой anon public ключ из настроек Supabase (скриншот 1783066045309.jpeg)
-        const SUPABASE_ANON_KEY = "СЮДА_ВСТАВЬ_КЛЮЧ"; 
+        const SUPABASE_ANON_KEY = "Sb_publishable_4I7C54sWOsg5W62bMElrDA_HIRi8pNG"; 
 
         let supabase;
-        try {
-            supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } catch(e) {
-            console.error("Ошибка базы данных");
-        }
+        try { supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e) {}
+
+        let isLoginMode = true;
 
         window.onload = async () => {
             if (supabase) {
@@ -171,36 +148,35 @@
             }
         };
 
-        // Функция Входа
-        async function login() {
-            const { email, password } = getInputs();
-            if(!email || !password) return showToast("Заполните все поля");
-            if(!supabase) return showToast("Ошибка подключения к серверу");
-
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            if(error) showToast("Неверный логин или пароль");
-            else showCabinet(data.user.email);
+        function toggleMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('form-title').innerText = isLoginMode ? "Авторизация" : "Регистрация";
+            document.getElementById('form-subtitle').innerText = isLoginMode ? "Войди, чтобы попасть в свой профиль" : "Создай профиль, чтобы продолжить";
+            document.getElementById('submit-btn').innerText = isLoginMode ? "Войти" : "Зарегистрироваться";
+            document.getElementById('switch-txt').innerText = isLoginMode ? "Нет аккаунта? Регистрация" : "Уже есть профиль? Войти";
         }
 
-        // Функция Регистрации
-        async function register() {
-            const { email, password } = getInputs();
-            if(!email || !password) return showToast("Заполните все поля");
-            if(password.length < 6) return showToast("Пароль должен быть от 6 символов");
-            if(!supabase) return showToast("Ошибка подключения к серверу");
+        function togglePassword() {
+            const p = document.getElementById('password');
+            p.type = p.type === "password" ? "text" : "password";
+        }
 
-            const { data, error } = await supabase.auth.signUp({ email, password });
-            if(error) {
-                showToast(error.message);
+        async function handleAuth() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if(!email || !password) return showToast("Заполните все поля");
+            if(!supabase) return showToast("Ошибка базы данных");
+
+            if(isLoginMode) {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if(error) showToast("Неверный логин или пароль");
+                else showCabinet(data.user.email);
             } else {
-                showToast("Аккаунт создан! Проверьте почту");
-            }
-        }
-
-        function getInputs() {
-            return {
-                email: document.getElementById('email').value.trim(),
-                password: document.getElementById('password').value.trim()
+                if(password.length < 6) return showToast("Пароль от 6 символов");
+                const { data, error } = await supabase.auth.signUp({ email, password });
+                if(error) showToast(error.message);
+                else showToast("Регистрация успешна!");
             }
         }
 
@@ -216,7 +192,6 @@
         }
 
         function copyScript() {
-            if (navigator.vibrate) navigator.vibrate(15);
             const code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/litevisuals/visuals/main/Lite_Pc.lua'))()";
             navigator.clipboard.writeText(code).then(() => { showToast("Скрипт скопирован!"); });
         }
