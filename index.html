@@ -3,61 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тест батареи</title>
+    <title>LITEVISUALS TERMINAL</title>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
-        .hidden { display: none; }
-        .battery-icon { width: 100px; height: 50px; border: 4px solid #fff; border-radius: 5px; position: relative; margin: 20px auto; }
-        .battery-level { height: 100%; background: #ff3333; width: 100%; transition: width 1s; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #050508;
+            color: #00e1ff;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .terminal {
+            background: rgba(5, 5, 8, 0.95);
+            border: 2px solid #00e1ff;
+            box-shadow: 0 0 20px rgba(0, 225, 255, 0.2);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            text-align: center;
+            border-radius: 4px;
+        }
+        h1 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 225, 255, 0.5);
+        }
+        .subtitle {
+            font-size: 13px;
+            color: #555577;
+            margin-bottom: 30px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            background: transparent;
+            color: #00e1ff;
+            border: 2px solid #00e1ff;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background: #00e1ff;
+            color: #050508;
+            box-shadow: 0 0 15px rgba(0, 225, 255, 0.6);
+        }
+        .btn-tg {
+            color: #ff0055;
+            border-color: #ff0055;
+        }
+        .btn-tg:hover {
+            background: #ff0055;
+            color: #050508;
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.6);
+        }
     </style>
 </head>
 <body>
 
-    <div id="intro">
-        <h2>Идет калибровка аккумулятора...</h2>
-        <p id="real-battery">Считывание данных датчика...</p>
-        <button id="start-btn" style="padding: 10px 20px; font-size: 16px;">Запустить тест</button>
-    </div>
+<div class="terminal">
+    <h1>LITEVISUALS</h1>
+    <div class="subtitle">PREMIUM ROBLOX SOFTWARE</div>
+    
+    <!-- Кнопка копирования скрипта -->
+    <button class="btn" onclick="copyScript()">COPY LUA SCRIPT</button>
+    
+    <!-- Кнопка перехода в телеграм -->
+    <a href="https://t.me/LITEVISUALS_OFFCIAL" target="_blank" class="btn btn-tg">TELEGRAM CHANNEL</a>
+</div>
 
-    <div id="prank" class="hidden">
-        <h1 style="color: #ff3333;">⚠️ КРИТИЧЕСКИЙ СБОЙ ПИТАНИЯ</h1>
-        <div class="battery-icon"><div id="level" class="battery-level"></div></div>
-        <h2 id="countdown">Заряд: 1%</h2>
-        <p>Завершение работы Android / iOS через 5 секунд...</p>
-    </div>
+<script>
+function copyScript() {
+    // ЗАМЕНИ ССЫЛКУ НИЖЕ НА СВОЮ RAW ССЫЛКУ ИЗ ГИТХАБА!
+    const luaCode = "loadstring(game:HttpGet('https://raw.githubusercontent.com/litevisuals/visuals/main/Lite_Pc.lua'))()";
+    
+    navigator.clipboard.writeText(luaCode).then(() => {
+        alert("Скрипт успешно скопирован в буфер обмена!");
+    }).catch(err => {
+        alert("Ошибка копирования. Скопируй вручную.");
+    });
+}
+</script>
 
-    <script>
-        const startBtn = document.getElementById('start-btn');
-        let currentBattery = 100;
-
-        // Запрашиваем реальный заряд батареи у браузера
-        if (navigator.getBattery) {
-            navigator.getBattery().then(function(battery) {
-                currentBattery = Math.floor(battery.level * 100);
-                document.getElementById('real-battery').innerText = `Ваш текущий заряд: ${currentBattery}%`;
-            });
-        }
-
-        startBtn.addEventListener('click', () => {
-            document.getElementById('intro').classList.add('hidden');
-            document.getElementById('prank').classList.remove('hidden');
-            
-            const levelBar = document.getElementById('level');
-            // Резко сбрасываем полоску заряда до минимума
-            setTimeout(() => { levelBar.style.width = '1%'; }, 100);
-
-            let seconds = 5;
-            const timer = setInterval(() => {
-                seconds--;
-                if (seconds <= 0) {
-                    clearInterval(timer);
-                    // Вместо выключения показываем развязку
-                    document.body.innerHTML = "<h1 style='color:#00ff00'>ПРАНК! 😂</h1><p>Твой телефон в порядке, зарядка по-прежнему на уровне " + currentBattery + "%!</p>";
-                } else {
-                    document.getElementById('countdown').innerText = `Заряд: 1% (Выключение через ${seconds} сек)`;
-                }
-            }, 1000);
-        });
-    </script>
 </body>
 </html>
