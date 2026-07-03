@@ -13,66 +13,12 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             min-height: 100vh; 
             display: flex; 
-            flex-direction: column;
+            justify-content: center;
             align-items: center; 
-            padding: 0 16px 30px;
+            padding: 16px;
         }
 
-        /* ХЕДЕР (Из скриншота 1000120672.jpg) */
-        .top-nav {
-            width: 100%;
-            max-width: 420px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #111116;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            padding: 6px;
-            border-radius: 16px;
-            margin: 24px 0 40px 0;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 14px;
-            color: #4e4e5e;
-            font-size: 14px;
-            font-weight: 500;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border-radius: 12px;
-        }
-
-        .nav-item svg {
-            width: 18px;
-            height: 18px;
-            fill: currentColor;
-        }
-
-        /* Активная вкладка "Сообщество" */
-        .nav-item.active {
-            color: #ffffff;
-            background: #161622;
-            border: 1px solid rgba(91, 87, 239, 0.2);
-            position: relative;
-        }
-        
-        .nav-item.active::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 15%;
-            width: 70%;
-            height: 2px;
-            background: #5b57ef;
-            box-shadow: 0 0 8px #5b57ef;
-            border-radius: 2px;
-        }
-
-        /* КАРТОЧКА ФОРМЫ (Из скриншота 1000120668.jpg) */
+        /* КАРТОЧКА ФОРМЫ (PulseVisuals стиль) */
         .main-card {
             width: 100%;
             max-width: 380px;
@@ -111,7 +57,7 @@
             background: #17171f;
             border: 1px solid rgba(255, 255, 255, 0.02);
             border-radius: 14px;
-            padding: 18px 45px 18px 18px;
+            padding: 18px;
             color: #fff;
             font-size: 14px;
             outline: none;
@@ -119,7 +65,7 @@
         }
         .input-group input:focus { border-color: #5b57ef; background: #1a1a26; }
         
-        /* ЖЕСТКИЙ ФИКС ЖЕЛТОГО ФОНА ИНПУТОВ */
+        /* Защита от желтого фона автозаполнения */
         .input-group input:-webkit-autofill,
         .input-group input:-webkit-autofill:hover, 
         .input-group input:-webkit-autofill:focus {
@@ -127,8 +73,6 @@
             -webkit-text-fill-color: #ffffff !important;
             transition: background-color 5000s ease-in-out 0s;
         }
-
-        .eye-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #4e4e5e; cursor: pointer; font-size: 16px; }
 
         .btn-submit {
             width: 100%;
@@ -167,21 +111,6 @@
 </head>
 <body>
 
-    <div class="top-nav">
-        <div class="nav-item">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-            Аккаунт
-        </div>
-        <div class="nav-item active">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-            Сообщество
-        </div>
-        <div class="nav-item">
-            <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-            Баланс
-        </div>
-    </div>
-
     <div class="main-card">
         <div class="banner">
             <div class="banner-text">Сделайте каждую игровую сессию по-настоящему комфортной с нашим продуктом</div>
@@ -199,7 +128,6 @@
 
             <div class="input-group">
                 <input type="password" id="password" placeholder="Пароль">
-                <span class="eye-icon" onclick="togglePassword()">👁</span>
             </div>
 
             <button class="btn-submit" id="submit-btn" onclick="handleAuth()">Войти</button>
@@ -223,17 +151,24 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Твои данные подключения (URL взят с твоего скрина 1000120660.jpg)
         const SUPABASE_URL = "https://ycvvuszmrydfuyuaavpk.supabase.co";
-        // Сюда вставь скопированный Ключ для публикации (anon public) из скрина 1783066045309.jpeg
-        const SUPABASE_ANON_KEY = "СЮДА_ВСТАВЬ_КЛЮЧ_ИЗ_НАСТРОЕК"; 
+        // Замени на свой скопированный anon public ключ из Supabase
+        const SUPABASE_ANON_KEY = "СЮДА_ВСТАВЬ_КЛЮЧ"; 
 
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let supabase;
+        try {
+            supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch(e) {
+            console.error("Ошибка инициализации базы");
+        }
+
         let isLoginMode = true;
 
         window.onload = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) { showCabinet(session.user.email); }
+            if (supabase) {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) { showCabinet(session.user.email); }
+            }
         };
 
         function toggleMode() {
@@ -243,50 +178,11 @@
             document.getElementById('switch-btn').innerHTML = isLoginMode ? "Нет аккаунта? <span>Регистрация</span>" : "Уже есть профиль? <span>Войти</span>";
         }
 
-        function togglePassword() {
-            const p = document.getElementById('password');
-            p.type = p.type === "password" ? "text" : "password";
-        }
-
         async function handleAuth() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
             
             if(!email || !password) return showToast("Заполните все поля");
+            if(password.length < 6) return showToast("Пароль должен быть от 6 символов");
 
-            if(isLoginMode) {
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                if(error) showToast("Неверный логин или пароль");
-                else showCabinet(data.user.email);
-            } else {
-                const { data, error } = await supabase.auth.signUp({ email, password });
-                if(error) showToast(error.message);
-                else showToast("Аккаунт создан! Подтвердите на почте.");
-            }
-        }
-
-        function showCabinet(email) {
-            document.getElementById('auth-area').style.display = 'none';
-            document.getElementById('client-area').style.display = 'block';
-            document.getElementById('user-display-email').innerText = email;
-        }
-
-        async function logout() {
-            await supabase.auth.signOut();
-            location.reload();
-        }
-
-        function copyScript() {
-            if (navigator.vibrate) navigator.vibrate(15);
-            const code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/litevisuals/visuals/main/Lite_Pc.lua'))()";
-            navigator.clipboard.writeText(code).then(() => { showToast("Скрипт скопирован!"); });
-        }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg; t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2200);
-        }
-    </script>
-</body>
-</html>
+            if(!supabase) return
