@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lite Market</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background-color: #060609; color: #f1f2f6; font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; text-align: center; margin: 0; padding: 8px; padding-bottom: 75px; user-select: none; }
+        .container { max-width: 440px; margin: 0 auto; display: none; }
+        
+        /* ЭКРАН ВХОДА И БАНА */
+        .auth-screen { max-width: 360px; margin: 80px auto; background: #0d0e15; padding: 30px 24px; border-radius: 24px; border: 1px solid #1c1e2d; box-shadow: 0 20px 40px rgba(0,0,0,0.9); }
+        .auth-screen h2 { margin-top: 0; color: #00ffcc; font-size: 24px; text-transform: uppercase; letter-spacing: 2px; }
+        .auth-desc { font-size: 13px; color: #7f8c8d; margin-bottom: 20px; line-height: 1.4; }
+        .auth-input { width: 90%; padding: 14px; margin: 8px 0; background: #131520; border: 1px solid #1c1e2d; border-radius: 14px; color: white; font-size: 15px; outline: none; }
+        .auth-input:focus { border-color: #00ffcc; background: #161927; }
+        
+        /* УВЕДОМЛЕНИЯ */
+        .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 340px; pointer-events: none; }
+        .toast { background: #131520; color: #fff; padding: 14px 18px; border-radius: 16px; border: 1px solid #1c1e2d; margin-bottom: 10px; font-size: 14px; font-weight: 500; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; opacity: 0; transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast-error { border-left: 4px solid #ff3d00; }
+        .toast-success { border-left: 4px solid #00ffcc; }
+        .toast-info { border-left: 4px solid #00bcff; }
+
+        /* НАВИГАЦИОННОЕ МЕНЮ */
+        .nav-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 440px; background: rgba(13, 14, 21, 0.95); backdrop-filter: blur(10px); border-top: 1px solid #1c1e2d; display: grid; grid-template-columns: repeat(4, 1fr); padding: 10px 0; z-index: 999; }
+        .nav-btn { background: none; border: none; color: #7f8c8d; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: color 0.2s; }
+        .nav-btn.active { color: #00ffcc; }
+        .nav-btn svg { width: 20px; height: 20px; fill: currentColor; }
+
+        /* СТРАНИЦЫ */
+        .page { display: none; animation: fadeIn 0.25s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-header { background: #0d0e15; border: 1px solid #1c1e2d; padding: 16px; border-radius: 20px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .balance-title { font-size: 11px; color: #7f8c8d; text-transform: uppercase; text-align: left; }
+        .balance-val { font-size: 24px; font-weight: 800; color: #00ffcc; text-align: left; }
+
+        /* Трейдинг элементы */
+        .asset-selector-box { margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; background: #131520; padding: 10px 14px; border-radius: 16px; border: 1px solid #1c1e2d; }
+        .asset-select { background: #0d0e15; color: #00ffcc; border: 1px solid #1c1e2d; padding: 6px 12px; border-radius: 10px; font-weight: bold; outline: none; }
+        .tap-btn { width: 100%; background: linear-gradient(135deg, #00ffcc, #00bcff); color: #050508; font-size: 15px; font-weight: 800; padding: 14px; border: none; border-radius: 16px; cursor: pointer; margin-bottom: 12px; text-transform: uppercase; }
+        .price-box { margin-bottom: 6px; font-size: 36px; font-weight: 800; }
+        .price-up { color: #00e676; text-shadow: 0 0 15px rgba(0,230,118,0.2); }
+        .price-down { color: #ff3d00; text-shadow: 0 0 15px rgba(255,61,0,0.2); }
+        .chart-container { background: #0d0e15; border-radius: 16px; border: 1px solid #1c1e2d; padding: 8px; margin-bottom: 12px; height: 150px; }
+        
+        .trading-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+        .mini-card { background: #131520; padding: 10px; border-radius: 14px; border: 1px solid #1c1e2d; text-align: left; }
+        .mini-card div { font-size: 10px; color: #7f8c8d; text-transform: uppercase; }
+        .mini-card span { font-size: 14px; font-weight: bold; color: white; }
+
+        /* Выбор количества */
+        .amount-selector { background: #131520; border: 1px solid #1c1e2d; border-radius: 14px; padding: 10px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .amount-input { flex: 1; background: #0d0e15; border: 1px solid #1c1e2d; border-radius: 10px; padding: 8px; color: white; font-weight: bold; text-align: center; outline: none; }
+        .btn-max { background: #1c1e2d; color: #00ffcc; border: 1px solid rgba(0,255,204,0.3); padding: 8px 12px; border-radius: 10px; font-size: 11px; font-weight: bold; cursor: pointer; }
+
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+        .btn { padding: 12px; font-size: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; text-transform: uppercase; }
+        .btn-buy { background: #00e676; color: #050508; }
+        .btn-sell { background: rgba(0, 230, 118, 0.12); color: #00e676; border: 1px solid rgba(0,230,118,0.25); }
+        .btn-short { background: #ff3d00; color: white; }
+        .btn-cover { background: rgba(255, 61, 0, 0.12); color: #ff3d00; border: 1px solid rgba(255,61,0,0.25); }
+
+        /* Секции блоков */
+        .block-section { background: #131520; border: 1px solid #1c1e2d; padding: 16px; border-radius: 18px; text-align: left; margin-bottom: 14px; }
+        .block-title { font-size: 13px; color: #00ffcc; font-weight: bold; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px; }
+        .profile-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1c1e2d; font-size: 14px; }
+        .profile-row:last-child { border: none; }
+        
+        /* Майнинг элементы */
+        .mining-item { display: flex; justify-content: space-between; align-items: center; background: #0d0e15; border: 1px solid #1c1e2d; padding: 12px; border-radius: 14px; margin-bottom: 8px; }
+        .mining-info { flex: 1; padding-right: 8px; }
+        .mining-info h4 { margin: 0; font-size: 13px; color: white; }
+        .mining-info p { margin: 4px 0 0 0; font-size: 11px; color: #7f8c8d; }
+        .mining-actions { display: flex; flex-direction: column; gap: 4px; }
+        .btn-mine-buy { background: #00ffcc; color: #000; font-weight: bold; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; white-space: nowrap; }
+        .btn-mine-sell { background: rgba(255,61,0,0.15); color: #ff3d00; border: 1px solid rgba(255,61,0,0.3); padding: 5px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: bold; }
+
+        /* Категории магазина деталей */
+        .shop-tabs { display: flex; gap: 4px; margin-bottom: 10px; background: #0d0e15; padding: 4px; border-radius: 10px; border: 1px solid #1c1e2d; }
+        .shop-tab-btn { flex: 1; background: none; border: none; color: #7f8c8d; padding: 6px; font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 6px; }
+        .shop-tab-btn.active { background: #1c1e2d; color: #00ffcc; }
+        .shop-pane { display: none; }
+        .shop-pane.active { display: block; }
+
+        /* Подарки */
+        .gift-btn { width: 100%; background: #ffffff; color: #000; font-weight: bold; padding: 14px; border: none; border-radius: 14px; font-size: 13px; cursor: pointer; margin-bottom: 12px; text-transform: uppercase; }
+        .promo-box { display: flex; gap: 8px; }
+        .promo-input { flex: 1; padding: 12px; background: #0d0e15; border: 1px solid #1c1e2d; border-radius: 12px; color: white; outline: none; }
+        
+        .leaderboard-box ol { padding-left: 14px; margin: 0; }
+        .leaderboard-box li { padding: 8px 0; border-bottom: 1px solid #1c1e2d; font-size: 13px; display: flex; justify-content: space-between; }
+
+        /* Админка */
+        .admin-panel { background: rgba(241, 196, 15, 0.03); border: 1px dashed #f1c40f; padding: 14px; border-radius: 18px; margin-bottom: 14px; text-align: left; }
+        .admin-input { width: 92%; padding: 8px; background: #0d0e15; border: 1px solid #1c1e2d; border-radius: 8px; color: white; margin-bottom: 8px; font-size: 13px; }
+        .admin-action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+        .btn-admin-act { padding: 8px; font-size: 11px; font-weight: bold; border-radius: 6px; border: none; cursor: pointer; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="auth-screen" id="authScreen">
+    <h2>Lite Market</h2>
+    <div class="auth-desc">Торговый симулятор нового поколения. Введите данные для авторизации.</div>
+    <input type="text" class="auth-input" id="authLogin" placeholder="Никнейм" maxlength="14">
+    <input type="password" class="auth-input" id="authPass" placeholder="Пароль">
+    <button class="tap-btn" id="btnAuth" style="margin-top:16px; margin-bottom:0;">Войти в terminal</button>
+</div>
+
+<div class="auth-screen" id="banScreen" style="display:none; border-color:#ff3d00;">
+    <h2 style="color:#ff3d00;">🛑 ТЕРМИНАЛ ЗАБЛОКИРОВАН</h2>
+    <div class="auth-desc" style="color:#f1f2f6; font-size:14px; margin-top:20px;">Ваш аккаунт был навсегда забанен администратором за манипуляции и взлом котировок!</div>
+</div>
+
+<div class="container" id="gameContainer">
+
+    <div class="page active" id="page-trading">
+        <div class="page-header">
+            <div>
+                <div class="balance-title">Капитал трейдера</div>
+                <div class="balance-val" id="balance-t">$10000.00</div>
+            </div>
+            <div style="background:rgba(0,255,204,0.1); color:#00ffcc; border:1px solid rgba(0,255,204,0.2); padding:6px 12px; border-radius:12px; font-weight:bold; font-size:12px;">
+                LVL <span id="playerLvl">1</span>
+            </div>
+        </div>
+
+        <div class="asset-selector-box">
+            <select class="asset-select" id="assetSelect" style="width:100%;">
+                <option value="pegasus">🔥 Pegasus Token</option>
+                <option value="btc">🪙 Bitcoin Crypto</option>
+                <option value="eth">💎 Ethereum Crypto</option>
+                <option value="aapl">🍏 Apple Shares</option>
+                <option value="gold">👑 Gold Spot</option>
+            </select>
+        </div>
+
+        <button class="tap-btn" id="btnTap">💸 Кликом в десктоп (+$5)</button>
+        <div class="price-box"><div id="price" class="price-up">$100.00</div></div>
+        <div class="chart-container"><canvas id="marketChart"></canvas></div>
+
+        <div class="trading-stats">
+            <div class="mini-card"><div>Лонг (Портфель)</div><span id="shares">0</span></div>
+            <div class="mini-card"><div>Шорт (Позиция)</div><span id="shortShares">0</span></div>
+        </div>
+
+        <div class="amount-selector">
+            <span style="font-size:12px; color:#7f8c8d; font-weight:bold;">Кол-во:</span>
+            <input type="number" class="amount-input" id="tradeAmount" value="1" min="1">
+            <button class="btn-max" id="btnMaxAmount">МАКС</button>
+        </div>
+
+        <div class="asset-selector-box" style="margin-bottom:10px; padding:6px 12px;">
+            <span style="font-size:11px; color:#a4b0be;">Маржинальное плечо:</span>
+            <select id="leverage" style="background:#0d0e15; color:#fff; border:1px solid #1c1e2d; padding:4px; border-radius:6px;">
+                <option value="1">x1</option>
+                <option value="3">x3</option>
+                <option value="5">x5</option>
+            </select>
+        </div>
+
+        <div class="btn-grid">
+            <button class="btn btn-buy" id="btnBuy">Лонг (Открыть)</button>
+            <button class="btn btn-sell" id="btnSell">Лонг (Закрыть)</button>
+            <button class="btn btn-short" id="btnShort">Шорт (Открыть)</button>
+            <button class="btn btn-cover" id="btnCover">Шорт (Выкупить)</button>
+        </div>
+    </div>
+
+    <div class="page" id="page-mining">
+        <div class="page-header">
+            <div>
+                <div class="balance-title">Статус Сборок</div>
+                <div class="balance-val" id="mining-income" style="color:#00ffcc;">+$0/с</div>
+            </div>
+            <div style="text-align:right;">
+                <div class="balance-title">Баланс сети</div>
+                <div id="mining-bal" style="font-weight:bold; font-size:15px; color:#fff;">$10000</div>
+            </div>
+        </div>
+
+        <div class="trading-stats" style="margin-bottom:6px;">
+            <div class="mini-card" style="border-color:#ff9f43;">
+                <div>Нагрев чипов</div>
+                <span id="mineHeat" style="color:#ff9f43;">25°C</span> (Эфф: <span id="mineEff">100</span>%)
+            </div>
+            <div class="mini-card" style="border-color:#ff5252;">
+                <div>Долг за Электричество</div>
+                <span id="minePower" style="color:#ff5252;">$0</span>
+            </div>
+        </div>
+
+        <div class="block-section" style="padding:10px; margin-bottom:10px; background:#0d0e15;">
+            <div style="font-size:11px; color:#7f8c8d; display:flex; justify-content:space-between;">
+                <span>Собранные стойки: <strong id="activeRigsCount" style="color:#00ffcc;">0</strong></span>
+                <span>Авто-сброс: <strong id="rigsCoolingPower" style="color:#54a0ff;">-0.5°C/с</strong></span>
+            </div>
+        </div>
+        
+        <div class="btn-grid" style="margin-bottom:10px;">
+            <button class="btn btn-buy" id="btnPayPower" style="background:#ff5252; color:#fff; padding:10px;">Оплатить счет / Старт</button>
+            <button class="btn btn-sell" id="btnCoolDown" style="background:#54a0ff; color:#fff; padding:10px;">Обслужить фермы (-$250)</button>
+        </div>
+
+        <div class="block-section" style="padding:10px;">
+            <div class="block-title">📦 Комплектующие для Серверов</div>
+            
+            <div class="shop-tabs">
+                <button class="shop-tab-btn active" onclick="switchShopTab('cpu')">Процессоры</button>
+                <button class="shop-tab-btn" onclick="switchShopTab('gpu')">Видеокарты</button>
+                <button class="shop-tab-btn" onclick="switchShopTab('cool')">Охлаждение</button>
+            </div>
+
+            <div class="shop-pane active" id="shop-cpu">
+                <div class="mining-item">
+                    <div class="mining-info">
+                        <h4>Intel Core i5 (Бюджетный)</h4>
+                        <p>Множитель: x1.0 к сборке</p>
+                        <p style="color:#00ffcc;">В наличии: <span id="inv-cpu_low">0</span> шт.</p>
+                    </div>
+                    <div class="mining-actions">
+                        <button class="btn-mine-buy" onclick="tradePart('buy', 'cpu_low', 800)">Купить $800</button>
+                        <button class="btn-mine-sell" onclick="tradePart('sell', 'cpu_low', 600)">💸 Продать $600</button>
+                    </div>
+                </div>
+                <div class="mining-item">
+                    <div class="mining-info">
+                        <h4>AMD Ryzen 9 (Игровой)</h4>
+                        <p>Множитель: x2.5 к сборке</p>
+                        <p style="color:#00ffcc;">В наличии: <span id="inv-cpu_mid">0</span> шт.</p>
+                    </div>
+                    <div class="mining-actions">
+                        <button class="btn-mine-buy" onclick="tradePart('buy', 'cpu_mid', 3200)">Купить $3.2k</button>
+                        <button class="btn-mine-sell" onclick="tradePart('sell', 'cpu_mid', 2400)">💸 Продать $2.4k</button>
+                    </div>
+                </div>
+                <div class="mining-item">
+                    <div class="mining-info">
+                        <h4>Intel Xeon Scalable (Серверный)</h4>
+                        <p>Множитель: x6.0 к сборке</p>
+                        <p style="color:#00ffcc;">В наличии: <span id="inv-cpu_high">0</span> шт.</p>
+                    </div>
+                    <div class="mining-actions">
+                        <button class="btn-mine-buy" onclick="tradePart('buy', 'cpu_high', 14000)">Купить $14k</button>
+                        <button class="btn-mine-sell" onclick="tradePart('sell', 'cpu_high', 10500)">💸 Продать $10.5k</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shop-pane" id="shop-gpu">
+                <div class="mining-item">
+                    <div class="mining-info">
+                        <h4>NVIDIA GTX 1660 Super</h4>
+                        <p>Доход: +$15/с | Тепло: +0.6°C/с</p>
+                        <p style="color:#00ffcc;">В наличии: <span id="inv-gpu_low">0</span> шт.</p>
+                    </div>
+                    <div class="mining-actions">
+                        <button class="btn-mine-buy" onclick="tradePart('buy', 'gpu_low', 1200)">Купить $1.2k</button>
+                        <button class="btn-mine-sell" onclick="tradePart('sell', 'gpu_low', 900)">💸 Продать $900</button>
+                    </div>
+                </div>
+                <div class="mining-item">
+                    <div class="mining-info">
+                        <h4>NVIDIA RTX 4070 Ti</h4>
+                        <p>Доход: +$75/с | Тепло: +2.2°C/с</p>
+                        <p style="color:#00ffcc;">В наличии: <span id="inv-gpu_mid">0</span> шт.</p>
+                    </div>
+                    <div class="mining-actions">
+                        <button class="btn-mine-buy" onclick="tradePart('buy', 'gpu_mid', 5000)">Купить $5k</button>
+                        <button class="btn-mine-sell" onclick="tradePart('sell', 'gpu_mid', 3750)">💸 Продать $3.7k</button>
+                    </div>
+                </div>
+                <div class="mining-item">
+                    <div class="mining-info">
+                        <h4>NVIDIA RTX 5090 Beast</h4>
+                        <p>Доход: +$450/с | Тепло: +8.5°C/с</p>
+                        <p style="color:#00ffcc;">В наличии: <span id="inv-gpu_high">0</span> шт.</p>
+                    </div>
+                    <div class="mining-actions">
+                        <button class="btn-mine-buy" onclick="tradePart('buy', 'gpu_high', 26000)">Купить $26k</button>
+                        <button class="btn-mine-sell" onclick="tradePart('sell', 'gpu_high', 19500)">💸 Продать $19.5k</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shop-pane" id="shop-cool">
+                <div class="mining-item">
+                    <div class="mining-info">
+                        <h4>Кулер боксовый (Воздух)</h4>
+                        <p>Рассеивание: -0.4°C/с на поток</p>
+                        <p style="color:#00ffcc;">В наличии: <span id="inv-cool_low">0</span> шт.</p>
+                    </div>
+                    <div class="mining-actions">
+                        <button class="btn-mine-buy" onclick="tradePart('buy', 'cool_low', 400)">Купить $400</button>
+                        <button class="btn-mine-sell" onclick="tradePart('sell', 'cool_low', 300)">💸 Продать $300</button>
+                    </div>
+                </div>
+                <div class="mining-item">
+                    <div class="mining-info">
+                        <h4>Кастомная СЖО (Водянка)</h4>
+                        <p>Рассеивание: -1.5°C/с на поток</p>
+                        <p style="color:#00ffcc;">В наличии: <span id="inv-cool_mid">0</span> шт.</p>
+                    </div>
+                    <div class="mining-actions">
+                        <button class="btn-mine-buy" onclick="tradePart('buy', 'cool_mid', 2200)">Купить $2.2k</button>
+                        <button class="btn-mine-sell" onclick="tradePart('sell', 'cool_mid', 1650)">💸 Продать $1.6k</button>
+                    </div>
+                </div>
+                <div class="mining-item">
+                    <div class="mining-info">
+                        <h4>Фреоновая крио-установка</h4>
+                        <p>Рассеивание: -7.0°C/с на поток</p>
+                        <p style="color:#00ffcc;">В наличии: <span id="inv-cool_high">0</span> шт.</p>
+                    </div>
+                    <div class="mining-actions">
+                        <button class="btn-mine-buy" onclick="tradePart('buy', 'cool_high', 11500)">Купить $11.5k</button>
+                        <button class="btn-mine-sell" onclick="tradePart('sell', 'cool_high', 8625)">💸 Продать $8.6k</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="page" id="page-gifts">
+        <div class="page-header" style="justify-content:center;">
+            <div style="text-align:center;">
+                <div class="balance-title">Бонусная зона</div>
+                <div class="balance-val" style="font-size:20px; color:#fff;">Награды и Кейсы</div>
+            </div>
+        </div>
+
+        <div class="block-section">
+            <div class="block-title">🎁 Ежедневная акция</div>
+            <div style="font-size:12px; color:#7f8c8d; margin-bottom:12px;">Забирай бесплатный кэш от $500 до $3000 каждые 24 часа.</div>
+            <button class="gift-btn" id="btnDailyBonus">Забрать бонус</button>
+        </div>
+
+        <div class="block-section">
+            <div class="block-title">🎟️ Промокоды сообщества</div>
+            <div class="promo-box">
+                <input type="text" class="promo-input" id="promoInput" placeholder="Код (Например: LITE2026)">
+                <button class="btn btn-buy" id="btnPromo" style="margin:0; padding:0 16px;">ОК</button>
+            </div>
+        </div>
+
+        <div class="block-section">
+            <div class="block-title">🍀 Кейс Уолл-Стрит</div>
+            <div style="font-size:12px; color:#7f8c8d; margin-bottom:12px;">Рискни $2,500. Выигрыш до $7,500 или пусто!</div>
+            <button class="tap-btn" id="btnOpenCase" style="background:linear-gradient(135deg, #af71ff, #e170ff); color:white; margin:0;">Открыть Кейс</button>
+        </div>
+    </div>
+
+    <div class="page" id="page-profile">
+        <div class="page-header">
+            <div>
+                <div class="balance-title">Ник трейдера</div>
+                <div class="balance-val" id="profile-name" style="color:#fff; font-size:20px;">...</div>
+            </div>
+            <button class="btn-max" id="btnLogout">Выйти</button>
+        </div>
+
+        <div class="admin-panel" id="adminPanel" style="display:none;">
+            <div style="font-size:12px; color:#f1c40f; font-weight:bold; margin-bottom:10px; text-transform:uppercase;">🛠️ Панель Управления Системой</div>
+            <input type="text" class="admin-input" id="admTargetUser" placeholder="Ник игрока цели">
+            <input type="number" class="admin-input" id="admAmount" placeholder="Количество / Значение">
+            
+            <div class="admin-action-grid">
+                <button class="btn-admin-act" style="background:#00e676; color:#000;" id="admAddCash">➕ Выдать $</button>
+                <button class="btn-admin-act" style="background:#ff3d00; color:#fff;" id="admTakeCash">➖ Забрать $</button>
+                <button class="btn-admin-act" style="background:#54a0ff; color:#fff;" id="admSetLvl">⭐ Поставить LVL</button>
+                <button class="btn-admin-act" style="background:#ff9f43; color:#fff;" id="admSetRank">👑 Поставить Ранг (0-4)</button>
+            </div>
+            <button class="btn-admin-act" style="background:#ff3d00; color:#fff; width:100%; font-size:12px;" id="admBan">🛑 ЗАБАНИТЬ / РАЗБАНИТЬ ИГРОКА</button>
+            
+            <div style="margin-top:10px; border-top:1px dashed #1c1e2d; padding-top:6px;">
+                <div style="font-size:10px; color:#7f8c8d;">Рыночные манипуляции:</div>
+                <div style="display:flex; gap:6px; margin-top:4px;">
+                    <button class="btn-admin-act" style="background:#00ffcc; color:#000; flex:1;" id="btnPump">🚀 ПАМП ТЕКУЩЕГО</button>
+                    <button class="btn-admin-act" style="background:#ff3d00; color:#fff; flex:1;" id="btnDump">📉 ДАМП ТЕКУЩЕГО</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="block-section">
+            <div class="block-title">📊 Данные аккаунта</div>
+            <div class="profile-row"><span>Текущий ранг:</span><strong id="playerRank" style="color:#ffb142;">Новичок</strong></div>
+            <div class="profile-row"><span>Общий опыт (EXP):</span><span id="profile-exp">0</span></div>
+        </div>
+
+        <div class="leaderboard-box block-section">
+            <div class="block-title">🏆 ТОП-5 Мирового рынка</div>
+            <ol id="leaderboard"><li>Синхронизация...</li></ol>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <button class="nav-btn active" onclick="switchPage('trading')">
+            <svg viewBox="0 0 24 24"><path d="M5 9.2A1 1 0 0 1 5.6 8l6-4a1 1 0 0 1 1 0l6 4a1 1 0 0 1 .4 1.1v9.5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V9.2zm2 1v8.5h10V10.2l-5-3.3-5 3.3z"/></svg>
+            Трейдинг
+        </button>
+        <button class="nav-btn" onclick="switchPage('mining')">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 10H6v-2h8v2zm4-4H6V7h12v2zm0 8h-4v-2h4v2z"/></svg>
+            Майнинг
+        </button>
+        <button class="nav-btn" onclick="switchPage('gifts')">
+            <svg viewBox="0 0 24 24"><path d="M20 6h-2.2A4.5 4.5 0 0 0 12 2a4.5 4.5 0 0 0-5.8 4H4a2 2 0 0 0-2 2v3c0 .8.5 1.5 1.2 1.8L4 20a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2l.8-7.2c.7-.3 1.2-1 1.2-1.8V8a2 2 0 0 0-2-2zm-8-2c1.4 0 2.5 1.1 2.5 2.5S13.4 9 12 9s-2.5-1.1-2.5-2.5S10.6 4 12 4z"/></svg>
+            Подарки
+        </button>
+        <button class="nav-btn" onclick="switchPage('profile')">
+            <svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z"/></svg>
+            Профиль
+        </button>
+    </div>
+
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { initializeFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDEaVk5ynHpi2uFu2d7Zqc3PAAPR58IeGI",
+        authDomain: "database-2aad8.firebaseapp.com",
+        projectId: "database-2aad8",
+        storageBucket: "database-2aad8.firebasestorage.app",
+        messagingSenderId: "1095120564272",
+        appId: "1:1095120564272:web:eeefe80cb3816df52c3df5",
+        measurementId: "G-49PRFBPGZ9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    // Принудительно отключаем локальный кэш, чтобы решить проблему "offline" в мобильных браузерах
+    const db = initializeFirestore(app, { localCache: undefined });
+
+    window.switchPage = function(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-bar .nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`page-${pageId}`).classList.add('active');
+        event.currentTarget.classList.add('active');
+    };
+
+    window.switchShopTab = function(tabId) {
+        document.querySelectorAll('.shop-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.shop-pane').forEach(p => p.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        document.getElementById(`shop-${tabId}`).classList.add('active');
+    };
+
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        let icon = '🔔'; if (type === 'success') icon = '✅'; if (type === 'error') icon = '❌';
+        toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+    }
+
+    let currentUser = localStorage.getItem('logged_user') || "";
+    let balance = 10000, exp = 0, lastBonusTime = 0, customRank = -1;
+    let usedPromos = [];
+    let isBanned = false;
+
+    let partsInventory = {
+        cpu_low: 0, cpu_mid: 0, cpu_high: 0,
+        gpu_low: 0, gpu_mid: 0, gpu_high: 0,
+        cool_low: 0, cool_mid: 0, cool_high: 0,
+        heat: 25, powerBill: 0, powerOn: true
+    };
+
+    let currentAsset = "pegasus";
+    let assetsData = {
+        pegasus: { price: 95, history: Array(20).fill(95), shares: 0, shortShares: 0, shortPrice: 0, trend: 0 },
+        btc: { price: 65000, history: Array(20).fill(65000), shares: 0, shortShares: 0, shortPrice: 0, trend: 0 },
+        eth: { price: 3400, history: Array(20).fill(3400), shares: 0, shortShares: 0, shortPrice: 0, trend: 0 },
+        aapl: { price: 215, history: Array(20).fill(215), shares: 0, shortShares: 0, shortPrice: 0, trend: 0 },
+        gold: { price: 2300, history: Array(20).fill(2300), shares: 0, shortShares: 0, shortPrice: 0, trend: 0 }
+    };
+
+    const ranks = ["Новичок", "Скальпер", "Инвестор", "Кит рынка", "Волк с Уолл-Стрит"];
+    const canvasCtx = document.getElementById('marketChart').getContext('2d');
+    let fillGradient = canvasCtx.createLinearGradient(0, 0, 0, 150);
+    fillGradient.addColorStop(0, 'rgba(0, 230, 118, 0.15)');
+    fillGradient.addColorStop(1, 'rgba(0, 230, 118, 0.0)');
+
+    const chart = new Chart(canvasCtx, {
+        type: 'line',
+        data: { labels: Array(20).fill(''), datasets: [{ data: [...assetsData[currentAsset].history], borderColor: '#00e676', borderWidth: 2.5, pointRadius: 0, tension: 0.35, fill: true, backgroundColor: fillGradient }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { position: 'right', grid: { color: '#161824' }, ticks: { color: '#61667f', font: { size: 10 } } } }
+    });
+
+    if (currentUser) loadUserData(currentUser);
+
+    document.getElementById('assetSelect').addEventListener('change', (e) => {
+        currentAsset = e.target.value;
+        chart.data.datasets[0].data = [...assetsData[currentAsset].history];
+        chart.update(); updateUI();
+    });
+
+    document.getElementById('btnAuth').addEventListener('click', async () => {
+        let inputName = document.getElementById('authLogin').value.trim();
+        let inputPass = document.getElementById('authPass').value.trim();
+        if (inputName.length < 3 || inputPass.length < 3) { showToast("Данные слишком короткие!", "error"); return; }
+        
+        const userDocRef = doc(db, "users", inputName);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+            let ud = userDoc.data();
+            if (ud.isBanned === true) { document.getElementById('authScreen').style.display='none'; document.getElementById('banScreen').style.display='block'; return; }
+            if (ud.password === inputPass) { currentUser = inputName; localStorage.setItem('logged_user', currentUser); loadUserData(currentUser); } 
+            else { showToast("Неверный пароль!", "error"); }
+        } else {
+            await setDoc(userDocRef, { password: inputPass, balance: 10000, exp: 0, lastBonusTime: 0, usedPromos: [], assets: assetsData, partsInventory: partsInventory, customRank: -1, isBanned: false });
+            currentUser = inputName; localStorage.setItem('logged_user', currentUser); loadUserData(currentUser);
+        }
+    });
+
+    document.getElementById('btnLogout').addEventListener('click', () => { localStorage.removeItem('logged_user'); location.reload(); });
+
+    function loadUserData(username) {
+        onSnapshot(doc(db, "users", username), (snapshot) => {
+            if (!snapshot.exists()) return;
+            let d = snapshot.data();
+            if (d.isBanned === true) { document.getElementById('gameContainer').style.display='none'; document.getElementById('banScreen').style.display='block'; return; }
+            
+            balance = d.balance ?? 10000;
+            exp = d.exp ?? 0;
+            lastBonusTime = d.lastBonusTime ?? 0;
+            usedPromos = d.usedPromos ?? [];
+            customRank = d.customRank ?? -1;
+            
+            if (d.partsInventory) {
+                partsInventory = { ...partsInventory, ...d.partsInventory };
+            } else if (d.mining) {
+                partsInventory.gpu_mid = d.mining.gpu ?? 0;
+                partsInventory.gpu_high = d.mining.quantum ?? 0;
+                partsInventory.cpu_low = (d.mining.gpu ?? 0) + (d.mining.quantum ?? 0);
+                partsInventory.cool_low = (d.mining.gpu ?? 0) + (d.mining.quantum ?? 0);
+                partsInventory.heat = d.mining.heat ?? 25;
+                partsInventory.powerBill = d.mining.powerBill ?? 0;
+            }
+            
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('gameContainer').style.display = 'block';
+            document.getElementById('profile-name').innerText = username;
+            if (username.toLowerCase() === "admin") document.getElementById('adminPanel').style.display = 'block';
+            
+            updateUI();
+        });
+    }
+
+    function getStats() {
+        let lvl = Math.floor(Math.sqrt(exp / 120)) + 1;
+        let rank = customRank !== -1 ? ranks[Math.min(customRank, ranks.length-1)] : ranks[Math.min(lvl - 1, ranks.length - 1)];
+        
+        let totalCoolingPower = 0.5 + (partsInventory.cool_low * 0.4) + (partsInventory.cool_mid * 1.5) + (partsInventory.cool_high * 7.0);
+        let totalCPUs = partsInventory.cpu_low + partsInventory.cpu_mid + partsInventory.cpu_high;
+        let totalGPUs = partsInventory.gpu_low + partsInventory.gpu_mid + partsInventory.gpu_high;
+        let activeRigs = Math.min(totalCPUs, totalGPUs);
+        
+        let totalCpuPower = (partsInventory.cpu_low * 1.0) + (partsInventory.cpu_mid * 2.5) + (partsInventory.cpu_high * 6.0);
+        let avgCpuMultiplier = totalCPUs > 0 ? (totalCpuPower / totalCPUs) : 1.0;
+
+        let rawIncomeSec = (partsInventory.gpu_low * 15) + (partsInventory.gpu_mid * 75) + (partsInventory.gpu_high * 450);
+        let eff = Math.max(10, 100 - Math.max(0, partsInventory.heat - 65) * 1.8); 
+        
+        let finalPassiveIncome = 0;
+        if (partsInventory.powerOn && activeRigs > 0) {
+            finalPassiveIncome = rawIncomeSec * avgCpuMultiplier * (eff / 100);
+        }
+        
+        return { lvl, rank, passiveIncome: Math.floor(finalPassiveIncome), efficiency: Math.floor(eff), totalCoolingPower, activeRigs };
+    }
+
+    function updateUI() {
+        let stats = getStats();
+        let active = assetsData[currentAsset];
+
+        document.getElementById('balance-t').innerText = '$' + balance.toFixed(2);
+        document.getElementById('mining-bal').innerText = '$' + balance.toFixed(2);
+        document.getElementById('shares').innerText = active.shares;
+        document.getElementById('shortShares').innerText = active.shortShares;
+        document.getElementById('playerLvl').innerText = stats.lvl;
+        document.getElementById('playerRank').innerText = stats.rank;
+        document.getElementById('profile-exp').innerText = exp;
+        
+        document.getElementById('mining-income').innerText = (partsInventory.powerOn && stats.activeRigs > 0 ? '+' : '❌ ') + `$${stats.passiveIncome}/с`;
+        document.getElementById('mineHeat').innerText = `${partsInventory.heat.toFixed(1)}°C`;
+        document.getElementById('mineEff').innerText = stats.efficiency;
+        document.getElementById('minePower').innerText = `$${Math.floor(partsInventory.powerBill)}`;
+        
+        document.getElementById('activeRigsCount').innerText = stats.activeRigs;
+        document.getElementById('rigsCoolingPower').innerText = `-${stats.totalCoolingPower.toFixed(1)}°C/с`;
+
+        for (let key in partsInventory) {
+            let el = document.getElementById(`inv-${key}`);
+            if (el) el.innerText = partsInventory[key];
+        }
+    }
+
+    window.partCosts = {
+        cpu_low: 800, cpu_mid: 3200, cpu_high: 14000,
+        gpu_low: 1200, gpu_mid: 5000, gpu_high: 26000,
+        cool_low: 400, cool_mid: 2200, cool_high: 11500
+    };
+
+    window.tradePart = function(action, partId, customPrice) {
+        let baseCost = window.partCosts[partId];
+        if (action === 'buy') {
+            if (balance >= baseCost) {
+                balance -= baseCost;
+                partsInventory[partId]++;
+                exp += Math.floor(baseCost * 0.05);
+                showToast("Компонент добавлен в пул сборок!", "success");
+                updateUI(); syncOnline();
+            } else { showToast("Недостаточно капитала!", "error"); }
+        } else if (action === 'sell') {
+            if (partsInventory[partId] > 0) {
+                let sellRefund = Math.floor(baseCost * 0.75);
+                balance += sellRefund;
+                partsInventory[partId]--;
+                showToast(`Компонент успешно продан за $${sellRefund}!`, "info");
+                updateUI(); syncOnline();
+            } else { showToast("У вас нет этой детали на продажу!", "error"); }
+        }
+    };
+
+    document.getElementById('btnTap').addEventListener('click', () => { let stats = getStats(); balance += 5 + (stats.lvl * 2); exp += 5; updateUI(); syncOnline(); });
+    
+    document.getElementById('btnCoolDown').addEventListener('click', () => {
+        if (balance >= 250) { balance -= 250; partsInventory.heat = 25; showToast("Фермы очищены и термопаста обновлена!", "success"); updateUI(); syncOnline(); }
+        else { showToast("Не хватает денег на сервис!", "error"); }
+    });
+    
+    document.getElementById('btnPayPower').addEventListener('click', () => {
+        if (balance >= partsInventory.powerBill) { balance -= partsInventory.powerBill; partsInventory.powerBill = 0; partsInventory.powerOn = true; showToast("Энергосеть перезапущена!", "success"); updateUI(); syncOnline(); }
+        else { showToast("Недостаточно денег для оплаты счетов электросети!", "error"); }
+    });
+
+    document.getElementById('btnMaxAmount').addEventListener('click', () => {
+        let active = assetsData[currentAsset];
+        let l = parseInt(document.getElementById('leverage').value);
+        let maxBuy = Math.floor(balance / (active.price / l));
+        document.getElementById('tradeAmount').value = maxBuy > 0 ? maxBuy : 1;
+    });
+
+    document.getElementById('btnBuy').addEventListener('click', () => {
+        let qty = parseInt(document.getElementById('tradeAmount').value) || 1;
+        let a = assetsData[currentAsset]; let l = parseInt(document.getElementById('leverage').value);
+        let cost = (a.price / l) * qty;
+        if (balance >= cost) { balance -= cost; a.shares += qty; exp += 15 * qty; showToast(`Куплено акций: ${qty}`, "success"); updateUI(); syncOnline(); } 
+        else { showToast("Недостаточно средств!", "error"); }
+    });
+
+    document.getElementById('btnSell').addEventListener('click', () => {
+        let qty = parseInt(document.getElementById('tradeAmount').value) || 1;
+        let a = assetsData[currentAsset]; if (a.shares >= qty) {
+            let l = parseInt(document.getElementById('leverage').value);
+            balance += (a.price / l) * qty + ((a.price - (a.price / l)) * qty);
+            a.shares -= qty; exp += 10 * qty; showToast(`Продано акций: ${qty}`, "success"); updateUI(); syncOnline();
+        } else { showToast("У вас нет столько акций Лонг!", "error"); }
+    });
+
+    document.getElementById('btnShort').addEventListener('click', () => {
+        let qty = parseInt(document.getElementById('tradeAmount').value) || 1;
+        let a = assetsData[currentAsset]; let l = parseInt(document.getElementById('leverage').value);
+        let cost = (a.price / l) * qty;
+        if (balance >= cost) {
+            if (a.shortShares === 0) a.shortPrice = a.price;
+            balance -= cost; a.shortShares += qty; exp += 15 * qty; showToast(`Открыт Шорт на: ${qty}`, "success"); updateUI(); syncOnline();
+        } else { showToast("Не хватает маржи!", "error"); }
+    });
+
+    document.getElementById('btnCover').addEventListener('click', () => {
+        let qty = parseInt(document.getElementById('tradeAmount').value) || 1;
+        let a = assetsData[currentAsset]; if (a.shortShares >= qty) {
+            let l = parseInt(document.getElementById('leverage').value);
+            balance += ((a.shortPrice / l) * qty) + ((a.shortPrice - a.price) * qty);
+            a.shortShares -= qty; if (a.shortShares === 0) a.shortPrice = 0; exp += 10 * qty; showToast(`Выкуплен шорт: ${qty}`, "success"); updateUI(); syncOnline();
+        } else { showToast("У вас нет такого объема шорт-позиции!", "error"); }
+    });
+
+    document.getElementById('btnDailyBonus').addEventListener('click', () => {
+        let now = Date.now(); if (now - lastBonusTime < 24 * 60 * 60 * 1000) {
+            let hr = Math.ceil(((24 * 60 * 60 * 1000) - (now - lastBonusTime)) / (1000 * 60 * 60));
+            showToast(`Приходи через ${hr} ч.`, "error"); return;
+        }
+        let prize = Math.floor(Math.random() * 2500) + 500; balance += prize; lastBonusTime = now;
+        showToast(`Акция сработала: +$${prize}!`, "success"); updateUI(); syncOnline();
+    });
+
+    document.getElementById('btnPromo').addEventListener('click', () => {
+        let code = document.getElementById('promoInput').value.trim().toUpperCase();
+        if (code === "LITE2026") {
+            if (usedPromos.includes(code)) { showToast("Уже активирован!", "error"); return; }
+            balance += 5000; usedPromos.push(code); showToast("Начислено +$5,000!", "success");
+            document.getElementById('promoInput').value = ""; updateUI(); syncOnline();
+        } else { showToast("Неверный промокод!", "error"); }
+    });
+
+    document.getElementById('btnOpenCase').addEventListener('click', () => {
+        if (balance >= 2500) {
+            balance -= 2500; let r = Math.random();
+            if (r > 0.6) { let w = Math.floor(Math.random() * 5000) + 2500; balance += w; showToast(`💸 КУШ! Выпало: $${w}`, "success"); } 
+            else { showToast("Кейс оказался пустым!", "error"); }
+            updateUI(); syncOnline();
+        }
+    });
+
+    async function execAdminCmd(cmdType) {
+        let target = document.getElementById('admTargetUser').value.trim();
+        let val = parseFloat(document.getElementById('admAmount').value) || 0;
+        if (!target) { showToast("Укажите ник игрока цели!", "error"); return; }
+        
+        const ref = doc(db, "users", target);
+        const snapshot = await getDoc(ref);
+        if (!snapshot.exists()) { showToast("Игрок не найден!", "error"); return; }
+        let tData = snapshot.data();
+
+        if (cmdType === 'add') { tData.balance = (tData.balance || 0) + val; showToast(`Выдано $${val}`, "success"); }
+        if (cmdType === 'take') { tData.balance = Math.max(0, (tData.balance || 0) - val); showToast(`Забрано $${val}`, "success"); }
+        if (cmdType === 'lvl') { tData.exp = Math.pow(val - 1, 2) * 120 + 10; showToast(`Установлен уровень ${val}`, "success"); }
+        if (cmdType === 'rank') { tData.customRank = Math.max(0, Math.min(4, parseInt(val))); showToast(`Ранг изменен`, "success"); }
+        if (cmdType === 'ban') { tData.isBanned = !tData.isBanned; showToast(`Бан: ${tData.isBanned}`, "info"); }
+
+        await setDoc(ref, tData, { merge: true });
+        await setDoc(doc(db, "players", target), { balance: tData.balance, score: tData.balance.toFixed(2), lvl: Math.floor(Math.sqrt((tData.exp || 0) / 120)) + 1 }, { merge: true });
+    }
+
+    document.getElementById('admAddCash').addEventListener('click', () => execAdminCmd('add'));
+    document.getElementById('admTakeCash').addEventListener('click', () => execAdminCmd('take'));
+    document.getElementById('admSetLvl').addEventListener('click', () => execAdminCmd('lvl'));
+    document.getElementById('admSetRank').addEventListener('click', () => execAdminCmd('rank'));
+    document.getElementById('admBan').addEventListener('click', () => execAdminCmd('ban'));
+
+    document.getElementById('btnPump').addEventListener('click', async () => { await setDoc(doc(db, "market", currentAsset), { action: "pump", time: Date.now() }); });
+    document.getElementById('btnDump').addEventListener('click', async () => { await setDoc(doc(db, "market", currentAsset), { action: "dump", time: Date.now() }); });
+
+    ['pegasus', 'btc', 'eth', 'aapl', 'gold'].forEach(assetKey => {
+        onSnapshot(doc(db, "market", assetKey), (snapshot) => {
+            if (snapshot.exists()) {
+                let data = snapshot.data();
+                if (data.action === "pump") { assetsData[assetKey].price *= 1.25; } 
+                else if (data.action === "dump") { assetsData[assetKey].price *= 0.75; }
+                chart.update(); updateUI();
+            }
+        });
+    });
+
+    function tickMarket() {
+        if (!currentUser) return;
+        let stats = getStats();
+        
+        if (partsInventory.powerOn && stats.activeRigs > 0) {
+            balance += stats.passiveIncome * 2;
+            let rawHeatGain = (partsInventory.gpu_low * 0.08) + (partsInventory.gpu_mid * 0.25) + (partsInventory.gpu_high * 1.1);
+            partsInventory.heat += rawHeatGain;
+            partsInventory.powerBill += (partsInventory.gpu_low * 1) + (partsInventory.gpu_mid * 5) + (partsInventory.gpu_high * 28);
+            
+            if (partsInventory.powerBill > balance * 4 && balance > 300) {
+                partsInventory.powerOn = false;
+                showToast("Энергосеть заблокирована за долги!", "error");
+            }
+        }
+        
+        partsInventory.heat = Math.max(25, partsInventory.heat - stats.totalCoolingPower);
+
+        for (let key in assetsData) {
+            let ast = assetsData[key];
+            let vol = key === 'btc' || key === 'pegasus' ? 7.0 : 3.0;
+            ast.price *= (1 + ((Math.random() - 0.492) * vol) / 100);
+            if (ast.price < 0.1) ast.price = 0.1;
+            ast.history.push(ast.price);
+            if (ast.history.length > 20) ast.history.shift();
+        }
+
+        let active = assetsData[currentAsset];
+        const priceEl = document.getElementById('price');
+        priceEl.innerText = '$' + active.price.toFixed(2);
+        
+        let lastDiff = active.history[active.history.length-1] - active.history[active.history.length-2];
+        let newGradient = canvasCtx.createLinearGradient(0, 0, 0, 150);
+        if (lastDiff >= 0) {
+            priceEl.className = 'price-up'; chart.data.datasets[0].borderColor = '#00e676';
+            newGradient.addColorStop(0, 'rgba(0, 230, 118, 0.15)'); newGradient.addColorStop(1, 'rgba(0, 230, 118, 0.0)');
+        } else {
+            priceEl.className = 'price-down'; chart.data.datasets[0].borderColor = '#ff3d00';
+            newGradient.addColorStop(0, 'rgba(255, 61, 0, 0.15)'); newGradient.addColorStop(1, 'rgba(255, 61, 0, 0.0)');
+        }
+        chart.data.datasets[0].backgroundColor = newGradient;
+        chart.data.datasets[0].data = [...active.history];
+        chart.update(); updateUI();
+    }
+
+    async function syncOnline() {
+        if (!currentUser) return;
+        let stats = getStats();
+        await setDoc(doc(db, "users", currentUser), { balance, exp, lastBonusTime, usedPromos, assets: assetsData, partsInventory: partsInventory, customRank, isBanned }, { merge: true });
+        await setDoc(doc(db, "players", currentUser), { balance, score: balance.toFixed(2), lvl: stats.lvl }, { merge: true });
+    }
+
+    const q = query(collection(db, "players"), orderBy("balance", "desc"), limit(5));
+    onSnapshot(q, (snapshot) => {
+        let html = ""; snapshot.forEach((doc) => {
+            let data = doc.data();
+            html += `<li><strong>${doc.id} (LVL ${data.lvl || 1})</strong> <span>$${data.score || 0}</span></li>`;
+        });
+        document.getElementById('leaderboard').innerHTML = html;
+    });
+
+    setInterval(tickMarket, 2000);
+</script>
+</body>
+</html>
