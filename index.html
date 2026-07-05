@@ -3,98 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pegasus Tycoon Pro</title>
+    <title>Pegasus Market Control</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Общий футуристичный темный фон */
         body { background-color: #060609; color: #f1f2f6; font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; text-align: center; margin: 0; padding: 8px; }
+        .container { max-width: 440px; margin: 0 auto; background: #0d0e15; padding: 16px; border-radius: 24px; border: 1px solid #1c1e2d; box-shadow: 0 15px 35px rgba(0,0,0,0.8); display: none; }
         
-        .container { max-width: 440px; margin: 0 auto; background: #0d0e15; padding: 16px; border-radius: 24px; border: 1px solid #1c1e2d; box-shadow: 0 15px 35px rgba(0,0,0,0.8); }
+        /* Окно авторизации */
+        .auth-screen { max-width: 360px; margin: 80px auto; background: #0d0e15; padding: 25px; border-radius: 24px; border: 1px solid #1c1e2d; box-shadow: 0 15px 35px rgba(0,0,0,0.8); }
+        .auth-screen h2 { margin-top: 0; color: #00ffcc; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .auth-input { width: 90%; padding: 12px; margin: 8px 0; background: #131520; border: 1px solid #1c1e2d; border-radius: 12px; color: white; font-size: 14px; outline: none; }
+        .auth-input:focus { border-color: #00ffcc; }
         
-        /* Верхняя панель */
+        /* Хедер игры */
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1c1e2d; padding-bottom: 12px; margin-bottom: 12px; }
-        .user-badge { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 15px; }
+        .user-badge { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 14px; }
         .lvl-badge { background: rgba(0, 255, 204, 0.1); color: #00ffcc; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid rgba(0, 255, 204, 0.3); }
-        
-        /* Неоновая кнопка-тапалка */
-        .tap-btn { width: 100%; background: linear-gradient(135deg, #00ffcc, #00bcff); color: #050508; font-size: 16px; font-weight: 800; padding: 16px; border: none; border-radius: 16px; cursor: pointer; box-shadow: 0 0 20px rgba(0,255,204,0.3); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.1s ease; }
-        .tap-btn:active { transform: scale(0.96); box-shadow: 0 0 30px rgba(0,255,204,0.6); filter: brightness(1.2); }
+        .logout-btn { background: none; border: 1px solid #ff3d00; color: #ff3d00; padding: 4px 8px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: bold; }
 
-        /* Сетка показателей */
+        .tap-btn { width: 100%; background: linear-gradient(135deg, #00ffcc, #00bcff); color: #050508; font-size: 16px; font-weight: 800; padding: 15px; border: none; border-radius: 16px; cursor: pointer; box-shadow: 0 0 20px rgba(0,255,204,0.3); margin-bottom: 16px; text-transform: uppercase; transition: all 0.1s ease; }
+        .tap-btn:active { transform: scale(0.96); filter: brightness(1.2); }
+
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-        .card { background: #131520; padding: 12px; border-radius: 16px; border: 1px solid #1c1e2d; text-align: left; position: relative; overflow: hidden; }
-        .card-title { font-size: 11px; color: #7f8c8d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+        .card { background: #131520; padding: 12px; border-radius: 16px; border: 1px solid #1c1e2d; text-align: left; }
+        .card-title { font-size: 11px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 4px; }
         .card-val { font-size: 18px; font-weight: 700; color: #ffffff; }
-        .card-val.highlight { color: #00ffcc; text-shadow: 0 0 10px rgba(0,255,204,0.2); }
+        .card-val.highlight { color: #00ffcc; }
         
-        /* Секция курса */
-        .price-box { margin-bottom: 12px; text-align: center; }
-        #price { font-size: 42px; font-weight: 800; letter-spacing: -1px; transition: color 0.2s ease; }
+        .price-box { margin-bottom: 8px; text-align: center; }
+        #price { font-size: 42px; font-weight: 800; }
         .price-up { color: #00e676; text-shadow: 0 0 20px rgba(0,230,118,0.3); }
         .price-down { color: #ff3d00; text-shadow: 0 0 20px rgba(255,61,0,0.3); }
         
-        /* Новостная плашка */
-        .news-ticker { background: #131520; color: #bdc3c7; padding: 10px 14px; border-radius: 12px; margin-bottom: 16px; font-size: 12px; text-align: left; border-left: 3px solid #00bcff; display: flex; align-items: center; gap: 8px; }
+        .news-ticker { background: #131520; color: #bdc3c7; padding: 10px; border-radius: 12px; margin-bottom: 16px; font-size: 12px; text-align: left; border-left: 3px solid #00bcff; }
+        .chart-container { position: relative; background: #0d0e15; border-radius: 16px; border: 1px solid #1c1e2d; padding: 8px; margin-bottom: 16px; height: 180px; }
 
-        /* Контейнер для сглаженного графика */
-        .chart-container { position: relative; background: #131520; border-radius: 16px; border: 1px solid #1c1e2d; padding: 10px; margin-bottom: 16px; }
+        /* СЕКРЕТНАЯ АДМИН ПАНЕЛЬ */
+        .admin-panel { display: none; background: rgba(241, 196, 15, 0.05); border: 1px dashed #f1c40f; padding: 12px; border-radius: 16px; margin-bottom: 16px; }
+        .admin-title { font-size: 12px; color: #f1c40f; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .admin-btn { padding: 10px; font-weight: bold; border-radius: 10px; border: none; cursor: pointer; font-size: 12px; text-transform: uppercase; }
+        .btn-pump { background: #00ffcc; color: #000; box-shadow: 0 0 10px rgba(0,255,204,0.4); }
+        .btn-dump { background: #ff3d00; color: #fff; box-shadow: 0 0 10px rgba(255,61,0,0.4); }
 
-        /* Селектор плеча */
-        .leverage-box { margin-bottom: 14px; font-size: 13px; color: #a4b0be; display: flex; justify-content: center; align-items: center; gap: 8px; }
-        select { background: #131520; color: white; border: 1px solid #1c1e2d; padding: 6px 12px; border-radius: 10px; font-weight: 600; outline: none; }
+        .leverage-box { margin-bottom: 14px; font-size: 13px; color: #a4b0be; }
+        select { background: #131520; color: white; border: 1px solid #1c1e2d; padding: 6px 12px; border-radius: 10px; font-weight: 600; }
 
-        /* Кнопки действий */
         .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
-        .btn { padding: 14px; font-size: 14px; border: none; border-radius: 14px; cursor: pointer; font-weight: 700; transition: all 0.2s; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+        .btn { padding: 14px; font-size: 12px; border: none; border-radius: 14px; cursor: pointer; font-weight: 700; text-transform: uppercase; }
         .btn-buy { background: #00e676; color: #050508; }
         .btn-sell { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0,230,118,0.3); }
         .btn-short { background: #ff3d00; color: white; }
         .btn-cover { background: rgba(255, 61, 0, 0.15); color: #ff3d00; border: 1px solid rgba(255,61,0,0.3); }
-        .btn:active { transform: scale(0.97); filter: brightness(1.1); }
         
-        /* Пассивные улучшения */
         .upgrades-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
         .upgrade-card { background: #131520; border: 1px solid #1c1e2d; border-radius: 16px; padding: 12px; text-align: left; }
         .upgrade-card h4 { margin: 0 0 4px 0; font-size: 13px; color: #ffffff; }
         .upgrade-desc { font-size: 11px; color: #7f8c8d; margin-bottom: 8px; }
-        .sm-btn { width: 100%; padding: 10px; font-size: 12px; background: #1c1e2d; color: #00ffcc; border: 1px solid rgba(0,255,204,0.2); border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .sm-btn:disabled { background: #11121a; color: #444; border-color: #222; cursor: not-allowed; }
+        .sm-btn { width: 100%; padding: 10px; font-size: 12px; background: #1c1e2d; color: #00ffcc; border: 1px solid rgba(0,255,204,0.2); border-radius: 10px; cursor: pointer; font-weight: bold; }
+        .sm-btn:disabled { background: #11121a; color: #444; border-color: #222; }
 
-        /* Онлайн лидерборд */
         .leaderboard-box { background: #131520; padding: 16px; border-radius: 16px; text-align: left; border: 1px solid #1c1e2d; }
-        .leaderboard-box h3 { margin: 0 0 12px 0; text-align: center; color: #00ffcc; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .leaderboard-box h3 { margin: 0 0 12px 0; text-align: center; color: #00ffcc; font-size: 14px; text-transform: uppercase; }
         ol { padding-left: 12px; margin: 0; }
         li { padding: 8px 0; border-bottom: 1px solid #1c1e2d; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
-        li:last-child { border: none; }
         .rank-name { color: #57606f; font-size: 11px; margin-left: 5px; }
         .lb-money { font-weight: 700; color: #00ffcc; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="auth-screen" id="authScreen">
+    <h2>Pegasus Terminal</h2>
+    <div style="font-size:12px; color:#7f8c8d; margin-bottom:10px;">Введи данные для входа. Если аккаунта нет, он создастся автоматически.</div>
+    <input type="text" class="auth-input" id="authLogin" placeholder="Никнейм" maxlength="14">
+    <input type="password" class="auth-input" id="authPass" placeholder="Пароль">
+    <button class="tap-btn" id="btnAuth" style="margin-top:10px; margin-bottom:0;">Войти в терминал</button>
+</div>
+
+<div class="container" id="gameContainer">
     <div class="header">
         <div class="user-badge">💼 <span id="playerName">...</span> <span id="playerRank" class="rank-name">()</span></div>
-        <div class="lvl-badge">LVL <span id="playerLvl">1</span></div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="lvl-badge">LVL <span id="playerLvl">1</span></div>
+            <button class="logout-btn" id="btnLogout">Выйти</button>
+        </div>
     </div>
 
     <button class="tap-btn" id="btnTap">💸 Тапать капитал (+$5)</button>
 
     <div class="stats-grid">
         <div class="card">
-            <div class="card-title">💵 Доступный баланс</div>
+            <div class="card-title">💵 Баланс Cash</div>
             <div class="card-val highlight" id="balance">$10000.00</div>
         </div>
         <div class="card">
-            <div class="card-title">⚡ Пассивный доход</div>
-            <div class="card-val" id="pps" style="color: #ffb142;">$0/сек</div>
+            <div class="card-title">⚡ Доход/сек</div>
+            <div class="card-val" id="pps" style="color: #ffb142;">$0/с</div>
         </div>
         <div class="card">
-            <div class="card-title">📈 Акции в Лонг</div>
+            <div class="card-title">📈 Лонг Позиции</div>
             <div class="card-val" id="shares">0</div>
         </div>
         <div class="card">
-            <div class="card-title">📉 Акции в Шорт</div>
+            <div class="card-title">📉 Шорт Позиции</div>
             <div class="card-val" id="shortShares">0</div>
         </div>
     </div>
@@ -104,21 +116,27 @@
     </div>
 
     <div class="news-ticker">
-        <span>📢</span>
-        <div id="news">Рыночные котировки запущены. Ожидание сигналов...</div>
+        <div id="news">Котировки запущены. Ожидание сигналов...</div>
     </div>
 
-    <!-- Красивый контейнер под гладкий график -->
     <div class="chart-container">
-        <canvas id="marketChart" height="140"></canvas>
+        <canvas id="marketChart"></canvas>
+    </div>
+
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-title">👑 Панель Управления Рынком (Admin)</div>
+        <div class="admin-grid">
+            <button class="admin-btn btn-pump" id="btnPump">🚀 ПАМП КУРСА (+25%)</button>
+            <button class="admin-btn btn-dump" id="btnDump">📉 ДАМП КУРСА (-25%)</button>
+        </div>
     </div>
 
     <div class="leverage-box">
         <span>Кредитное плечо:</span>
         <select id="leverage">
-            <option value="1">x1 (Без риска)</option>
-            <option value="3">x3 (Умеренный)</option>
-            <option value="5">x5 (Макс Плечо)</option>
+            <option value="1">x1 (Обычный)</option>
+            <option value="3">x3 (Маржа)</option>
+            <option value="5">x5 (Макс Риск)</option>
         </select>
     </div>
 
@@ -136,7 +154,7 @@
             <button class="sm-btn" id="btnBuyFarm">Купить [$1,500]</button>
         </div>
         <div class="upgrade-card">
-            <h4>🎁 Секретный кейс</h4>
+            <h4>🎁 Кейс магната</h4>
             <div class="upgrade-desc">Случайный исход</div>
             <button class="sm-btn" id="btnOpenCase" style="color: #af71ff; border-color: rgba(175,113,255,0.2);">Открыть [$2,000]</button>
         </div>
@@ -144,13 +162,13 @@
 
     <div class="leaderboard-box">
         <h3>🏆 ТОП ТРЕЙДЕРОВ СЕТИ</h3>
-        <ol id="leaderboard"><li>Синхронизация списков...</li></ol>
+        <ol id="leaderboard"><li>Синхронизация...</li></ol>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDEaVk5ynHpi2uFu2d7Zqc3PAAPR58IeGI",
@@ -165,61 +183,146 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    let username = localStorage.getItem('crypto_trader_name') || "Трейдер";
-    document.getElementById('playerName').innerText = username;
-
-    let balance = parseFloat(localStorage.getItem('t_bal')) || 10000;
-    let shares = parseInt(localStorage.getItem('t_sh')) || 0;
-    let shortShares = parseInt(localStorage.getItem('t_ssh')) || 0;
-    let shortPrice = parseFloat(localStorage.getItem('t_sp')) || 0;
-    let exp = parseInt(localStorage.getItem('t_exp')) || 0;
-    let farms = parseInt(localStorage.getItem('t_farms')) || 0;
+    // Игровой профиль текущей сессии
+    let currentUser = localStorage.getItem('logged_user') || "";
+    let balance = 10000, shares = 0, shortShares = 0, shortPrice = 0, exp = 0, farms = 0;
 
     let currentPrice = 100;
-    let priceHistory = Array(12).fill(100);
-    let labels = Array(12).fill('');
+    let priceHistory = Array(20).fill(100); 
+    let labels = Array(20).fill('');
     let timeTick = 0;
     let marketTrend = 0;
-
     const ranks = ["Новичок", "Скальпер", "Инвестор", "Кит рынка", "Волк с Уолл-Стрит"];
 
-    // Создаем градиент для графика динамически
-    const ctx = document.getElementById('marketChart').getContext('2d');
-    const gradient = ctx.createLinearGradient(0, 0, 0, 140);
-    gradient.addColorStop(0, 'rgba(0, 255, 204, 0.25)');
-    gradient.addColorStop(1, 'rgba(0, 255, 204, 0.0)');
+    // ЛОГИКА ЖИВОГО ГРАФИКА
+    const livePriceLinePlugin = {
+        id: 'livePriceLine',
+        afterDatasetsDraw(chart) {
+            const { ctx, chartArea: { right, left }, scales: { y } } = chart;
+            const meta = chart.getDatasetMeta(0);
+            if (!meta.data || meta.data.length === 0) return;
+            const lastPoint = meta.data[meta.data.length - 1];
+            const yCoord = lastPoint.y;
+            ctx.save();
+            ctx.strokeStyle = chart.data.datasets[0].borderColor;
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath(); ctx.moveTo(left, yCoord); ctx.lineTo(right, yCoord); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = chart.data.datasets[0].borderColor;
+            ctx.beginPath(); ctx.arc(lastPoint.x, yCoord, 5, 0, 2 * Math.PI); ctx.fill();
+            ctx.restore();
+        }
+    };
 
-    const chart = new Chart(ctx, {
+    const canvasCtx = document.getElementById('marketChart').getContext('2d');
+    let fillGradient = canvasCtx.createLinearGradient(0, 0, 0, 180);
+    fillGradient.addColorStop(0, 'rgba(0, 230, 118, 0.2)');
+    fillGradient.addColorStop(1, 'rgba(0, 230, 118, 0.0)');
+
+    const chart = new Chart(canvasCtx, {
         type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Курс',
-                data: priceHistory,
-                borderColor: '#00ffcc', // Яркая неоновая линия
-                borderWidth: 3,
-                pointRadius: 0, // Убираем точки как в оригинале
-                pointHoverRadius: 0,
-                tension: 0.4, // Идеальное сглаживание углов линии
-                fill: true,
-                backgroundColor: gradient // Мягкая подсветка под графиком
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { display: false },
-                y: {
-                    grid: { color: 'rgba(28, 30, 45, 0.5)' },
-                    ticks: { color: '#7f8c8d', font: { size: 10 } }
-                }
+        data: { labels: labels, datasets: [{ data: priceHistory, borderColor: '#00e676', borderWidth: 2.5, pointRadius: 0, tension: 0.35, fill: true, backgroundColor: fillGradient }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { position: 'right', grid: { color: '#161824' }, ticks: { color: '#61667f', font: { size: 10 } } } } },
+        plugins: [livePriceLinePlugin]
+    });
+
+    // ПРОВЕРКА АВТОРИЗАЦИИ ПРИ СТАРТЕ
+    if (currentUser) {
+        loadUserData(currentUser);
+    }
+
+    // КНОПКА LOGIN / REGISTER
+    document.getElementById('btnAuth').addEventListener('click', async () => {
+        let inputName = document.getElementById('authLogin').value.trim();
+        let inputPass = document.getElementById('authPass').value.trim();
+
+        if (inputName.length < 3 || inputPass.length < 3) {
+            alert("Ник и пароль должны содержать от 3 символов!");
+            return;
+        }
+
+        const userDocRef = doc(db, "users", inputName);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+            // Пользователь существует -> проверяем пароль
+            if (userDoc.data().password === inputPass) {
+                currentUser = inputName;
+                localStorage.setItem('logged_user', currentUser);
+                loadUserData(currentUser);
+            } else {
+                alert("❌ Неверный пароль для этого никнейма!");
             }
+        } else {
+            // Пользователя нет -> регистрируем нового
+            await setDoc(userDocRef, {
+                password: inputPass,
+                balance: 10000, shares: 0, shortShares: 0, shortPrice: 0, exp: 0, farms: 0
+            });
+            currentUser = inputName;
+            localStorage.setItem('logged_user', currentUser);
+            loadUserData(currentUser);
+            alert("🎉 Аккаунт успешно создан и зарегистрирован!");
         }
     });
 
-    updateUI();
+    // КНОПКА ВЫХОДА
+    document.getElementById('btnLogout').addEventListener('click', () => {
+        localStorage.removeItem('logged_user');
+        location.reload();
+    });
+
+    // ЗАГРУЗКА И ДЕСИНХРОНИЗАЦИЯ С ЛОКАЛЬНЫХ ДАННЫХ В FIREBASE
+    async function loadUserData(username) {
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('gameContainer').style.display = 'block';
+        document.getElementById('playerName').innerText = username;
+
+        // Если зашел админ — включаем секретную панель
+        if (username.toLowerCase() === "admin") {
+            document.getElementById('adminPanel').style.display = 'block';
+        }
+
+        const userDoc = await getDoc(doc(db, "users", username));
+        if (userDoc.exists()) {
+            let d = userDoc.data();
+            balance = d.balance ?? 10000;
+            shares = d.shares ?? 0;
+            shortShares = d.shortShares ?? 0;
+            shortPrice = d.shortPrice ?? 0;
+            exp = d.exp ?? 0;
+            farms = d.farms ?? 0;
+        }
+        updateUI();
+    }
+
+    // СЕКРЕТНЫЕ АДМИНСКИЕ КНОПКИ УПРАВЛЕНИЯ ЦЕНОЙ КРИПТЫ
+    document.getElementById('btnPump').addEventListener('click', async () => {
+        // Записываем команду пампа прямо в общую базу, чтобы цена подскочила у всех одновременно
+        await setDoc(doc(db, "market", "global"), { action: "pump", time: Date.now() });
+    });
+
+    document.getElementById('btnDump').addEventListener('click', async () => {
+        // Команда дампа в облако
+        await setDoc(doc(db, "market", "global"), { action: "dump", time: Date.now() });
+    });
+
+    // СЛУШАТЕЛЬ ГЛОБАЛЬНЫХ АДМИН-КОМАНД В РЕАЛЬНОМ ВРЕМЕНИ
+    onSnapshot(doc(db, "market", "global"), (snapshot) => {
+        if (snapshot.exists()) {
+            let data = snapshot.data();
+            if (data.action === "pump") {
+                currentPrice *= 1.25; // Сразу бустим курс на 25% на всех телефонах
+                document.getElementById('news').innerText = "🚨 РЫНОК ПОДВЕРГСЯ ЖЕСТКОМУ ПАМПУ СО СТОРОНЫ КИТА Admin!!";
+            } else if (data.action === "dump") {
+                currentPrice *= 0.75; // Обваливаем курс на 25% у всех игроков
+                document.getElementById('news').innerText = "🚨 ВНИМАНИЕ: Admin КРУПНО СЛИВАЕТ АКТИВЫ! КРАХ РЫНКА!!";
+            }
+            chart.update();
+            updateUI();
+        }
+    });
 
     function getStats() {
         let lvl = Math.floor(Math.sqrt(exp / 120)) + 1;
@@ -239,125 +342,79 @@
         document.getElementById('playerRank').innerText = `(${stats.rank})`;
         document.getElementById('pps').innerText = `$${stats.passiveIncome}/с`;
         document.getElementById('farmInfo').innerText = `Куплено: ${farms} (+$${stats.passiveIncome}/с)`;
-        
         document.getElementById('btnBuyFarm').disabled = balance < 1500;
         document.getElementById('btnOpenCase').disabled = balance < 2000;
     }
 
-    document.getElementById('btnTap').addEventListener('click', () => {
-        let stats = getStats();
-        balance += 5 + (stats.lvl * 2);
-        exp += 5;
-        updateUI();
-        syncOnline();
-    });
-
-    document.getElementById('btnBuyFarm').addEventListener('click', () => {
-        if (balance >= 1500) { balance -= 1500; farms++; exp += 100; updateUI(); syncOnline(); }
-    });
-
+    // ИГРОВЫЕ ДЕЙСТВИЯ И СИНХРОНИЗАЦИЯ С БД ПОД ИМЕНЕМ ЮЗЕРА
+    document.getElementById('btnTap').addEventListener('click', () => { let stats = getStats(); balance += 5 + (stats.lvl * 2); exp += 5; updateUI(); syncOnline(); });
+    document.getElementById('btnBuyFarm').addEventListener('click', () => { if (balance >= 1500) { balance -= 1500; farms++; exp += 100; updateUI(); syncOnline(); } });
+    
     document.getElementById('btnOpenCase').addEventListener('click', () => {
         if (balance >= 2000) {
-            balance -= 2000;
-            let roll = Math.random();
-            if (roll > 0.65) {
-                let win = Math.floor(Math.random() * 4000) + 2500;
-                balance += win; exp += 250; alert(`🎉 ОКУП! Из кейса выпало: $${win}!`);
-            } else if (roll > 0.3) {
-                balance += 800; exp += 50; alert("📦 Выпало всего $800.");
-            } else {
-                exp += 20; alert("💀 СЛИВ! Кейс оказался пустым.");
-            }
+            balance -= 2000; let roll = Math.random();
+            if (roll > 0.65) { let win = Math.floor(Math.random() * 4000) + 2500; balance += win; exp += 250; alert(`🎉 ОКУП! Из кейса выпало: $${win}!`); } 
+            else if (roll > 0.3) { balance += 800; exp += 50; alert("📦 Выпало всего $800."); } 
+            else { exp += 20; alert("💀 СЛИВ! Пусто."); }
             updateUI(); syncOnline();
         }
     });
 
-    document.getElementById('btnBuy').addEventListener('click', () => {
-        let lev = parseInt(document.getElementById('leverage').value);
-        if (balance >= (currentPrice / lev)) { balance -= (currentPrice / lev); shares++; exp += 15; updateUI(); syncOnline(); }
-    });
-    document.getElementById('btnSell').addEventListener('click', () => {
-        if (shares > 0) { let lev = parseInt(document.getElementById('leverage').value); balance += currentPrice / lev + (currentPrice - (currentPrice / lev)); shares--; exp += 10; updateUI(); syncOnline(); }
-    });
-    document.getElementById('btnShort').addEventListener('click', () => {
-        if (shortShares === 0) shortPrice = currentPrice;
-        let lev = parseInt(document.getElementById('leverage').value);
-        if (balance >= (currentPrice / lev)) { balance -= (currentPrice / lev); shortShares++; exp += 15; updateUI(); syncOnline(); }
-    });
-    document.getElementById('btnCover').addEventListener('click', () => {
-        if (shortShares > 0) { let lev = parseInt(document.getElementById('leverage').value); balance += (shortPrice / lev) + (shortPrice - currentPrice); shortShares--; if (shortShares === 0) shortPrice = 0; exp += 10; updateUI(); syncOnline(); }
-    });
+    document.getElementById('btnBuy').addEventListener('click', () => { let lev = parseInt(document.getElementById('leverage').value); if (balance >= (currentPrice / lev)) { balance -= (currentPrice / lev); shares++; exp += 15; updateUI(); syncOnline(); } });
+    document.getElementById('btnSell').addEventListener('click', () => { if (shares > 0) { let lev = parseInt(document.getElementById('leverage').value); balance += currentPrice / lev + (currentPrice - (currentPrice / lev)); shares--; exp += 10; updateUI(); syncOnline(); } });
+    document.getElementById('btnShort').addEventListener('click', () => { if (shortShares === 0) shortPrice = currentPrice; let lev = parseInt(document.getElementById('leverage').value); if (balance >= (currentPrice / lev)) { balance -= (currentPrice / lev); shortShares++; exp += 15; updateUI(); syncOnline(); } });
+    document.getElementById('btnCover').addEventListener('click', () => { if (shortShares > 0) { let lev = parseInt(document.getElementById('leverage').value); balance += (shortPrice / lev) + (shortPrice - currentPrice); shortShares--; if (shortShares === 0) shortPrice = 0; exp += 10; updateUI(); syncOnline(); } });
 
     function tickMarket() {
+        if (!currentUser) return;
         timeTick++;
         let stats = getStats();
         if (stats.passiveIncome > 0) balance += stats.passiveIncome * 2;
 
         if (timeTick % 10 === 0) {
             let newsList = [
-                { text: "🚀 Спутники Pegasus вышли на орбиту. Акции летят вверх!", trend: 6 },
-                { text: "📉 Крупный фонд сливает активы. На рынке паника!", trend: -5 },
-                { text: "📊 Квартальный отчет Pegasus превзошел все ожидания рынка!", trend: 4.5 },
-                { text: "❌ Обнаружен баг в коде смарт-контракта! Спад!", trend: -4 }
+                { text: "🚀 Проект Pegasus выкатил масштабное обновление экосистемы!", trend: 5 },
+                { text: "📉 Произошел крупный дамп монет со счетов инвесторов!", trend: -5 },
+                { text: "📊 Фондовые рынки показывают стабильный приток кэша!", trend: 3.5 }
             ];
             let n = newsList[Math.floor(Math.random() * newsList.length)];
-            document.getElementById('news').innerText = n.text;
-            marketTrend = n.trend;
+            document.getElementById('news').innerText = n.text; marketTrend = n.trend;
             setTimeout(() => { marketTrend = 0; document.getElementById('news').innerText = "💤 На рынке затишье..."; }, 6000);
         }
 
-        let totalChange = ((Math.random() - 0.49) * 8) + marketTrend;
+        let totalChange = ((Math.random() - 0.49) * 8.5) + marketTrend;
         currentPrice *= (1 + totalChange / 100);
         if (currentPrice < 1) currentPrice = 1;
 
-        if (stats.equity <= 0) {
-            balance = 1000; shares = 0; shortShares = 0; farms = 0;
-            alert("🚨 МАРЖИН-КОЛЛ! Твой фонд обанкротился. Выдано $1000 пособия.");
-        }
+        if (stats.equity <= 0) { balance = 1000; shares = 0; shortShares = 0; farms = 0; alert("🚨 ЛИКВИДАЦИЯ! Фонд обанкротился."); }
 
         const priceEl = document.getElementById('price');
         priceEl.innerText = '$' + currentPrice.toFixed(2);
         
-        // Меняем цвет неоновой линии графика динамически в зависимости от тренда
+        let newGradient = canvasCtx.createLinearGradient(0, 0, 0, 180);
         if (totalChange >= 0) {
-            priceEl.className = 'price-up';
-            chart.data.datasets[0].borderColor = '#00e676';
-            chart.data.datasets[0].backgroundColor = ctx.createLinearGradient(0,0,0,140);
-            chart.data.datasets[0].backgroundColor.addColorStop(0, 'rgba(0, 230, 118, 0.2)');
-            chart.data.datasets[0].backgroundColor.addColorStop(1, 'rgba(0, 230, 118, 0.0)');
+            priceEl.className = 'price-up'; chart.data.datasets[0].borderColor = '#00e676';
+            newGradient.addColorStop(0, 'rgba(0, 230, 118, 0.18)'); newGradient.addColorStop(1, 'rgba(0, 230, 118, 0.0)');
         } else {
-            priceEl.className = 'price-down';
-            chart.data.datasets[0].borderColor = '#ff3d00';
-            chart.data.datasets[0].backgroundColor = ctx.createLinearGradient(0,0,0,140);
-            chart.data.datasets[0].backgroundColor.addColorStop(0, 'rgba(255, 61, 0, 0.2)');
-            chart.data.datasets[0].backgroundColor.addColorStop(1, 'rgba(255, 61, 0, 0.0)');
+            priceEl.className = 'price-down'; chart.data.datasets[0].borderColor = '#ff3d00';
+            newGradient.addColorStop(0, 'rgba(255, 61, 0, 0.18)'); newGradient.addColorStop(1, 'rgba(255, 61, 0, 0.0)');
         }
+        chart.data.datasets[0].backgroundColor = newGradient;
 
-        priceHistory.push(currentPrice);
-        labels.push('');
-        if (priceHistory.length > 15) { priceHistory.shift(); labels.shift(); }
-        chart.update();
-        updateUI();
+        priceHistory.push(currentPrice); labels.push('');
+        if (priceHistory.length > 20) { priceHistory.shift(); labels.shift(); }
+        chart.update(); updateUI();
     }
 
     async function syncOnline() {
+        if (!currentUser) return;
         let stats = getStats();
-        localStorage.setItem('t_bal', balance);
-        localStorage.setItem('t_sh', shares);
-        localStorage.setItem('t_ssh', shortShares);
-        localStorage.setItem('t_sp', shortPrice);
-        localStorage.setItem('t_exp', exp);
-        localStorage.setItem('t_farms', farms);
-
-        try {
-            await setDoc(doc(db, "players", username), {
-                balance: stats.equity,
-                score: stats.equity.toFixed(2),
-                lvl: stats.lvl
-            }, { merge: true });
-        } catch (e) {}
+        // Сохраняем и параметры аккаунта, и данные для общей таблицы лидеров
+        await setDoc(doc(db, "users", currentUser), { balance, shares, shortShares, shortPrice, exp, farms }, { merge: true });
+        await setDoc(doc(db, "players", currentUser), { balance: stats.equity, score: stats.equity.toFixed(2), lvl: stats.lvl }, { merge: true });
     }
 
+    // ТОП ЛИДЕРОВ ОНЛАЙН
     const q = query(collection(db, "players"), orderBy("balance", "desc"), limit(5));
     onSnapshot(q, (snapshot) => {
         let html = "";
