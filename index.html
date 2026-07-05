@@ -9,12 +9,21 @@
         body { background-color: #060609; color: #f1f2f6; font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; text-align: center; margin: 0; padding: 8px; }
         .container { max-width: 440px; margin: 0 auto; background: #0d0e15; padding: 16px; border-radius: 24px; border: 1px solid #1c1e2d; box-shadow: 0 15px 35px rgba(0,0,0,0.8); display: none; }
         
-        /* Окно авторизации */
-        .auth-screen { max-width: 360px; margin: 80px auto; background: #0d0e15; padding: 25px; border-radius: 24px; border: 1px solid #1c1e2d; box-shadow: 0 15px 35px rgba(0,0,0,0.8); }
-        .auth-screen h2 { margin-top: 0; color: #00ffcc; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; }
-        .auth-input { width: 90%; padding: 12px; margin: 8px 0; background: #131520; border: 1px solid #1c1e2d; border-radius: 12px; color: white; font-size: 14px; outline: none; }
-        .auth-input:focus { border-color: #00ffcc; }
+        /* КРУТОЙ СОВРЕМЕННЫЙ ЭКРАН ВХОДА */
+        .auth-screen { max-width: 360px; margin: 80px auto; background: #0d0e15; padding: 30px 24px; border-radius: 24px; border: 1px solid #1c1e2d; box-shadow: 0 20px 40px rgba(0,0,0,0.9); }
+        .auth-screen h2 { margin-top: 0; color: #00ffcc; font-size: 22px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 15px rgba(0,255,204,0.3); }
+        .auth-desc { font-size: 13px; color: #7f8c8d; margin-bottom: 20px; line-height: 1.4; }
+        .auth-input { width: 90%; padding: 14px; margin: 8px 0; background: #131520; border: 1px solid #1c1e2d; border-radius: 14px; color: white; font-size: 15px; outline: none; transition: all 0.2s ease; }
+        .auth-input:focus { border-color: #00ffcc; box-shadow: 0 0 10px rgba(0,255,204,0.15); background: #161927; }
         
+        /* КАСТОМНЫЕ СТИЛЬНЫЕ УВЕДОМЛЕНИЯ (ВМЕСТО ALERT) */
+        .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 340px; pointer-events: none; }
+        .toast { background: #131520; color: #fff; padding: 14px 18px; border-radius: 16px; border: 1px solid #1c1e2d; margin-bottom: 10px; font-size: 14px; font-weight: 500; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; opacity: 0; transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast-error { border-left: 4px solid #ff3d00; }
+        .toast-success { border-left: 4px solid #00ffcc; }
+        .toast-info { border-left: 4px solid #f1c40f; }
+
         /* Хедер игры */
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1c1e2d; padding-bottom: 12px; margin-bottom: 12px; }
         .user-badge { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 14px; }
@@ -38,7 +47,7 @@
         .news-ticker { background: #131520; color: #bdc3c7; padding: 10px; border-radius: 12px; margin-bottom: 16px; font-size: 12px; text-align: left; border-left: 3px solid #00bcff; }
         .chart-container { position: relative; background: #0d0e15; border-radius: 16px; border: 1px solid #1c1e2d; padding: 8px; margin-bottom: 16px; height: 180px; }
 
-        /* СЕКРЕТНАЯ АДМИН ПАНЕЛЬ */
+        /* АДМИН ПАНЕЛЬ КИТА */
         .admin-panel { display: none; background: rgba(241, 196, 15, 0.05); border: 1px dashed #f1c40f; padding: 12px; border-radius: 16px; margin-bottom: 16px; }
         .admin-title { font-size: 12px; color: #f1c40f; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
         .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -73,14 +82,19 @@
 </head>
 <body>
 
+<!-- КОНТЕЙНЕР ДЛЯ СТИЛЬНЫХ СИСТЕМНЫХ СOОБЩЕНИЙ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ЭКРАН ВХОДА / РЕГИСТРАЦИИ -->
 <div class="auth-screen" id="authScreen">
     <h2>Pegasus Terminal</h2>
-    <div style="font-size:12px; color:#7f8c8d; margin-bottom:10px;">Введи данные для входа. Если аккаунта нет, он создастся автоматически.</div>
+    <div class="auth-desc">Введите никнейм и пароль для авторизации. Если аккаунта нет в сети, база данных создаст его автоматически.</div>
     <input type="text" class="auth-input" id="authLogin" placeholder="Никнейм" maxlength="14">
     <input type="password" class="auth-input" id="authPass" placeholder="Пароль">
-    <button class="tap-btn" id="btnAuth" style="margin-top:10px; margin-bottom:0;">Войти в терминал</button>
+    <button class="tap-btn" id="btnAuth" style="margin-top:16px; margin-bottom:0;">Войти в терминал</button>
 </div>
 
+<!-- ОСНОВНОЙ ЭКРАН ИГРЫ -->
 <div class="container" id="gameContainer">
     <div class="header">
         <div class="user-badge">💼 <span id="playerName">...</span> <span id="playerRank" class="rank-name">()</span></div>
@@ -123,6 +137,7 @@
         <canvas id="marketChart"></canvas>
     </div>
 
+    <!-- СЕКРЕТНАЯ АДМИН-ПАНЕЛЬ КИТА -->
     <div class="admin-panel" id="adminPanel">
         <div class="admin-title">👑 Панель Управления Рынком (Admin)</div>
         <div class="admin-grid">
@@ -183,7 +198,27 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Игровой профиль текущей сессии
+    // Функция красивых уведомлений вместо alert()
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        
+        let icon = '🔔';
+        if (type === 'success') icon = '✅';
+        if (type === 'error') icon = '❌';
+        
+        toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+        container.appendChild(toast);
+        
+        setTimeout(() => toast.classList.add('show'), 10);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3500);
+    }
+
     let currentUser = localStorage.getItem('logged_user') || "";
     let balance = 10000, shares = 0, shortShares = 0, shortPrice = 0, exp = 0, farms = 0;
 
@@ -194,7 +229,7 @@
     let marketTrend = 0;
     const ranks = ["Новичок", "Скальпер", "Инвестор", "Кит рынка", "Волк с Уолл-Стрит"];
 
-    // ЛОГИКА ЖИВОГО ГРАФИКА
+    // Логика живого графика
     const livePriceLinePlugin = {
         id: 'livePriceLine',
         afterDatasetsDraw(chart) {
@@ -227,18 +262,17 @@
         plugins: [livePriceLinePlugin]
     });
 
-    // ПРОВЕРКА АВТОРИЗАЦИИ ПРИ СТАРТЕ
     if (currentUser) {
         loadUserData(currentUser);
     }
 
-    // КНОПКА LOGIN / REGISTER
+    // Авторизация
     document.getElementById('btnAuth').addEventListener('click', async () => {
         let inputName = document.getElementById('authLogin').value.trim();
         let inputPass = document.getElementById('authPass').value.trim();
 
         if (inputName.length < 3 || inputPass.length < 3) {
-            alert("Ник и пароль должны содержать от 3 символов!");
+            showToast("Ник и пароль должны содержать от 3 символов!", "error");
             return;
         }
 
@@ -246,16 +280,15 @@
         const userDoc = await getDoc(userDocRef);
 
         if (userDoc.exists()) {
-            // Пользователь существует -> проверяем пароль
             if (userDoc.data().password === inputPass) {
                 currentUser = inputName;
                 localStorage.setItem('logged_user', currentUser);
                 loadUserData(currentUser);
+                showToast(`С возвращением в систему, ${currentUser}!`, "success");
             } else {
-                alert("❌ Неверный пароль для этого никнейма!");
+                showToast("Неверный пароль для этого никнейма!", "error");
             }
         } else {
-            // Пользователя нет -> регистрируем нового
             await setDoc(userDocRef, {
                 password: inputPass,
                 balance: 10000, shares: 0, shortShares: 0, shortPrice: 0, exp: 0, farms: 0
@@ -263,25 +296,23 @@
             currentUser = inputName;
             localStorage.setItem('logged_user', currentUser);
             loadUserData(currentUser);
-            alert("🎉 Аккаунт успешно создан и зарегистрирован!");
+            showToast("Аккаунт успешно создан и зарегистрирован!", "success");
         }
     });
 
-    // КНОПКА ВЫХОДА
     document.getElementById('btnLogout').addEventListener('click', () => {
         localStorage.removeItem('logged_user');
         location.reload();
     });
 
-    // ЗАГРУЗКА И ДЕСИНХРОНИЗАЦИЯ С ЛОКАЛЬНЫХ ДАННЫХ В FIREBASE
     async function loadUserData(username) {
         document.getElementById('authScreen').style.display = 'none';
         document.getElementById('gameContainer').style.display = 'block';
         document.getElementById('playerName').innerText = username;
 
-        // Если зашел админ — включаем секретную панель
         if (username.toLowerCase() === "admin") {
             document.getElementById('adminPanel').style.display = 'block';
+            showToast("Права Администратора подтверждены!", "info");
         }
 
         const userDoc = await getDoc(doc(db, "users", username));
@@ -297,27 +328,26 @@
         updateUI();
     }
 
-    // СЕКРЕТНЫЕ АДМИНСКИЕ КНОПКИ УПРАВЛЕНИЯ ЦЕНОЙ КРИПТЫ
+    // Админ команды
     document.getElementById('btnPump').addEventListener('click', async () => {
-        // Записываем команду пампа прямо в общую базу, чтобы цена подскочила у всех одновременно
         await setDoc(doc(db, "market", "global"), { action: "pump", time: Date.now() });
     });
 
     document.getElementById('btnDump').addEventListener('click', async () => {
-        // Команда дампа в облако
         await setDoc(doc(db, "market", "global"), { action: "dump", time: Date.now() });
     });
 
-    // СЛУШАТЕЛЬ ГЛОБАЛЬНЫХ АДМИН-КОМАНД В РЕАЛЬНОМ ВРЕМЕНИ
     onSnapshot(doc(db, "market", "global"), (snapshot) => {
         if (snapshot.exists()) {
             let data = snapshot.data();
             if (data.action === "pump") {
-                currentPrice *= 1.25; // Сразу бустим курс на 25% на всех телефонах
+                currentPrice *= 1.25;
                 document.getElementById('news').innerText = "🚨 РЫНОК ПОДВЕРГСЯ ЖЕСТКОМУ ПАМПУ СО СТОРОНЫ КИТА Admin!!";
+                showToast("Рыночный курс запамплен Администратором!", "success");
             } else if (data.action === "dump") {
-                currentPrice *= 0.75; // Обваливаем курс на 25% у всех игроков
+                currentPrice *= 0.75;
                 document.getElementById('news').innerText = "🚨 ВНИМАНИЕ: Admin КРУПНО СЛИВАЕТ АКТИВЫ! КРАХ РЫНКА!!";
+                showToast("Рынок обвален Администратором!", "error");
             }
             chart.update();
             updateUI();
@@ -346,16 +376,15 @@
         document.getElementById('btnOpenCase').disabled = balance < 2000;
     }
 
-    // ИГРОВЫЕ ДЕЙСТВИЯ И СИНХРОНИЗАЦИЯ С БД ПОД ИМЕНЕМ ЮЗЕРА
     document.getElementById('btnTap').addEventListener('click', () => { let stats = getStats(); balance += 5 + (stats.lvl * 2); exp += 5; updateUI(); syncOnline(); });
-    document.getElementById('btnBuyFarm').addEventListener('click', () => { if (balance >= 1500) { balance -= 1500; farms++; exp += 100; updateUI(); syncOnline(); } });
+    document.getElementById('btnBuyFarm').addEventListener('click', () => { if (balance >= 1500) { balance -= 1500; farms++; exp += 100; updateUI(); syncOnline(); showToast("Видеокарта успешно введена в эксплуатацию!", "success"); } });
     
     document.getElementById('btnOpenCase').addEventListener('click', () => {
         if (balance >= 2000) {
             balance -= 2000; let roll = Math.random();
-            if (roll > 0.65) { let win = Math.floor(Math.random() * 4000) + 2500; balance += win; exp += 250; alert(`🎉 ОКУП! Из кейса выпало: $${win}!`); } 
-            else if (roll > 0.3) { balance += 800; exp += 50; alert("📦 Выпало всего $800."); } 
-            else { exp += 20; alert("💀 СЛИВ! Пусто."); }
+            if (roll > 0.65) { let win = Math.floor(Math.random() * 4000) + 2500; balance += win; exp += 250; showToast(`🔥 ОКУП! Из кейса выпало: $${win}!`, "success"); } 
+            else if (roll > 0.3) { balance += 800; exp += 50; showToast("📦 Выпало всего $800.", "info"); } 
+            else { exp += 20; showToast("💀 СЛИВ! Кейс оказался пустым.", "error"); }
             updateUI(); syncOnline();
         }
     });
@@ -386,7 +415,7 @@
         currentPrice *= (1 + totalChange / 100);
         if (currentPrice < 1) currentPrice = 1;
 
-        if (stats.equity <= 0) { balance = 1000; shares = 0; shortShares = 0; farms = 0; alert("🚨 ЛИКВИДАЦИЯ! Фонд обанкротился."); }
+        if (stats.equity <= 0) { balance = 1000; shares = 0; shortShares = 0; farms = 0; showToast("🚨 ЛИКВИДАЦИЯ! Ваш инвестиционный фонд обанкротился.", "error"); }
 
         const priceEl = document.getElementById('price');
         priceEl.innerText = '$' + currentPrice.toFixed(2);
@@ -409,12 +438,10 @@
     async function syncOnline() {
         if (!currentUser) return;
         let stats = getStats();
-        // Сохраняем и параметры аккаунта, и данные для общей таблицы лидеров
         await setDoc(doc(db, "users", currentUser), { balance, shares, shortShares, shortPrice, exp, farms }, { merge: true });
         await setDoc(doc(db, "players", currentUser), { balance: stats.equity, score: stats.equity.toFixed(2), lvl: stats.lvl }, { merge: true });
     }
 
-    // ТОП ЛИДЕРОВ ОНЛАЙН
     const q = query(collection(db, "players"), orderBy("balance", "desc"), limit(5));
     onSnapshot(q, (snapshot) => {
         let html = "";
