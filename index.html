@@ -1,55 +1,94 @@
-import { db } from "./firebaseConfig.js"; // Убедись, что импорт базы правильный
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore.js";
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чистый Тест Базы Данных</title>
+    <style>
+        body { background: #0b0c10; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: #1f2833; padding: 30px; border-radius: 12px; width: 320px; text-align: center; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 6px; border: 1px solid #45f3ff; background: #0b0c10; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background: #45f3ff; color: #0b0c10; }
+        .btn-reg { background: transparent; color: #45f3ff; border: 1px solid #45f3ff; }
+    </style>
+</head>
+<body>
 
-async function handleAuth(inputName, inputPass) {
-    // 1. Очищаем пробелы, которые могли случайно скопироваться
-    const username = inputName.trim();
-    const password = inputPass.trim();
+<div class="box">
+    <h3>Проверка связи с Firestore</h3>
+    <input type="text" id="username" placeholder="Логин (например, Admin)">
+    <input type="text" id="password" placeholder="Пароль (например, 123)">
+    
+    <button id="loginBtn">ПОПЫТКА ВХОДА</button>
+    <button class="btn-reg" id="regBtn">СОЗДАТЬ ТЕСТОВЫЙ АКК</button>
+</div>
 
-    // 2. Проверка длины (теперь 123 точно пройдет, так как длина ровно 3)
-    if (username.length < 3 || password.length < 3) {
-        alert("Ник и пароль должны содержать от 3 символов!");
-        return;
-    }
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    try {
-        // Ссылка на документ в коллекции "users"
-        const userRef = doc(db, "users", username);
-        const userSnap = await getDoc(userRef);
+    // Твоя конфигурация из прошлых шагов
+    const firebaseConfig = {
+        apiKey: "AIzaSyAs6X0V..." /* Твой ключ из прошлых конфигураций */,
+        authDomain: "database-b5015.firebaseapp.com",
+        projectId: "database-b5015",
+        storageBucket: "database-b5015.appspot.com",
+        messagingSenderId: "956382033664",
+        appId: "1:956382033664:web:e9b609cb571b0cdab45cb5"
+    };
 
-        if (userSnap.exists()) {
-            // АВТОРИЗАЦИЯ: Пользователь найден
-            const userData = userSnap.data();
-            if (userData.password === password) {
-                alert("Успешный вход!");
-                // Здесь твой код перехода в терминал (например, window.location.href = ...)
-            } else {
-                alert("Неверный пароль для этого пользователя!");
-            }
-        } else {
-            // РЕГИСТРАЦИЯ: Пользователя нет, создаем нового
-            // Прописываем дефолтные поля, как на твоем скриншоте
-            await setDoc(userRef, {
-                password: password,
-                balance: 10000, // Стартовый баланс для нового игрока
-                customRank: 1,
-                exp: 0,
-                farms: 0,
-                isBanned: false,
-                mining: {
-                    asic: 0,
-                    gpu: 0,
-                    heat: 0,
-                    powerBill: 0,
-                    powerOn: false,
-                    quantum: 0
+    // Инициализация
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Функция входа
+    async function login() {
+        const name = document.getElementById('username').value.trim();
+        const pass = document.getElementById('password').value.trim();
+
+        try {
+            // Ищем в коллекции "users", как на твоем скриншоте
+            const userRef = doc(db, "users", name);
+            const snap = await getDoc(userRef);
+
+            if (snap.exists()) {
+                const dbPass = snap.data().password;
+                if (String(dbPass) === String(pass)) {
+                    alert("✅ СВЯЗЬ ЕСТЬ! Успешный вход под: " + name);
+                } else {
+                    alert("❌ Пользователь найден, но пароль в базе [" + dbPass + "] не совпал с вашим [" + pass + "]");
                 }
-            });
-            alert("Аккаунт успешно создан! Нажмите Войти еще раз.");
+            } else {
+                alert("ℹ️ Документ '" + name + "' не найден в коллекции 'users'.");
+            }
+        } catch (e) {
+            // Если Firebase выдаст ошибку доступа, мы увидим её тут
+            alert("🚨 Ошибка Firebase: " + e.message);
+            console.error(e);
         }
-    } catch (error) {
-        // Если база отклонит запрос, мы увидим точную причину прямо на экране телефона
-        console.error("Ошибка Firebase:", error);
-        alert("Ошибка базы данных: " + error.message);
     }
-}
+
+    // Функция регистрации
+    async function register() {
+        const name = document.getElementById('username').value.trim();
+        const pass = document.getElementById('password').value.trim();
+
+        try {
+            const userRef = doc(db, "users", name);
+            await setDoc(userRef, {
+                password: pass,
+                balance: 555,
+                isBanned: false
+            });
+            alert("✅ Аккаунт '" + name + "' успешно создан в базе данных!");
+        } catch (e) {
+            alert("🚨 Не удалось создать аккаунт. Ошибка:\n" + e.message);
+        }
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', login);
+    document.getElementById('regBtn').addEventListener('click', register);
+</script>
+
+</body>
+</html>
