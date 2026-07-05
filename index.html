@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+l<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -9,26 +9,31 @@
         body { background-color: #060609; color: #f1f2f6; font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; text-align: center; margin: 0; padding: 8px; }
         .container { max-width: 440px; margin: 0 auto; background: #0d0e15; padding: 16px; border-radius: 24px; border: 1px solid #1c1e2d; box-shadow: 0 15px 35px rgba(0,0,0,0.8); display: none; }
         
-        /* КРУТОЙ СОВРЕМЕННЫЙ ЭКРАН ВХОДА */
+        /* ЭКРАН ВХОДА */
         .auth-screen { max-width: 360px; margin: 80px auto; background: #0d0e15; padding: 30px 24px; border-radius: 24px; border: 1px solid #1c1e2d; box-shadow: 0 20px 40px rgba(0,0,0,0.9); }
         .auth-screen h2 { margin-top: 0; color: #00ffcc; font-size: 22px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 15px rgba(0,255,204,0.3); }
         .auth-desc { font-size: 13px; color: #7f8c8d; margin-bottom: 20px; line-height: 1.4; }
         .auth-input { width: 90%; padding: 14px; margin: 8px 0; background: #131520; border: 1px solid #1c1e2d; border-radius: 14px; color: white; font-size: 15px; outline: none; transition: all 0.2s ease; }
         .auth-input:focus { border-color: #00ffcc; box-shadow: 0 0 10px rgba(0,255,204,0.15); background: #161927; }
         
-        /* КАСТОМНЫЕ СТИЛЬНЫЕ УВЕДОМЛЕНИЯ (ВМЕСТО ALERT) */
+        /* УВЕДОМЛЕНИЯ */
         .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 340px; pointer-events: none; }
         .toast { background: #131520; color: #fff; padding: 14px 18px; border-radius: 16px; border: 1px solid #1c1e2d; margin-bottom: 10px; font-size: 14px; font-weight: 500; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; opacity: 0; transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .toast.show { opacity: 1; transform: translateY(0); }
         .toast-error { border-left: 4px solid #ff3d00; }
         .toast-success { border-left: 4px solid #00ffcc; }
-        .toast-info { border-left: 4px solid #f1c40f; }
+        .toast-info { border-left: 4px solid #00bcff; }
 
-        /* Хедер игры */
+        /* Хедер */
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1c1e2d; padding-bottom: 12px; margin-bottom: 12px; }
         .user-badge { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 14px; }
         .lvl-badge { background: rgba(0, 255, 204, 0.1); color: #00ffcc; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid rgba(0, 255, 204, 0.3); }
         .logout-btn { background: none; border: 1px solid #ff3d00; color: #ff3d00; padding: 4px 8px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: bold; }
+
+        /* ВЫБОР ПЛОЩАДКИ / АКТИВА */
+        .asset-selector-box { margin-bottom: 14px; text-align: left; background: #131520; padding: 12px; border-radius: 16px; border: 1px solid #1c1e2d; display: flex; justify-content: space-between; align-items: center; }
+        .asset-label { font-size: 12px; color: #7f8c8d; text-transform: uppercase; font-weight: bold; }
+        .asset-select { background: #0d0e15; color: #00ffcc; border: 1px solid #1c1e2d; padding: 8px 14px; border-radius: 12px; font-weight: bold; outline: none; cursor: pointer; }
 
         .tap-btn { width: 100%; background: linear-gradient(135deg, #00ffcc, #00bcff); color: #050508; font-size: 16px; font-weight: 800; padding: 15px; border: none; border-radius: 16px; cursor: pointer; box-shadow: 0 0 20px rgba(0,255,204,0.3); margin-bottom: 16px; text-transform: uppercase; transition: all 0.1s ease; }
         .tap-btn:active { transform: scale(0.96); filter: brightness(1.2); }
@@ -44,19 +49,19 @@
         .price-up { color: #00e676; text-shadow: 0 0 20px rgba(0,230,118,0.3); }
         .price-down { color: #ff3d00; text-shadow: 0 0 20px rgba(255,61,0,0.3); }
         
-        .news-ticker { background: #131520; color: #bdc3c7; padding: 10px; border-radius: 12px; margin-bottom: 16px; font-size: 12px; text-align: left; border-left: 3px solid #00bcff; }
+        .news-ticker { background: #131520; color: #bdc3c7; padding: 10px; border-radius: 12px; margin-bottom: 16px; font-size: 12px; text-align: left; border-left: 3px solid #00bcff; height: 34px; display: flex; align-items: center; }
         .chart-container { position: relative; background: #0d0e15; border-radius: 16px; border: 1px solid #1c1e2d; padding: 8px; margin-bottom: 16px; height: 180px; }
 
-        /* АДМИН ПАНЕЛЬ КИТА */
+        /* АДМИН ПАНЕЛЬ */
         .admin-panel { display: none; background: rgba(241, 196, 15, 0.05); border: 1px dashed #f1c40f; padding: 12px; border-radius: 16px; margin-bottom: 16px; }
-        .admin-title { font-size: 12px; color: #f1c40f; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .admin-title { font-size: 12px; color: #f1c40f; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
         .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .admin-btn { padding: 10px; font-weight: bold; border-radius: 10px; border: none; cursor: pointer; font-size: 12px; text-transform: uppercase; }
-        .btn-pump { background: #00ffcc; color: #000; box-shadow: 0 0 10px rgba(0,255,204,0.4); }
-        .btn-dump { background: #ff3d00; color: #fff; box-shadow: 0 0 10px rgba(255,61,0,0.4); }
+        .btn-pump { background: #00ffcc; color: #000; }
+        .btn-dump { background: #ff3d00; color: #fff; }
 
-        .leverage-box { margin-bottom: 14px; font-size: 13px; color: #a4b0be; }
-        select { background: #131520; color: white; border: 1px solid #1c1e2d; padding: 6px 12px; border-radius: 10px; font-weight: 600; }
+        .leverage-box { margin-bottom: 14px; font-size: 13px; color: #a4b0be; text-align: left; display: flex; justify-content: space-between; align-items: center; background: #131520; padding: 8px 12px; border-radius: 12px; border: 1px solid #1c1e2d; }
+        select { background: #0d0e15; color: white; border: 1px solid #1c1e2d; padding: 6px 12px; border-radius: 10px; font-weight: 600; outline: none; }
 
         .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
         .btn { padding: 14px; font-size: 12px; border: none; border-radius: 14px; cursor: pointer; font-weight: 700; text-transform: uppercase; }
@@ -82,19 +87,16 @@
 </head>
 <body>
 
-<!-- КОНТЕЙНЕР ДЛЯ СТИЛЬНЫХ СИСТЕМНЫХ СOОБЩЕНИЙ -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- ЭКРАН ВХОДА / РЕГИСТРАЦИИ -->
 <div class="auth-screen" id="authScreen">
     <h2>Pegasus Terminal</h2>
-    <div class="auth-desc">Введите никнейм и пароль для авторизации. Если аккаунта нет в сети, база данных создаст его автоматически.</div>
+    <div class="auth-desc">Введите никнейм и пароль. Несуществующий аккаунт зарегистрируется автоматически.</div>
     <input type="text" class="auth-input" id="authLogin" placeholder="Никнейм" maxlength="14">
     <input type="password" class="auth-input" id="authPass" placeholder="Пароль">
     <button class="tap-btn" id="btnAuth" style="margin-top:16px; margin-bottom:0;">Войти в терминал</button>
 </div>
 
-<!-- ОСНОВНОЙ ЭКРАН ИГРЫ -->
 <div class="container" id="gameContainer">
     <div class="header">
         <div class="user-badge">💼 <span id="playerName">...</span> <span id="playerRank" class="rank-name">()</span></div>
@@ -104,23 +106,34 @@
         </div>
     </div>
 
+    <div class="asset-selector-box">
+        <span class="asset-label">🌐 Выберите площадку:</span>
+        <select class="asset-select" id="assetSelect">
+            <option value="pegasus">🔥 Pegasus (Токен)</option>
+            <option value="btc">🪙 Bitcoin (Крипта)</option>
+            <option value="eth">💎 Ethereum (Крипта)</option>
+            <option value="aapl">🍏 Apple Inc. (Акции)</option>
+            <option value="gold">👑 Gold (Товары)</option>
+        </select>
+    </div>
+
     <button class="tap-btn" id="btnTap">💸 Тапать капитал (+$5)</button>
 
     <div class="stats-grid">
         <div class="card">
-            <div class="card-title">💵 Баланс Cash</div>
+            <div class="card-title">💵 Свободный баланс</div>
             <div class="card-val highlight" id="balance">$10000.00</div>
         </div>
         <div class="card">
-            <div class="card-title">⚡ Доход/сек</div>
+            <div class="card-title">⚡ Пассивный доход</div>
             <div class="card-val" id="pps" style="color: #ffb142;">$0/с</div>
         </div>
         <div class="card">
-            <div class="card-title">📈 Лонг Позиции</div>
+            <div class="card-title">📈 В лонгах (шт)</div>
             <div class="card-val" id="shares">0</div>
         </div>
         <div class="card">
-            <div class="card-title">📉 Шорт Позиции</div>
+            <div class="card-title">📉 В шортах (шт)</div>
             <div class="card-val" id="shortShares">0</div>
         </div>
     </div>
@@ -130,16 +143,15 @@
     </div>
 
     <div class="news-ticker">
-        <div id="news">Котировки запущены. Ожидание сигналов...</div>
+        <div id="news">Подключение к торговым биржам...</div>
     </div>
 
     <div class="chart-container">
         <canvas id="marketChart"></canvas>
     </div>
 
-    <!-- СЕКРЕТНАЯ АДМИН-ПАНЕЛЬ КИТА -->
     <div class="admin-panel" id="adminPanel">
-        <div class="admin-title">👑 Панель Управления Рынком (Admin)</div>
+        <div class="admin-title">👑 Управление выбранным рынком (Admin)</div>
         <div class="admin-grid">
             <button class="admin-btn btn-pump" id="btnPump">🚀 ПАМП КУРСА (+25%)</button>
             <button class="admin-btn btn-dump" id="btnDump">📉 ДАМП КУРСА (-25%)</button>
@@ -147,7 +159,7 @@
     </div>
 
     <div class="leverage-box">
-        <span>Кредитное плечо:</span>
+        <span>Кредитное плечо маржи:</span>
         <select id="leverage">
             <option value="1">x1 (Обычный)</option>
             <option value="3">x3 (Маржа)</option>
@@ -198,38 +210,39 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Функция красивых уведомлений вместо alert()
     function showToast(message, type = 'info') {
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
-        
         let icon = '🔔';
         if (type === 'success') icon = '✅';
         if (type === 'error') icon = '❌';
-        
         toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
         container.appendChild(toast);
-        
         setTimeout(() => toast.classList.add('show'), 10);
-        
         setTimeout(() => {
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 300);
-        }, 3500);
+        }, 3000);
     }
 
     let currentUser = localStorage.getItem('logged_user') || "";
-    let balance = 10000, shares = 0, shortShares = 0, shortPrice = 0, exp = 0, farms = 0;
+    let balance = 10000, exp = 0, farms = 0;
 
-    let currentPrice = 100;
-    let priceHistory = Array(20).fill(100); 
+    // Структура данных под несколько активов
+    let currentAsset = "pegasus";
+    let assetsData = {
+        pegasus: { price: 96.6, history: Array(20).fill(96.6), shares: 0, shortShares: 0, shortPrice: 0, trend: 0 },
+        btc: { price: 64000, history: Array(20).fill(64000), shares: 0, shortShares: 0, shortPrice: 0, trend: 0 },
+        eth: { price: 3450, history: Array(20).fill(3450), shares: 0, shortShares: 0, shortPrice: 0, trend: 0 },
+        aapl: { price: 220, history: Array(20).fill(220), shares: 0, shortShares: 0, shortPrice: 0, trend: 0 },
+        gold: { price: 2350, history: Array(20).fill(2350), shares: 0, shortShares: 0, shortPrice: 0, trend: 0 }
+    };
+
     let labels = Array(20).fill('');
     let timeTick = 0;
-    let marketTrend = 0;
     const ranks = ["Новичок", "Скальпер", "Инвестор", "Кит рынка", "Волк с Уолл-Стрит"];
 
-    // Логика живого графика
     const livePriceLinePlugin = {
         id: 'livePriceLine',
         afterDatasetsDraw(chart) {
@@ -237,15 +250,14 @@
             const meta = chart.getDatasetMeta(0);
             if (!meta.data || meta.data.length === 0) return;
             const lastPoint = meta.data[meta.data.length - 1];
-            const yCoord = lastPoint.y;
             ctx.save();
             ctx.strokeStyle = chart.data.datasets[0].borderColor;
             ctx.lineWidth = 1.5;
             ctx.setLineDash([4, 4]);
-            ctx.beginPath(); ctx.moveTo(left, yCoord); ctx.lineTo(right, yCoord); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(left, lastPoint.y); ctx.lineTo(right, lastPoint.y); ctx.stroke();
             ctx.setLineDash([]);
             ctx.fillStyle = chart.data.datasets[0].borderColor;
-            ctx.beginPath(); ctx.arc(lastPoint.x, yCoord, 5, 0, 2 * Math.PI); ctx.fill();
+            ctx.beginPath(); ctx.arc(lastPoint.x, lastPoint.y, 5, 0, 2 * Math.PI); ctx.fill();
             ctx.restore();
         }
     };
@@ -257,25 +269,34 @@
 
     const chart = new Chart(canvasCtx, {
         type: 'line',
-        data: { labels: labels, datasets: [{ data: priceHistory, borderColor: '#00e676', borderWidth: 2.5, pointRadius: 0, tension: 0.35, fill: true, backgroundColor: fillGradient }] },
+        data: { labels: labels, datasets: [{ data: [...assetsData[currentAsset].history], borderColor: '#00e676', borderWidth: 2.5, pointRadius: 0, tension: 0.35, fill: true, backgroundColor: fillGradient }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { position: 'right', grid: { color: '#161824' }, ticks: { color: '#61667f', font: { size: 10 } } } } },
         plugins: [livePriceLinePlugin]
     });
 
-    if (currentUser) {
-        loadUserData(currentUser);
+    if (currentUser) loadUserData(currentUser);
+
+    // Смена площадки
+    document.getElementById('assetSelect').addEventListener('change', (e) => {
+        currentAsset = e.target.value;
+        showToast(`Переключение на площадку: ${e.target.options[e.target.selectedIndex].text}`, "info");
+        updateChartStructure();
+        updateUI();
+    });
+
+    function updateChartStructure() {
+        chart.data.datasets[0].data = [...assetsData[currentAsset].history];
+        chart.update();
     }
 
     // Авторизация
     document.getElementById('btnAuth').addEventListener('click', async () => {
         let inputName = document.getElementById('authLogin').value.trim();
         let inputPass = document.getElementById('authPass').value.trim();
-
         if (inputName.length < 3 || inputPass.length < 3) {
             showToast("Ник и пароль должны содержать от 3 символов!", "error");
             return;
         }
-
         const userDocRef = doc(db, "users", inputName);
         const userDoc = await getDoc(userDocRef);
 
@@ -284,19 +305,19 @@
                 currentUser = inputName;
                 localStorage.setItem('logged_user', currentUser);
                 loadUserData(currentUser);
-                showToast(`С возвращением в систему, ${currentUser}!`, "success");
+                showToast(`Авторизация успешна!`, "success");
             } else {
-                showToast("Неверный пароль для этого никнейма!", "error");
+                showToast("Неверный пароль!", "error");
             }
         } else {
+            // Регистрация с поддержкой объекта площадок
             await setDoc(userDocRef, {
-                password: inputPass,
-                balance: 10000, shares: 0, shortShares: 0, shortPrice: 0, exp: 0, farms: 0
+                password: inputPass, balance: 10000, exp: 0, farms: 0, assets: assetsData
             });
             currentUser = inputName;
             localStorage.setItem('logged_user', currentUser);
             loadUserData(currentUser);
-            showToast("Аккаунт успешно создан и зарегистрирован!", "success");
+            showToast("Новый аккаунт создан!", "success");
         }
     });
 
@@ -312,62 +333,83 @@
 
         if (username.toLowerCase() === "admin") {
             document.getElementById('adminPanel').style.display = 'block';
-            showToast("Права Администратора подтверждены!", "info");
         }
 
         const userDoc = await getDoc(doc(db, "users", username));
         if (userDoc.exists()) {
             let d = userDoc.data();
             balance = d.balance ?? 10000;
-            shares = d.shares ?? 0;
-            shortShares = d.shortShares ?? 0;
-            shortPrice = d.shortPrice ?? 0;
             exp = d.exp ?? 0;
             farms = d.farms ?? 0;
+            if (d.assets) {
+                // Загружаем сохраненные позиции по площадкам
+                for (let key in d.assets) {
+                    if (assetsData[key]) {
+                        assetsData[key].shares = d.assets[key].shares ?? 0;
+                        assetsData[key].shortShares = d.assets[key].shortShares ?? 0;
+                        assetsData[key].shortPrice = d.assets[key].shortPrice ?? 0;
+                    }
+                }
+            }
         }
+        updateChartStructure();
         updateUI();
     }
 
-    // Админ команды
+    // Админ команды на текущий актив
     document.getElementById('btnPump').addEventListener('click', async () => {
-        await setDoc(doc(db, "market", "global"), { action: "pump", time: Date.now() });
+        await setDoc(doc(db, "market", currentAsset), { action: "pump", time: Date.now() });
     });
-
     document.getElementById('btnDump').addEventListener('click', async () => {
-        await setDoc(doc(db, "market", "global"), { action: "dump", time: Date.now() });
+        await setDoc(doc(db, "market", currentAsset), { action: "dump", time: Date.now() });
     });
 
-    onSnapshot(doc(db, "market", "global"), (snapshot) => {
-        if (snapshot.exists()) {
-            let data = snapshot.data();
-            if (data.action === "pump") {
-                currentPrice *= 1.25;
-                document.getElementById('news').innerText = "🚨 РЫНОК ПОДВЕРГСЯ ЖЕСТКОМУ ПАМПУ СО СТОРОНЫ КИТА Admin!!";
-                showToast("Рыночный курс запамплен Администратором!", "success");
-            } else if (data.action === "dump") {
-                currentPrice *= 0.75;
-                document.getElementById('news').innerText = "🚨 ВНИМАНИЕ: Admin КРУПНО СЛИВАЕТ АКТИВЫ! КРАХ РЫНКА!!";
-                showToast("Рынок обвален Администратором!", "error");
+    // Слушатель глобальных пампов/дампов для каждого актива отдельно
+    ['pegasus', 'btc', 'eth', 'aapl', 'gold'].forEach(assetKey => {
+        onSnapshot(doc(db, "market", assetKey), (snapshot) => {
+            if (snapshot.exists()) {
+                let data = snapshot.data();
+                if (data.action === "pump") {
+                    assetsData[assetKey].price *= 1.25;
+                    if (assetKey === currentAsset) {
+                        document.getElementById('news').innerText = `🚨 КИТЫ КРУПНО ПАМПЯТ РЫНОК НА ПЛОЩАДКЕ ${assetKey.toUpperCase()}!`;
+                        showToast("Рынок запамплен!", "success");
+                    }
+                } else if (data.action === "dump") {
+                    assetsData[assetKey].price *= 0.75;
+                    if (assetKey === currentAsset) {
+                        document.getElementById('news').innerText = `🚨 ОБВАЛ: Панические распродажи на площадке ${assetKey.toUpperCase()}!`;
+                        showToast("Рыночный крах!", "error");
+                    }
+                }
+                chart.update(); updateUI();
             }
-            chart.update();
-            updateUI();
-        }
+        });
     });
 
     function getStats() {
         let lvl = Math.floor(Math.sqrt(exp / 120)) + 1;
         let rank = ranks[Math.min(lvl - 1, ranks.length - 1)];
-        let shortProfit = shortShares > 0 ? (shortPrice - currentPrice) * shortShares : 0;
         let passiveIncome = farms * 25;
-        let equity = balance + (shares * currentPrice) + shortProfit + (farms * 1500 * 0.8);
+        
+        let totalPositionsValue = 0;
+        for (let key in assetsData) {
+            let ast = assetsData[key];
+            let shortProfit = ast.shortShares > 0 ? (ast.shortPrice - ast.price) * ast.shortShares : 0;
+            totalPositionsValue += (ast.shares * ast.price) + shortProfit;
+        }
+
+        let equity = balance + totalPositionsValue + (farms * 1500 * 0.8);
         return { lvl, rank, equity, passiveIncome };
     }
 
     function updateUI() {
         let stats = getStats();
+        let active = assetsData[currentAsset];
+
         document.getElementById('balance').innerText = '$' + balance.toFixed(2);
-        document.getElementById('shares').innerText = shares;
-        document.getElementById('shortShares').innerText = shortShares;
+        document.getElementById('shares').innerText = active.shares;
+        document.getElementById('shortShares').innerText = active.shortShares;
         document.getElementById('playerLvl').innerText = stats.lvl;
         document.getElementById('playerRank').innerText = `(${stats.rank})`;
         document.getElementById('pps').innerText = `$${stats.passiveIncome}/с`;
@@ -377,51 +419,101 @@
     }
 
     document.getElementById('btnTap').addEventListener('click', () => { let stats = getStats(); balance += 5 + (stats.lvl * 2); exp += 5; updateUI(); syncOnline(); });
-    document.getElementById('btnBuyFarm').addEventListener('click', () => { if (balance >= 1500) { balance -= 1500; farms++; exp += 100; updateUI(); syncOnline(); showToast("Видеокарта успешно введена в эксплуатацию!", "success"); } });
+    document.getElementById('btnBuyFarm').addEventListener('click', () => { if (balance >= 1500) { balance -= 1500; farms++; exp += 100; updateUI(); syncOnline(); showToast("Ферма куплена!", "success"); } });
     
     document.getElementById('btnOpenCase').addEventListener('click', () => {
         if (balance >= 2000) {
             balance -= 2000; let roll = Math.random();
-            if (roll > 0.65) { let win = Math.floor(Math.random() * 4000) + 2500; balance += win; exp += 250; showToast(`🔥 ОКУП! Из кейса выпало: $${win}!`, "success"); } 
+            if (roll > 0.65) { let win = Math.floor(Math.random() * 4000) + 2500; balance += win; exp += 250; showToast(`🔥 ОКУП! Получено: $${win}!`, "success"); } 
             else if (roll > 0.3) { balance += 800; exp += 50; showToast("📦 Выпало всего $800.", "info"); } 
-            else { exp += 20; showToast("💀 СЛИВ! Кейс оказался пустым.", "error"); }
+            else { exp += 20; showToast("💀 Кейс оказался пустым!", "error"); }
             updateUI(); syncOnline();
         }
     });
 
-    document.getElementById('btnBuy').addEventListener('click', () => { let lev = parseInt(document.getElementById('leverage').value); if (balance >= (currentPrice / lev)) { balance -= (currentPrice / lev); shares++; exp += 15; updateUI(); syncOnline(); } });
-    document.getElementById('btnSell').addEventListener('click', () => { if (shares > 0) { let lev = parseInt(document.getElementById('leverage').value); balance += currentPrice / lev + (currentPrice - (currentPrice / lev)); shares--; exp += 10; updateUI(); syncOnline(); } });
-    document.getElementById('btnShort').addEventListener('click', () => { if (shortShares === 0) shortPrice = currentPrice; let lev = parseInt(document.getElementById('leverage').value); if (balance >= (currentPrice / lev)) { balance -= (currentPrice / lev); shortShares++; exp += 15; updateUI(); syncOnline(); } });
-    document.getElementById('btnCover').addEventListener('click', () => { if (shortShares > 0) { let lev = parseInt(document.getElementById('leverage').value); balance += (shortPrice / lev) + (shortPrice - currentPrice); shortShares--; if (shortShares === 0) shortPrice = 0; exp += 10; updateUI(); syncOnline(); } });
+    // ТОРГОВЫЕ ОПЕРАЦИИ С ТЕКУЩИМ АКТИВОМ
+    document.getElementById('btnBuy').addEventListener('click', () => { 
+        let active = assetsData[currentAsset];
+        let lev = parseInt(document.getElementById('leverage').value); 
+        if (balance >= (active.price / lev)) { 
+            balance -= (active.price / lev); active.shares++; exp += 15; updateUI(); syncOnline(); 
+        } 
+    });
+    document.getElementById('btnSell').addEventListener('click', () => { 
+        let active = assetsData[currentAsset];
+        if (active.shares > 0) { 
+            let lev = parseInt(document.getElementById('leverage').value); 
+            balance += active.price / lev + (active.price - (active.price / lev)); active.shares--; exp += 10; updateUI(); syncOnline(); 
+        } 
+    });
+    document.getElementById('btnShort').addEventListener('click', () => { 
+        let active = assetsData[currentAsset];
+        if (active.shortShares === 0) active.shortPrice = active.price; 
+        let lev = parseInt(document.getElementById('leverage').value); 
+        if (balance >= (active.price / lev)) { 
+            balance -= (active.price / lev); active.shortShares++; exp += 15; updateUI(); syncOnline(); 
+        } 
+    });
+    document.getElementById('btnCover').addEventListener('click', () => { 
+        let active = assetsData[currentAsset];
+        if (active.shortShares > 0) { 
+            let lev = parseInt(document.getElementById('leverage').value); 
+            balance += (active.shortPrice / lev) + (active.shortPrice - active.price); active.shortShares--; 
+            if (active.shortShares === 0) active.shortPrice = 0; exp += 10; updateUI(); syncOnline(); 
+        } 
+    });
 
+    // Симуляция всех рынков одновременно
     function tickMarket() {
         if (!currentUser) return;
         timeTick++;
         let stats = getStats();
         if (stats.passiveIncome > 0) balance += stats.passiveIncome * 2;
 
-        if (timeTick % 10 === 0) {
-            let newsList = [
-                { text: "🚀 Проект Pegasus выкатил масштабное обновление экосистемы!", trend: 5 },
-                { text: "📉 Произошел крупный дамп монет со счетов инвесторов!", trend: -5 },
-                { text: "📊 Фондовые рынки показывают стабильный приток кэша!", trend: 3.5 }
+        // Новостной триггер для случайного актива
+        if (timeTick % 8 === 0) {
+            let assetKeys = Object.keys(assetsData);
+            let targetKey = assetKeys[Math.floor(Math.random() * assetKeys.length)];
+            let newsOptions = [
+                { text: `🚀 Срочные новости: Повышен интерес инвесторов к площадке ${targetKey.toUpperCase()}!`, trend: 6 },
+                { text: `📉 Падение котировок: Институционалы фиксируют прибыль на ${targetKey.toUpperCase()}!`, trend: -6 }
             ];
-            let n = newsList[Math.floor(Math.random() * newsList.length)];
-            document.getElementById('news').innerText = n.text; marketTrend = n.trend;
-            setTimeout(() => { marketTrend = 0; document.getElementById('news').innerText = "💤 На рынке затишье..."; }, 6000);
+            let picked = newsOptions[Math.floor(Math.random() * newsOptions.length)];
+            assetsData[targetKey].trend = picked.trend;
+            if (targetKey === currentAsset) document.getElementById('news').innerText = picked.text;
+
+            setTimeout(() => { 
+                assetsData[targetKey].trend = 0; 
+                if (currentAsset === targetKey) document.getElementById('news').innerText = "💤 На рынках стабильный боковик..."; 
+            }, 5000);
         }
 
-        let totalChange = ((Math.random() - 0.49) * 8.5) + marketTrend;
-        currentPrice *= (1 + totalChange / 100);
-        if (currentPrice < 1) currentPrice = 1;
+        // Обсчитываем движения цен всех активов
+        for (let key in assetsData) {
+            let ast = assetsData[key];
+            let volatility = key === 'btc' || key === 'pegasus' ? 9.5 : 4.5; // Крипта более волатильна
+            let change = ((Math.random() - 0.49) * volatility) + ast.trend;
+            ast.price *=(1 + change / 100);
+            if (ast.price < 0.5) ast.price = 0.5;
 
-        if (stats.equity <= 0) { balance = 1000; shares = 0; shortShares = 0; farms = 0; showToast("🚨 ЛИКВИДАЦИЯ! Ваш инвестиционный фонд обанкротился.", "error"); }
+            ast.history.push(ast.price);
+            if (ast.history.length > 20) ast.history.shift();
+        }
 
+        if (stats.equity <= 0) { 
+            balance = 1000; farms = 0; 
+            for(let key in assetsData) { assetsData[key].shares = 0; assetsData[key].shortShares = 0; }
+            showToast("🚨 МАРЖИН-КОЛЛ! Фонд полностью ликвидирован за долги.", "error"); 
+        }
+
+        // Рендеринг текущего актива на экран
+        let active = assetsData[currentAsset];
         const priceEl = document.getElementById('price');
-        priceEl.innerText = '$' + currentPrice.toFixed(2);
+        priceEl.innerText = '$' + active.price.toFixed(2);
         
+        let lastDiff = active.history[active.history.length-1] - active.history[active.history.length-2];
         let newGradient = canvasCtx.createLinearGradient(0, 0, 0, 180);
-        if (totalChange >= 0) {
+        if (lastDiff >= 0) {
             priceEl.className = 'price-up'; chart.data.datasets[0].borderColor = '#00e676';
             newGradient.addColorStop(0, 'rgba(0, 230, 118, 0.18)'); newGradient.addColorStop(1, 'rgba(0, 230, 118, 0.0)');
         } else {
@@ -429,16 +521,15 @@
             newGradient.addColorStop(0, 'rgba(255, 61, 0, 0.18)'); newGradient.addColorStop(1, 'rgba(255, 61, 0, 0.0)');
         }
         chart.data.datasets[0].backgroundColor = newGradient;
+        chart.data.datasets[0].data = [...active.history];
 
-        priceHistory.push(currentPrice); labels.push('');
-        if (priceHistory.length > 20) { priceHistory.shift(); labels.shift(); }
         chart.update(); updateUI();
     }
 
     async function syncOnline() {
         if (!currentUser) return;
         let stats = getStats();
-        await setDoc(doc(db, "users", currentUser), { balance, shares, shortShares, shortPrice, exp, farms }, { merge: true });
+        await setDoc(doc(db, "users", currentUser), { balance, exp, farms, assets: assetsData }, { merge: true });
         await setDoc(doc(db, "players", currentUser), { balance: stats.equity, score: stats.equity.toFixed(2), lvl: stats.lvl }, { merge: true });
     }
 
