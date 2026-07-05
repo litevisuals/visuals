@@ -424,7 +424,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { initializeFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDEaVk5ynHpi2uFu2d7Zqc3PAAPR58IeGI",
@@ -437,8 +437,8 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    // Принудительно отключаем локальный кэш, чтобы решить проблему "offline" в мобильных браузерах
-    const db = initializeFirestore(app, { localCache: undefined });
+    // Надежный стандартный запуск Firestore без зависаний кэша
+    const db = getFirestore(app);
 
     window.switchPage = function(pageId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -498,7 +498,10 @@
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { position: 'right', grid: { color: '#161824' }, ticks: { color: '#61667f', font: { size: 10 } } } }
     });
 
-    if (currentUser) loadUserData(currentUser);
+    if (currentUser) {
+        loadUserData(currentUser);
+        initOnlineListeners(); // Запуск слушателей для авторизованного юзера
+    }
 
     document.getElementById('assetSelect').addEventListener('change', (e) => {
         currentAsset = e.target.value;
@@ -517,11 +520,13 @@
         if (userDoc.exists()) {
             let ud = userDoc.data();
             if (ud.isBanned === true) { document.getElementById('authScreen').style.display='none'; document.getElementById('banScreen').style.display='block'; return; }
-            if (ud.password === inputPass) { currentUser = inputName; localStorage.setItem('logged_user', currentUser); loadUserData(currentUser); } 
+            if (ud.password === inputPass) { currentUser = inputName; localStorage.setItem('logged_user', currentUser); loadUserData(currentUser); initOnlineListeners(); } 
             else { showToast("Неверный пароль!", "error"); }
         } else {
+            // Первая регистрация автоматически запишет структуру в пустую БД
             await setDoc(userDocRef, { password: inputPass, balance: 10000, exp: 0, lastBonusTime: 0, usedPromos: [], assets: assetsData, partsInventory: partsInventory, customRank: -1, isBanned: false });
-            currentUser = inputName; localStorage.setItem('logged_user', currentUser); loadUserData(currentUser);
+            await setDoc(doc(db, "players", inputName), { balance: 10000, score: "10000.00", lvl: 1 });
+            currentUser = inputName; localStorage.setItem('logged_user', currentUser); loadUserData(currentUser); initOnlineListeners();
         }
     });
 
@@ -658,7 +663,7 @@
         let qty = parseInt(document.getElementById('tradeAmount').value) || 1;
         let a = assetsData[currentAsset]; let l = parseInt(document.getElementById('leverage').value);
         let cost = (a.price / l) * qty;
-        if (balance >= cost) { balance -= cost; a.shares += qty; exp += 15 * qty; showToast(`Куплено акций: ${qty}`, "success"); updateUI(); syncOnline(); } 
+        if (balance >= cost) { balance -= cost; a.shares += qty; exp += 15 * qty; showToast(`Куплено акций: ${qty}`, "success"); updateUI(); updateUI(); syncOnline(); } 
         else { showToast("Недостаточно средств!", "error"); }
     });
 
@@ -746,16 +751,28 @@
     document.getElementById('btnPump').addEventListener('click', async () => { await setDoc(doc(db, "market", currentAsset), { action: "pump", time: Date.now() }); });
     document.getElementById('btnDump').addEventListener('click', async () => { await setDoc(doc(db, "market", currentAsset), { action: "dump", time: Date.now() }); });
 
-    ['pegasus', 'btc', 'eth', 'aapl', 'gold'].forEach(assetKey => {
-        onSnapshot(doc(db, "market", assetKey), (snapshot) => {
-            if (snapshot.exists()) {
-                let data = snapshot.data();
-                if (data.action === "pump") { assetsData[assetKey].price *= 1.25; } 
-                else if (data.action === "dump") { assetsData[assetKey].price *= 0.75; }
-                chart.update(); updateUI();
-            }
+    // Функция безопасной инициализации слушателей базы данных ОНЛАЙН после входа
+    function initOnlineListeners() {
+        ['pegasus', 'btc', 'eth', 'aapl', 'gold'].forEach(assetKey => {
+            onSnapshot(doc(db, "market", assetKey), (snapshot) => {
+                if (snapshot.exists()) {
+                    let data = snapshot.data();
+                    if (data.action === "pump") { assetsData[assetKey].price *= 1.25; } 
+                    else if (data.action === "dump") { assetsData[assetKey].price *= 0.75; }
+                    chart.update(); updateUI();
+                }
+            });
         });
-    });
+
+        const q = query(collection(db, "players"), orderBy("balance", "desc"), limit(5));
+        onSnapshot(q, (snapshot) => {
+            let html = ""; snapshot.forEach((doc) => {
+                let data = doc.data();
+                html += `<li><strong>${doc.id} (LVL ${data.lvl || 1})</strong> <span>$${data.score || 0}</span></li>`;
+            });
+            document.getElementById('leaderboard').innerHTML = html;
+        });
+    }
 
     function tickMarket() {
         if (!currentUser) return;
@@ -808,15 +825,6 @@
         await setDoc(doc(db, "users", currentUser), { balance, exp, lastBonusTime, usedPromos, assets: assetsData, partsInventory: partsInventory, customRank, isBanned }, { merge: true });
         await setDoc(doc(db, "players", currentUser), { balance, score: balance.toFixed(2), lvl: stats.lvl }, { merge: true });
     }
-
-    const q = query(collection(db, "players"), orderBy("balance", "desc"), limit(5));
-    onSnapshot(q, (snapshot) => {
-        let html = ""; snapshot.forEach((doc) => {
-            let data = doc.data();
-            html += `<li><strong>${doc.id} (LVL ${data.lvl || 1})</strong> <span>$${data.score || 0}</span></li>`;
-        });
-        document.getElementById('leaderboard').innerHTML = html;
-    });
 
     setInterval(tickMarket, 2000);
 </script>
