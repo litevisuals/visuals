@@ -2,205 +2,306 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LITEVISUALS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pegasus Trading Online</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            background: #09090e; 
-            color: #ffffff; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            min-height: 100vh; 
-            display: flex; 
-            justify-content: center;
-            align-items: center; 
-            padding: 16px;
-        }
-
-        /* Карточка один в один по форме из PulseVisuals */
-        .main-card {
-            width: 100%;
-            max-width: 380px;
-            background: #111116;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 24px;
-            padding: 35px 24px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-        }
-
-        .form-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
-        .form-subtitle { font-size: 13px; color: #62627a; margin-bottom: 28px; }
-
-        .input-group { position: relative; margin-bottom: 16px; }
-        .input-group input {
-            width: 100%;
-            background: #17171f;
-            border: 1px solid rgba(255, 255, 255, 0.02);
-            border-radius: 14px;
-            padding: 18px 50px 18px 18px;
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.2s;
-        }
-        .input-group input:focus { border-color: #5b57ef; background: #1a1a26; }
-        
-        /* Защита от стандартного желтого фона браузера */
-        .input-group input:-webkit-autofill {
-            -webkit-box-shadow: 0 0 0 1000px #17171f inset !important;
-            -webkit-text-fill-color: #ffffff !important;
-        }
-
-        .eye-icon { 
-            position: absolute; right: 18px; top: 50%; transform: translateY(-50%); 
-            color: #4e4e5e; cursor: pointer; font-size: 16px; user-select: none;
-        }
-
-        /* Кнопка "Войти" */
-        .btn-submit {
-            width: 100%;
-            background: linear-gradient(135deg, #5b57ef 0%, #3b37c7 100%);
-            color: #ffffff;
-            border: none;
-            padding: 18px;
-            border-radius: 14px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(91, 87, 239, 0.25);
-            transition: all 0.15s;
-            margin-top: 8px;
-            margin-bottom: 24px;
-        }
-        .btn-submit:active { transform: scale(0.98); opacity: 0.95; }
-
-        /* Нижние ссылки */
-        .footer-links { display: flex; justify-content: space-between; font-size: 13px; }
-        .link-secondary { color: #525266; text-decoration: none; cursor: pointer; }
-        .link-secondary span { color: #a2a2bd; transition: color 0.2s; }
-        .link-secondary:hover span { color: #fff; }
-
-        /* Личный кабинет (после авторизации) */
-        #client-area { display: none; text-align: center; }
-        .welcome-text { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
-        .user-email { font-size: 13px; color: #525266; margin-bottom: 30px; font-family: monospace; }
-
-        #toast { 
-            position: fixed; bottom: -60px; left: 50%; transform: translateX(-50%); 
-            background: #fff; color: #000; padding: 14px 28px; border-radius: 50px; 
-            font-size: 13px; font-weight: 700; opacity: 0; z-index: 1000;
-            transition: all 0.3s cubic-bezier(0.1, 1, 0.1, 1); pointer-events: none; 
-            white-space: nowrap;
-        }
-        #toast.show { bottom: 30px; opacity: 1; }
+        body { background-color: #0b0b0d; color: #ffffff; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 10px; }
+        .container { max-width: 480px; margin: 0 auto; background: #13131a; padding: 15px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #22222f; padding-bottom: 10px; }
+        .stats { display: flex; justify-content: space-between; margin: 15px 0; background: #1c1c24; padding: 12px; border-radius: 12px; }
+        .stat-box { text-align: center; width: 33%; }
+        .stat-val { font-weight: bold; color: #f1c40f; font-size: 16px; margin-top: 4px; }
+        .price-box { margin: 15px 0; padding: 10px; background: #1c1c24; border-radius: 12px; }
+        .price-up { color: #2ecc71; font-size: 32px; font-weight: bold; animation: pulse-g 0.3s; }
+        .price-down { color: #e74c3c; font-size: 32px; font-weight: bold; animation: pulse-r 0.3s; }
+        .news-ticker { background: #ff9f43; color: #000; padding: 8px; font-weight: bold; border-radius: 8px; margin: 10px 0; font-size: 13px; min-height: 18px; }
+        .leverage-selector { margin: 10px 0; display: flex; justify-content: center; gap: 10px; align-items: center; }
+        select { background: #22222f; color: white; border: 1px solid #444; padding: 5px; border-radius: 5px; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .btn { padding: 14px; font-size: 16px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-buy { background: #2ecc71; color: white; }
+        .btn-sell { background: #e74c3c; color: white; }
+        .btn-short { background: #3498db; color: white; }
+        .btn-cover { background: #9b59b6; color: white; }
+        .btn:active { transform: scale(0.97); }
+        .leaderboard-box { background: #1c1c24; padding: 15px; border-radius: 12px; text-align: left; margin-top: 15px; }
+        .leaderboard-box h3 { margin: 0 0 10px 0; text-align: center; color: #f1c40f; font-size: 16px; }
+        ol { padding-left: 20px; margin: 0; }
+        li { padding: 6px 0; border-bottom: 1px solid #282835; font-size: 14px; display: flex; justify-content: space-between; }
+        .rank-name { color: #888; font-size: 12px; }
     </style>
 </head>
 <body>
 
-    <div class="main-card">
-        <div id="auth-area">
-            <div class="form-title" id="form-title">Авторизация</div>
-            <div class="form-subtitle" id="form-subtitle">Войди, чтобы попасть в свой профиль</div>
-
-            <div class="input-group">
-                <input type="email" id="email" placeholder="Email">
-            </div>
-
-            <div class="input-group">
-                <input type="password" id="password" placeholder="Пароль">
-                <span class="eye-icon" onclick="togglePassword()">👁</span>
-            </div>
-
-            <button class="btn-submit" id="submit-btn" onclick="handleAuth()">Войти</button>
-
-            <div class="footer-links">
-                <div class="link-secondary" onclick="toggleMode()"><span id="switch-txt">Нет аккаунта? Регистрация</span></div>
-                <div class="link-secondary"><span>Забыл пароль</span></div>
-            </div>
-        </div>
-
-        <div id="client-area">
-            <div class="welcome-text">Доступ получен</div>
-            <div class="user-email" id="user-display-email">...</div>
-            <button class="btn-submit" onclick="copyScript()">Скопировать скрипт</button>
-            <button class="btn-submit" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); margin-top:0; color:#62627a;" onclick="logout()">Выйти из профиля</button>
-        </div>
+<div class="container">
+    <div class="header">
+        <div>💼 <span id="playerName">...</span> <span id="playerRank" class="rank-name">(Новичок)</span></div>
+        <div>LVL: <span id="playerLvl" style="color:#3498db; font-weight:bold;">1</span></div>
     </div>
 
-    <div id="toast">Готово</div>
+    <div class="stats">
+        <div class="stat-box">Баланс<br><div class="stat-val" id="balance">$10000.00</div></div>
+        <div class="stat-box">Лонг Акции<br><div class="stat-val" id="shares" style="color:#fff;">0</div></div>
+        <div class="stat-box">Шорт Акции<br><div class="stat-val" id="shortShares" style="color:#fff;">0</div></div>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        // Твоя рабочая связка с Supabase
-        const SUPABASE_URL = "https://ycvvuszmrydfuyuaavpk.supabase.co";
-        const SUPABASE_ANON_KEY = "Sb_publishable_4I7C54sWOsg5W62bMElrDA_HIRi8pNG"; 
+    <div class="price-box">
+        <span style="font-size: 12px; color: #aaa;">ТЕКУЩИЙ КУРС PEGASUS:</span>
+        <div id="price" class="price-up">$100.00</div>
+    </div>
 
-        let supabase;
-        try { supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e) {}
+    <div class="news-ticker" id="news">📈 Рынок стабилен. Ждем новостей...</div>
 
-        let isLoginMode = true;
+    <canvas id="marketChart" height="160"></canvas>
 
-        window.onload = async () => {
-            if (supabase) {
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session) showCabinet(session.user.email);
-            }
-        };
+    <div class="leverage-selector">
+        <label>Кредитное плечо: </label>
+        <select id="leverage">
+            <option value="1">x1 (Свои деньги)</option>
+            <option value="2">x2 (Маржа)</option>
+            <option value="5">x5 (Макс Риск!)</option>
+        </select>
+    </div>
 
-        function toggleMode() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('form-title').innerText = isLoginMode ? "Авторизация" : "Регистрация";
-            document.getElementById('form-subtitle').innerText = isLoginMode ? "Войди, чтобы попасть в свой профиль" : "Создай профиль, чтобы продолжить";
-            document.getElementById('submit-btn').innerText = isLoginMode ? "Войти" : "Зарегистрироваться";
-            document.getElementById('switch-txt').innerText = isLoginMode ? "Нет аккаунта? Регистрация" : "Уже есть профиль? Войти";
+    <div class="btn-grid">
+        <button class="btn btn-buy" id="btnBuy">КУПИТЬ (Лонг)</button>
+        <button class="btn btn-sell" id="btnSell">ПРОДАТЬ</button>
+        <button class="btn btn-short" id="btnShort">ШОРТ (В долг)</button>
+        <button class="btn btn-cover" id="btnCover">ВЫКУП ШОРТА</button>
+    </div>
+
+    <div class="leaderboard-box">
+        <h3>🏆 ТОП-5 ОНЛАЙН ТРЕЙДЕРОВ</h3>
+        <ol id="leaderboard"><li>Загрузка...</li></ol>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // Твои проверенные ключи Firestore
+    const firebaseConfig = {
+        apiKey: "AIzaSyDEaVk5ynHpi2uFu2d7Zqc3PAAPR58IeGI",
+        authDomain: "database-2aad8.firebaseapp.com",
+        projectId: "database-2aad8",
+        storageBucket: "database-2aad8.firebasestorage.app",
+        messagingSenderId: "1095120564272",
+        appId: "1:1095120564272:web:eeefe80cb3816df52c3df5",
+        measurementId: "G-49PRFBPGZ9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Никнейм
+    let username = localStorage.getItem('crypto_trader_name');
+    if (!username) {
+        username = prompt("Твой никнейм на бирже:", "Трейдер_" + Math.floor(Math.random() * 1000));
+        if(!username || username.trim() === "") username = "Аноним_" + Math.floor(Math.random() * 100);
+        localStorage.setItem('crypto_trader_name', username);
+    }
+    document.getElementById('playerName').innerText = username;
+
+    // Геймплейные переменные
+    let balance = parseFloat(localStorage.getItem('t_bal')) || 10000;
+    let shares = parseInt(localStorage.getItem('t_sh')) || 0;
+    let shortShares = parseInt(localStorage.getItem('t_ssh')) || 0;
+    let shortPrice = parseFloat(localStorage.getItem('t_sp')) || 0; // Цена, по которой зашортили
+    let exp = parseInt(localStorage.getItem('t_exp')) || 0;
+
+    let currentPrice = 100;
+    let priceHistory = [100];
+    let labels = ['0s'];
+    let timeTick = 0;
+    let marketTrend = 0; // Влияние новостей (-5 до +5)
+
+    const ranks = ["Новичок", "Скальпер", "Инвестор", "Кит рынка", "Волк с Уолл-Стрит"];
+
+    updateUI();
+
+    // Симуляция кликов и логика
+    function getStats() {
+        let lvl = Math.floor(Math.sqrt(exp / 100)) + 1;
+        let rank = ranks[Math.min(lvl - 1, ranks.length - 1)];
+        // Чистая стоимость активов (учитывая шорты и лонги)
+        let shortProfit = shortShares > 0 ? (shortPrice - currentPrice) * shortShares : 0;
+        let equity = balance + (shares * currentPrice) + shortProfit;
+        return { lvl, rank, equity };
+    }
+
+    function updateUI() {
+        let stats = getStats();
+        document.getElementById('balance').innerText = '$' + balance.toFixed(2);
+        document.getElementById('shares').innerText = shares;
+        document.getElementById('shortShares').innerText = shortShares;
+        document.getElementById('playerLvl').innerText = stats.lvl;
+        document.getElementById('playerRank').innerText = `(${stats.rank})`;
+    }
+
+    // ЛОНГ (ПОКУПКА)
+    document.getElementById('btnBuy').addEventListener('click', () => {
+        let lev = parseInt(document.getElementById('leverage').value);
+        let requiredMoney = currentPrice / lev;
+        if (balance >= requiredMoney) {
+            balance -= requiredMoney;
+            shares++;
+            exp += 15;
+            updateUI();
+            syncOnline();
+        }
+    });
+
+    // ПРОДАЖА ЛОНГА
+    document.getElementById('btnSell').addEventListener('click', () => {
+        if (shares > 0) {
+            let lev = parseInt(document.getElementById('leverage').value);
+            balance += currentPrice / lev + (currentPrice - (currentPrice / lev)); // Возвращаем залог + прибыль
+            shares--;
+            exp += 10;
+            updateUI();
+            syncOnline();
+        }
+    });
+
+    // ШОРТ (ПРОДАЖА В ДОЛГ)
+    document.getElementById('btnShort').addEventListener('click', () => {
+        if (shortShares === 0) shortPrice = currentPrice; // Фиксируем цену входа
+        let lev = parseInt(document.getElementById('leverage').value);
+        let margin = currentPrice / lev;
+
+        if (balance >= margin) {
+            balance -= margin;
+            shortShares++;
+            exp += 15;
+            updateUI();
+            syncOnline();
+        }
+    });
+
+    // ВЫКУП ШОРТА
+    document.getElementById('btnCover').addEventListener('click', () => {
+        if (shortShares > 0) {
+            let lev = parseInt(document.getElementById('leverage').value);
+            let profit = shortPrice - currentPrice; // Если цена упала — мы в плюсе
+            balance += (shortPrice / lev) + profit; // Возвращаем залог + профит
+            shortShares--;
+            if (shortShares === 0) shortPrice = 0;
+            exp += 10;
+            updateUI();
+            syncOnline();
+        }
+    });
+
+    // Движок генерации цен и новостей
+    function tickMarket() {
+        timeTick++;
+        
+        // Случайные новости каждые ~24 секунды (12 тиков)
+        if (timeTick % 12 === 0) {
+            generateNews();
         }
 
-        function togglePassword() {
-            const p = document.getElementById('password');
-            p.type = p.type === "password" ? "text" : "password";
+        let randomMove = (Math.random() - 0.49) * 6; // Обычный шум рынка
+        let totalChange = randomMove + marketTrend; 
+        
+        currentPrice = currentPrice * (1 + totalChange / 100);
+        if (currentPrice < 0.5) currentPrice = 0.5; // Защита от полного нуля
+
+        // Ликвидация при маржин-колле (если баланс ушел в минус из-за плеча)
+        let stats = getStats();
+        if (stats.equity <= 0) {
+            balance = 1000; // Спасительный банкротный грант
+            shares = 0;
+            shortShares = 0;
+            alert("🚨 МАРЖИН-КОЛЛ! Ваши позиции ликвидированы за долги. Выдано $1000 пособия.");
         }
 
-        async function handleAuth() {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
-            
-            if(!email || !password) return showToast("Заполните все поля");
-            if(!supabase) return showToast("Ошибка базы данных");
+        const priceEl = document.getElementById('price');
+        priceEl.innerText = '$' + currentPrice.toFixed(2);
+        priceEl.className = totalChange >= 0 ? 'price-up' : 'price-down';
 
-            if(isLoginMode) {
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                if(error) showToast("Неверный логин или пароль");
-                else showCabinet(data.user.email);
-            } else {
-                if(password.length < 6) return showToast("Пароль от 6 символов");
-                const { data, error } = await supabase.auth.signUp({ email, password });
-                if(error) showToast(error.message);
-                else showToast("Регистрация успешна!");
-            }
+        priceHistory.push(currentPrice);
+        labels.push(timeTick + 's');
+        if (priceHistory.length > 15) {
+            priceHistory.shift();
+            labels.shift();
         }
+        chart.update();
+        updateUI();
+    }
 
-        function showCabinet(email) {
-            document.getElementById('auth-area').style.display = 'none';
-            document.getElementById('client-area').style.display = 'block';
-            document.getElementById('user-display-email').innerText = email;
-        }
+    const newsList = [
+        { text: "🚀 Илон Маск пропампил актив в соцсетях! Курс растет!", trend: 4 },
+        { text: "📉 Крупный фонд зафиксировал прибыль. Паника на бирже!", trend: -4 },
+        { text: "⚡ Pegasus заключил контракт с правительством!", trend: 3 },
+        { text: "🐳 Киты начали массово заводить монеты на биржу!", trend: -2 },
+        { text: "📊 Вышли позитивные отчеты по инфляции. Всё зеленеет!", trend: 2.5 },
+        { text: "❌ Технический сбой сети! Инвесторы выводят средства!", trend: -3.5 }
+    ];
 
-        async function logout() {
-            if (supabase) await supabase.auth.signOut();
-            location.reload();
-        }
+    function generateNews() {
+        let randomNews = newsList[Math.floor(Math.random() * newsList.length)];
+        document.getElementById('news').innerText = randomNews.text;
+        marketTrend = randomNews.trend;
+        
+        // Через 6 секунд действие новости плавно затухает
+        setTimeout(() => {
+            marketTrend = 0;
+            document.getElementById('news').innerText = "💤 На рынке затишье...";
+        }, 6000);
+    }
 
-        function copyScript() {
-            const code = "loadstring(game:HttpGet('https://raw.githubusercontent.com/litevisuals/visuals/main/Lite_Pc.lua'))()";
-            navigator.clipboard.writeText(code).then(() => { showToast("Скрипт скопирован!"); });
-        }
+    // Синхронизация данных с Firebase
+    async function syncOnline() {
+        let stats = getStats();
+        localStorage.setItem('t_bal', balance);
+        localStorage.setItem('t_sh', shares);
+        localStorage.setItem('t_ssh', shortShares);
+        localStorage.setItem('t_sp', shortPrice);
+        localStorage.setItem('t_exp', exp);
 
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg; t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2500);
-        }
-    </script>
+        try {
+            await setDoc(doc(db, "players", username), {
+                balance: stats.equity,
+                score: stats.equity.toFixed(2),
+                rank: stats.rank,
+                lvl: stats.lvl
+            }, { merge: true });
+        } catch (e) { console.error(e); }
+    }
+
+    // Подгрузка ТОП-5 трейдеров онлайн
+    const q = query(collection(db, "players"), orderBy("balance", "desc"), limit(5));
+    onSnapshot(q, (snapshot) => {
+        let html = "";
+        snapshot.forEach((doc) => {
+            let data = doc.data();
+            html += `<li><div><strong>${doc.id}</strong> <span class='rank-name'>LVL ${data.lvl || 1}</span></div> <span>$${data.score || 0}</span></li>`;
+        });
+        document.getElementById('leaderboard').innerHTML = html || "<li>Список пуст</li>";
+    });
+
+    // Отрисовка графика
+    const ctx = document.getElementById('marketChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Цена ($)',
+                data: priceHistory,
+                borderColor: '#f1c40f',
+                borderWidth: 2,
+                tension: 0.1,
+                fill: false
+            }]
+        },
+        options: { responsive: true, scales: { x: { display: false }, y: { beginAtZero: false } } }
+    });
+
+    setInterval(tickMarket, 2000); // Рынок обновляется раз в 2 секунды
+</script>
 </body>
 </html>
