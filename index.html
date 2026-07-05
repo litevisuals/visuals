@@ -3,103 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pegasus Tycoon Online</title>
+    <title>Pegasus Tycoon Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { background-color: #08080c; color: #ffffff; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 10px; }
-        .container { max-width: 480px; margin: 0 auto; background: #0f0f15; padding: 15px; border-radius: 20px; border: 1px solid #1f1f2e; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1f1f2e; padding-bottom: 10px; }
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
-        .stat-box { background: #151522; padding: 10px; border-radius: 12px; border: 1px solid #252538; }
-        .stat-val { font-weight: bold; color: #00ffcc; font-size: 18px; margin-top: 4px; }
-        .price-box { margin: 10px 0; padding: 12px; background: #151522; border-radius: 12px; border: 1px solid #252538; }
-        #price { font-size: 34px; font-weight: bold; text-shadow: 0 0 10px rgba(0,255,200,0.2); }
-        .price-up { color: #2ecc71; }
-        .price-down { color: #e74c3c; }
-        .news-ticker { background: #34495e; color: #fff; padding: 10px; font-weight: 500; border-radius: 10px; margin: 10px 0; font-size: 13px; border-left: 4px solid #f1c40f; }
+        /* Общий футуристичный темный фон */
+        body { background-color: #060609; color: #f1f2f6; font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; text-align: center; margin: 0; padding: 8px; }
         
-        /* Кнопка Тапалки */
-        .tap-btn { width: 100%; background: linear-gradient(135deg, #00ffcc, #0099ff); color: #000; font-size: 18px; font-weight: bold; padding: 15px; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,255,200,0.3); margin-bottom: 10px; transition: 0.1s; }
-        .tap-btn:active { transform: scale(0.96); filter: brightness(1.2); }
-
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
-        .btn { padding: 12px; font-size: 14px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .btn-buy { background: #2ecc71; color: white; }
-        .btn-sell { background: #27ae60; color: white; }
-        .btn-short { background: #e74c3c; color: white; }
-        .btn-cover { background: #c0392b; color: white; }
+        .container { max-width: 440px; margin: 0 auto; background: #0d0e15; padding: 16px; border-radius: 24px; border: 1px solid #1c1e2d; box-shadow: 0 15px 35px rgba(0,0,0,0.8); }
         
-        /* Секция Бизнеса и Кейсов */
-        .sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .panel-box { background: #151522; padding: 12px; border-radius: 12px; border: 1px solid #252538; text-align: left; }
-        .panel-box h4 { margin: 0 0 8px 0; font-size: 14px; color: #f1c40f; text-align: center; }
-        .sm-btn { width: 100%; padding: 8px; font-size: 12px; background: #34495e; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 5px; }
-        .sm-btn:disabled { background: #222; color: #555; }
+        /* Верхняя панель */
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1c1e2d; padding-bottom: 12px; margin-bottom: 12px; }
+        .user-badge { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 15px; }
+        .lvl-badge { background: rgba(0, 255, 204, 0.1); color: #00ffcc; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid rgba(0, 255, 204, 0.3); }
+        
+        /* Неоновая кнопка-тапалка */
+        .tap-btn { width: 100%; background: linear-gradient(135deg, #00ffcc, #00bcff); color: #050508; font-size: 16px; font-weight: 800; padding: 16px; border: none; border-radius: 16px; cursor: pointer; box-shadow: 0 0 20px rgba(0,255,204,0.3); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.1s ease; }
+        .tap-btn:active { transform: scale(0.96); box-shadow: 0 0 30px rgba(0,255,204,0.6); filter: brightness(1.2); }
 
-        .leaderboard-box { background: #151522; padding: 12px; border-radius: 12px; text-align: left; margin-top: 15px; border: 1px solid #252538; }
-        .leaderboard-box h3 { margin: 0 0 8px 0; text-align: center; color: #f1c40f; font-size: 15px; }
-        ol { padding-left: 15px; margin: 0; }
-        li { padding: 5px 0; border-bottom: 1px solid #222230; font-size: 13px; display: flex; justify-content: space-between; }
-        .rank-name { color: #888; font-size: 11px; }
+        /* Сетка показателей */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+        .card { background: #131520; padding: 12px; border-radius: 16px; border: 1px solid #1c1e2d; text-align: left; position: relative; overflow: hidden; }
+        .card-title { font-size: 11px; color: #7f8c8d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+        .card-val { font-size: 18px; font-weight: 700; color: #ffffff; }
+        .card-val.highlight { color: #00ffcc; text-shadow: 0 0 10px rgba(0,255,204,0.2); }
+        
+        /* Секция курса */
+        .price-box { margin-bottom: 12px; text-align: center; }
+        #price { font-size: 42px; font-weight: 800; letter-spacing: -1px; transition: color 0.2s ease; }
+        .price-up { color: #00e676; text-shadow: 0 0 20px rgba(0,230,118,0.3); }
+        .price-down { color: #ff3d00; text-shadow: 0 0 20px rgba(255,61,0,0.3); }
+        
+        /* Новостная плашка */
+        .news-ticker { background: #131520; color: #bdc3c7; padding: 10px 14px; border-radius: 12px; margin-bottom: 16px; font-size: 12px; text-align: left; border-left: 3px solid #00bcff; display: flex; align-items: center; gap: 8px; }
+
+        /* Контейнер для сглаженного графика */
+        .chart-container { position: relative; background: #131520; border-radius: 16px; border: 1px solid #1c1e2d; padding: 10px; margin-bottom: 16px; }
+
+        /* Селектор плеча */
+        .leverage-box { margin-bottom: 14px; font-size: 13px; color: #a4b0be; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        select { background: #131520; color: white; border: 1px solid #1c1e2d; padding: 6px 12px; border-radius: 10px; font-weight: 600; outline: none; }
+
+        /* Кнопки действий */
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+        .btn { padding: 14px; font-size: 14px; border: none; border-radius: 14px; cursor: pointer; font-weight: 700; transition: all 0.2s; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+        .btn-buy { background: #00e676; color: #050508; }
+        .btn-sell { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0,230,118,0.3); }
+        .btn-short { background: #ff3d00; color: white; }
+        .btn-cover { background: rgba(255, 61, 0, 0.15); color: #ff3d00; border: 1px solid rgba(255,61,0,0.3); }
+        .btn:active { transform: scale(0.97); filter: brightness(1.1); }
+        
+        /* Пассивные улучшения */
+        .upgrades-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+        .upgrade-card { background: #131520; border: 1px solid #1c1e2d; border-radius: 16px; padding: 12px; text-align: left; }
+        .upgrade-card h4 { margin: 0 0 4px 0; font-size: 13px; color: #ffffff; }
+        .upgrade-desc { font-size: 11px; color: #7f8c8d; margin-bottom: 8px; }
+        .sm-btn { width: 100%; padding: 10px; font-size: 12px; background: #1c1e2d; color: #00ffcc; border: 1px solid rgba(0,255,204,0.2); border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .sm-btn:disabled { background: #11121a; color: #444; border-color: #222; cursor: not-allowed; }
+
+        /* Онлайн лидерборд */
+        .leaderboard-box { background: #131520; padding: 16px; border-radius: 16px; text-align: left; border: 1px solid #1c1e2d; }
+        .leaderboard-box h3 { margin: 0 0 12px 0; text-align: center; color: #00ffcc; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        ol { padding-left: 12px; margin: 0; }
+        li { padding: 8px 0; border-bottom: 1px solid #1c1e2d; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+        li:last-child { border: none; }
+        .rank-name { color: #57606f; font-size: 11px; margin-left: 5px; }
+        .lb-money { font-weight: 700; color: #00ffcc; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <div>💼 <span id="playerName">...</span> <span id="playerRank" class="rank-name">()</span></div>
-        <div>LVL: <span id="playerLvl" style="color:#00ffcc; font-weight:bold;">1</span></div>
+        <div class="user-badge">💼 <span id="playerName">...</span> <span id="playerRank" class="rank-name">()</span></div>
+        <div class="lvl-badge">LVL <span id="playerLvl">1</span></div>
     </div>
 
-    <button class="tap-btn" id="btnTap">💸 ТАПАТЬ БАБЛО (+$5)</button>
+    <button class="tap-btn" id="btnTap">💸 Тапать капитал (+$5)</button>
 
-    <div class="stats">
-        <div class="stat-box">Баланс Cash<br><div class="stat-val" id="balance">$10000.00</div></div>
-        <div class="stat-box">Пассивный доход<br><div class="stat-val" id="pps" style="color:#f1c40f;">$0/сек</div></div>
-        <div class="stat-box">Лонг Акции<br><div class="stat-val" id="shares" style="color:#fff;">0</div></div>
-        <div class="stat-box">Шорт Акции<br><div class="stat-val" id="shortShares" style="color:#fff;">0</div></div>
+    <div class="stats-grid">
+        <div class="card">
+            <div class="card-title">💵 Доступный баланс</div>
+            <div class="card-val highlight" id="balance">$10000.00</div>
+        </div>
+        <div class="card">
+            <div class="card-title">⚡ Пассивный доход</div>
+            <div class="card-val" id="pps" style="color: #ffb142;">$0/сек</div>
+        </div>
+        <div class="card">
+            <div class="card-title">📈 Акции в Лонг</div>
+            <div class="card-val" id="shares">0</div>
+        </div>
+        <div class="card">
+            <div class="card-title">📉 Акции в Шорт</div>
+            <div class="card-val" id="shortShares">0</div>
+        </div>
     </div>
 
     <div class="price-box">
         <div id="price" class="price-up">$100.00</div>
     </div>
 
-    <div class="news-ticker" id="news">📈 Тренды стабильны. Ждем отчетов...</div>
+    <div class="news-ticker">
+        <span>📢</span>
+        <div id="news">Рыночные котировки запущены. Ожидание сигналов...</div>
+    </div>
 
-    <canvas id="marketChart" height="140"></canvas>
+    <!-- Красивый контейнер под гладкий график -->
+    <div class="chart-container">
+        <canvas id="marketChart" height="140"></canvas>
+    </div>
 
-    <div style="font-size:13px; margin: 5px 0;">
-        <label>Плечо: </label>
+    <div class="leverage-box">
+        <span>Кредитное плечо:</span>
         <select id="leverage">
-            <option value="1">x1 (Обычный режим)</option>
-            <option value="3">x3 (Маржинальный)</option>
-            <option value="5">x5 (Макс Риск!)</option>
+            <option value="1">x1 (Без риска)</option>
+            <option value="3">x3 (Умеренный)</option>
+            <option value="5">x5 (Макс Плечо)</option>
         </select>
     </div>
 
     <div class="btn-grid">
-        <button class="btn btn-buy" id="btnBuy">КУПИТЬ ЛОНГ</button>
-        <button class="btn btn-sell" id="btnSell">ПРОДАТЬ ЛОНГ</button>
-        <button class="btn btn-short" id="btnShort">ОТКРЫТЬ ШОРТ</button>
-        <button class="btn btn-cover" id="btnCover">ЗАКРЫТЬ ШОРТ</button>
+        <button class="btn btn-buy" id="btnBuy">Купить</button>
+        <button class="btn btn-sell" id="btnSell">Продать</button>
+        <button class="btn btn-short" id="btnShort">Шорт</button>
+        <button class="btn btn-cover" id="btnCover">Выкуп</button>
     </div>
 
-    <div class="sub-grid">
-        <div class="panel-box">
-            <h4>⛏️ МАЙНИНГ ФЕРМЫ</h4>
-            <div id="farmInfo" style="font-size:11px; color:#aaa;">Ферм: 0 (+$0/с)</div>
-            <button class="sm-btn" id="btnBuyFarm">Купить Ферму ($1,500)</button>
+    <div class="upgrades-grid">
+        <div class="upgrade-card">
+            <h4>⛏️ Видеокарты</h4>
+            <div class="upgrade-desc" id="farmInfo">Куплено: 0 (+$0/с)</div>
+            <button class="sm-btn" id="btnBuyFarm">Купить [$1,500]</button>
         </div>
-        <div class="panel-box">
-            <h4>🎁 ЛУТБОКСЫ</h4>
-            <div style="font-size:11px; color:#aaa; text-align:center;">Шанс х3 или Слив!</div>
-            <button class="sm-btn" id="btnOpenCase" style="background:#9b59b6;">Открыть Кейс ($2,000)</button>
+        <div class="upgrade-card">
+            <h4>🎁 Секретный кейс</h4>
+            <div class="upgrade-desc">Случайный исход</div>
+            <button class="sm-btn" id="btnOpenCase" style="color: #af71ff; border-color: rgba(175,113,255,0.2);">Открыть [$2,000]</button>
         </div>
     </div>
 
     <div class="leaderboard-box">
-        <h3>🏆 ТОП-5 ОНЛАЙН МАГНАТОВ</h3>
-        <ol id="leaderboard"><li>Загрузка...</li></ol>
+        <h3>🏆 ТОП ТРЕЙДЕРОВ СЕТИ</h3>
+        <ol id="leaderboard"><li>Синхронизация списков...</li></ol>
     </div>
 </div>
 
@@ -123,21 +168,56 @@
     let username = localStorage.getItem('crypto_trader_name') || "Трейдер";
     document.getElementById('playerName').innerText = username;
 
-    // Переменные
     let balance = parseFloat(localStorage.getItem('t_bal')) || 10000;
     let shares = parseInt(localStorage.getItem('t_sh')) || 0;
     let shortShares = parseInt(localStorage.getItem('t_ssh')) || 0;
     let shortPrice = parseFloat(localStorage.getItem('t_sp')) || 0;
     let exp = parseInt(localStorage.getItem('t_exp')) || 0;
-    let farms = parseInt(localStorage.getItem('t_farms')) || 0; // Кол-во майнинг ферм
+    let farms = parseInt(localStorage.getItem('t_farms')) || 0;
 
     let currentPrice = 100;
-    let priceHistory = [100];
-    let labels = ['0s'];
+    let priceHistory = Array(12).fill(100);
+    let labels = Array(12).fill('');
     let timeTick = 0;
     let marketTrend = 0;
 
     const ranks = ["Новичок", "Скальпер", "Инвестор", "Кит рынка", "Волк с Уолл-Стрит"];
+
+    // Создаем градиент для графика динамически
+    const ctx = document.getElementById('marketChart').getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 140);
+    gradient.addColorStop(0, 'rgba(0, 255, 204, 0.25)');
+    gradient.addColorStop(1, 'rgba(0, 255, 204, 0.0)');
+
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Курс',
+                data: priceHistory,
+                borderColor: '#00ffcc', // Яркая неоновая линия
+                borderWidth: 3,
+                pointRadius: 0, // Убираем точки как в оригинале
+                pointHoverRadius: 0,
+                tension: 0.4, // Идеальное сглаживание углов линии
+                fill: true,
+                backgroundColor: gradient // Мягкая подсветка под графиком
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { display: false },
+                y: {
+                    grid: { color: 'rgba(28, 30, 45, 0.5)' },
+                    ticks: { color: '#7f8c8d', font: { size: 10 } }
+                }
+            }
+        }
+    });
 
     updateUI();
 
@@ -145,7 +225,7 @@
         let lvl = Math.floor(Math.sqrt(exp / 120)) + 1;
         let rank = ranks[Math.min(lvl - 1, ranks.length - 1)];
         let shortProfit = shortShares > 0 ? (shortPrice - currentPrice) * shortShares : 0;
-        let passiveIncome = farms * 25; // Каждая ферма приносит $25 в секунду
+        let passiveIncome = farms * 25;
         let equity = balance + (shares * currentPrice) + shortProfit + (farms * 1500 * 0.8);
         return { lvl, rank, equity, passiveIncome };
     }
@@ -157,59 +237,41 @@
         document.getElementById('shortShares').innerText = shortShares;
         document.getElementById('playerLvl').innerText = stats.lvl;
         document.getElementById('playerRank').innerText = `(${stats.rank})`;
-        document.getElementById('pps').innerText = `$${stats.passiveIncome}/сек`;
-        document.getElementById('farmInfo').innerText = `Ферм: ${farms} (+$${stats.passiveIncome}/с)`;
+        document.getElementById('pps').innerText = `$${stats.passiveIncome}/с`;
+        document.getElementById('farmInfo').innerText = `Куплено: ${farms} (+$${stats.passiveIncome}/с)`;
         
-        // Блокировка кнопок покупки бизнеса, если мало денег
         document.getElementById('btnBuyFarm').disabled = balance < 1500;
         document.getElementById('btnOpenCase').disabled = balance < 2000;
     }
 
-    // ТАПАЛКА БАБЛА
     document.getElementById('btnTap').addEventListener('click', () => {
         let stats = getStats();
-        let tapPower = 5 + (stats.lvl * 2); // Чем выше уровень, тем больше за клик!
-        balance += tapPower;
+        balance += 5 + (stats.lvl * 2);
         exp += 5;
         updateUI();
         syncOnline();
     });
 
-    // ПОКУПКА МАЙНИНГ ФЕРМЫ
     document.getElementById('btnBuyFarm').addEventListener('click', () => {
-        if (balance >= 1500) {
-            balance -= 1500;
-            farms++;
-            exp += 100;
-            updateUI();
-            syncOnline();
-        }
+        if (balance >= 1500) { balance -= 1500; farms++; exp += 100; updateUI(); syncOnline(); }
     });
 
-    // ОТКРЫТИЕ ЛУТБОКСА
     document.getElementById('btnOpenCase').addEventListener('click', () => {
         if (balance >= 2000) {
             balance -= 2000;
             let roll = Math.random();
-            if (roll > 0.65) { // Выигрыш Джекпота
+            if (roll > 0.65) {
                 let win = Math.floor(Math.random() * 4000) + 2500;
-                balance += win;
-                exp += 250;
-                alert(`🎉 ОКУП! Из кейса выпало: $${win}!`);
-            } else if (roll > 0.3) { // Утешительный приз
-                balance += 800;
-                exp += 50;
-                alert("📦 Шлак... Выпало всего $800.");
-            } else { // Слив
-                exp += 20;
-                alert("💀 СЛИВ! Кейс оказался пустым.");
+                balance += win; exp += 250; alert(`🎉 ОКУП! Из кейса выпало: $${win}!`);
+            } else if (roll > 0.3) {
+                balance += 800; exp += 50; alert("📦 Выпало всего $800.");
+            } else {
+                exp += 20; alert("💀 СЛИВ! Кейс оказался пустым.");
             }
-            updateUI();
-            syncOnline();
+            updateUI(); syncOnline();
         }
     });
 
-    // ЛОНГ / ШОРТ МЕХАНИКА
     document.getElementById('btnBuy').addEventListener('click', () => {
         let lev = parseInt(document.getElementById('leverage').value);
         if (balance >= (currentPrice / lev)) { balance -= (currentPrice / lev); shares++; exp += 15; updateUI(); syncOnline(); }
@@ -226,22 +288,17 @@
         if (shortShares > 0) { let lev = parseInt(document.getElementById('leverage').value); balance += (shortPrice / lev) + (shortPrice - currentPrice); shortShares--; if (shortShares === 0) shortPrice = 0; exp += 10; updateUI(); syncOnline(); }
     });
 
-    // Рыночный движок и пассивный доход
     function tickMarket() {
         timeTick++;
-        
-        // Начисление пассивного дохода от ферм (раз в 2 секунды капает за 2 секунды)
         let stats = getStats();
-        if (stats.passiveIncome > 0) {
-            balance += stats.passiveIncome * 2;
-        }
+        if (stats.passiveIncome > 0) balance += stats.passiveIncome * 2;
 
         if (timeTick % 10 === 0) {
             let newsList = [
-                { text: "🚀 Запуск спутников Pegasus-X прошел успешно! Акции взлетают!", trend: 5 },
-                { text: "📉 Крупнейший инвестор закрыл шорты. Паника!", trend: -4.5 },
-                { text: "⚡ Регуляторы начали проверку компании. Курс падает!", trend: -3 },
-                { text: "📊 Слияние века! Pegasus покупает конкурентов!", trend: 4 }
+                { text: "🚀 Спутники Pegasus вышли на орбиту. Акции летят вверх!", trend: 6 },
+                { text: "📉 Крупный фонд сливает активы. На рынке паника!", trend: -5 },
+                { text: "📊 Квартальный отчет Pegasus превзошел все ожидания рынка!", trend: 4.5 },
+                { text: "❌ Обнаружен баг в коде смарт-контракта! Спад!", trend: -4 }
             ];
             let n = newsList[Math.floor(Math.random() * newsList.length)];
             document.getElementById('news').innerText = n.text;
@@ -249,22 +306,36 @@
             setTimeout(() => { marketTrend = 0; document.getElementById('news').innerText = "💤 На рынке затишье..."; }, 6000);
         }
 
-        let totalChange = ((Math.random() - 0.49) * 7) + marketTrend;
+        let totalChange = ((Math.random() - 0.49) * 8) + marketTrend;
         currentPrice *= (1 + totalChange / 100);
-        if (currentPrice < 0.5) currentPrice = 0.5;
+        if (currentPrice < 1) currentPrice = 1;
 
         if (stats.equity <= 0) {
             balance = 1000; shares = 0; shortShares = 0; farms = 0;
-            alert("🚨 МАРЖИН-КОЛЛ! Банкротство. Все активы и фермы изъяты.");
+            alert("🚨 МАРЖИН-КОЛЛ! Твой фонд обанкротился. Выдано $1000 пособия.");
         }
 
         const priceEl = document.getElementById('price');
         priceEl.innerText = '$' + currentPrice.toFixed(2);
-        priceEl.className = totalChange >= 0 ? 'price-up' : 'price-down';
+        
+        // Меняем цвет неоновой линии графика динамически в зависимости от тренда
+        if (totalChange >= 0) {
+            priceEl.className = 'price-up';
+            chart.data.datasets[0].borderColor = '#00e676';
+            chart.data.datasets[0].backgroundColor = ctx.createLinearGradient(0,0,0,140);
+            chart.data.datasets[0].backgroundColor.addColorStop(0, 'rgba(0, 230, 118, 0.2)');
+            chart.data.datasets[0].backgroundColor.addColorStop(1, 'rgba(0, 230, 118, 0.0)');
+        } else {
+            priceEl.className = 'price-down';
+            chart.data.datasets[0].borderColor = '#ff3d00';
+            chart.data.datasets[0].backgroundColor = ctx.createLinearGradient(0,0,0,140);
+            chart.data.datasets[0].backgroundColor.addColorStop(0, 'rgba(255, 61, 0, 0.2)');
+            chart.data.datasets[0].backgroundColor.addColorStop(1, 'rgba(255, 61, 0, 0.0)');
+        }
 
         priceHistory.push(currentPrice);
-        labels.push(timeTick + 's');
-        if (priceHistory.length > 12) { priceHistory.shift(); labels.shift(); }
+        labels.push('');
+        if (priceHistory.length > 15) { priceHistory.shift(); labels.shift(); }
         chart.update();
         updateUI();
     }
@@ -292,16 +363,9 @@
         let html = "";
         snapshot.forEach((doc) => {
             let data = doc.data();
-            html += `<li><div><strong>${doc.id}</strong> <span class='rank-name'>LVL ${data.lvl || 1}</span></div> <span>$${data.score || 0}</span></li>`;
+            html += `<li><div><strong>${doc.id}</strong> <span class='rank-name'>LVL ${data.lvl || 1}</span></div> <span class="lb-money">$${data.score || 0}</span></li>`;
         });
         document.getElementById('leaderboard').innerHTML = html;
-    });
-
-    const ctx = document.getElementById('marketChart').getContext('2d');
-    const chart = new Chart(ctx, {
-        type: 'line',
-        data: { labels: labels, datasets: [{ label: 'Цена ($)', data: priceHistory, borderColor: '#00ffcc', borderWidth: 2, tension: 0.1, fill: false }] },
-        options: { responsive: true, scales: { x: { display: false }, y: { beginAtZero: false } } }
     });
 
     setInterval(tickMarket, 2000);
