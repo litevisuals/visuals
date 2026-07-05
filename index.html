@@ -505,22 +505,63 @@
         chart.update(); updateUI();
     });
 
-    document.getElementById('btnAuth').addEventListener('click', async () => {
+    // ОТРЕМОНТИРОВАННЫЙ БЛОК АВТОРИЗАЦИИ (БЕЗ ПЕРЕЗАГРУЗОК)
+    document.getElementById('btnAuth').addEventListener('click', async (e) => {
+        if (e) e.preventDefault(); // Запрещаем браузеру сбрасывать страницу!
+
         let inputName = document.getElementById('authLogin').value.trim();
         let inputPass = document.getElementById('authPass').value.trim();
-        if (inputName.length < 3 || inputPass.length < 3) { showToast("Данные слишком короткие!", "error"); return; }
         
-        const userDocRef = doc(db, "users", inputName);
-        const userDoc = await getDoc(userDocRef);
+        if (inputName.length < 3 || inputPass.length < 3) { 
+            showToast("Данные слишком короткие!", "error"); 
+            return; 
+        }
+        
+        const authBtn = document.getElementById('btnAuth');
+        authBtn.disabled = true;
+        authBtn.innerText = "ПОДКЛЮЧЕНИЕ...";
 
-        if (userDoc.exists()) {
-            let ud = userDoc.data();
-            if (ud.isBanned === true) { document.getElementById('authScreen').style.display='none'; document.getElementById('banScreen').style.display='block'; return; }
-            if (ud.password === inputPass) { currentUser = inputName; localStorage.setItem('logged_user', currentUser); loadUserData(currentUser); } 
-            else { showToast("Неверный пароль!", "error"); }
-        } else {
-            await setDoc(userDocRef, { password: inputPass, balance: 10000, exp: 0, lastBonusTime: 0, usedPromos: [], assets: assetsData, partsInventory: partsInventory, customRank: -1, isBanned: false });
-            currentUser = inputName; localStorage.setItem('logged_user', currentUser); loadUserData(currentUser);
+        try {
+            const userDocRef = doc(db, "users", inputName);
+            const userDoc = await getDoc(userDocRef);
+
+            if (userDoc.exists()) {
+                let ud = userDoc.data();
+                if (ud.isBanned === true) { 
+                    document.getElementById('authScreen').style.display='none'; 
+                    document.getElementById('banScreen').style.display='block'; 
+                    return; 
+                }
+                if (ud.password === inputPass) { 
+                    currentUser = inputName; 
+                    localStorage.setItem('logged_user', currentUser); 
+                    loadUserData(currentUser); 
+                } else { 
+                    showToast("Неверный пароль!", "error"); 
+                }
+            } else {
+                // Регистрируем нового пользователя с оригинальной структурой
+                await setDoc(userDocRef, { 
+                    password: inputPass, 
+                    balance: 10000, 
+                    exp: 0, 
+                    lastBonusTime: 0, 
+                    usedPromos: [], 
+                    assets: assetsData, 
+                    partsInventory: partsInventory, 
+                    customRank: -1, 
+                    isBanned: false 
+                });
+                currentUser = inputName; 
+                localStorage.setItem('logged_user', currentUser); 
+                loadUserData(currentUser);
+            }
+        } catch (err) {
+            console.error("Ошибка авторизации:", err);
+            showToast("Ошибка БД! Проверьте правила доступа.", "error");
+        } finally {
+            authBtn.disabled = false;
+            authBtn.innerText = "Войти в terminal";
         }
     });
 
