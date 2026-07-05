@@ -1,46 +1,159 @@
-// 1. Импортируем базовые функции Firebase
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lite Market - Terminal</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #0b0b0c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #ffffff;
+        }
+        .login-card {
+            background: #121215;
+            border: 1px solid #1a1a1e;
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .logo {
+            color: #00ffcc;
+            font-size: 24px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 15px 20px;
+            background: #18181c;
+            border: 1px solid #222226;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+        }
+        .input-group input:focus {
+            border-color: #00ffcc;
+            background: #1c1c22;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, #00ffcc, #0099ff);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+        .btn-submit:hover {
+            opacity: 0.9;
+            box-shadow: 0 5px 15px rgba(0, 255, 204, 0.3);
+        }
+    </style>
+</head>
+<body>
 
-// КРИТИЧЕСКИЙ ШАГ: Импортируем функции для работы именно с Firestore (базой данных)
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+    <!-- Меню авторизации (Интерфейс возвращен) -->
+    <div class="login-card">
+        <div class="logo">Lite Market</div>
+        <div class="subtitle">Торговый симулятор нового поколения. Введите данные для авторизации.</div>
+        
+        <form id="loginForm">
+            <div class="input-group">
+                <input type="text" id="username" placeholder="Admin" required>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="••••••" required>
+            </div>
+            <button type="submit" class="btn-submit">Войти в Terminal</button>
+        </form>
+    </div>
 
-// Ваш конфигурационный файл (все ключи на месте)
-const firebaseConfig = {
-  apiKey: "AIzaSyDEaVk5ynHpi2uFu2d7Zqc3PAAPR58IeGI",
-  authDomain: "database-2aad8.firebaseapp.com",
-  projectId: "database-2aad8",
-  storageBucket: "database-2aad8.firebasestorage.app", // Исправлено автоматически SDK
-  messagingSenderId: "1095120564272",
-  appId: "1:1095120564272:web:eeefe80cb3816df52c3df5",
-  measurementId: "G-49PRFBPGZ9"
-};
+    <!-- ФОНОВЫЙ СКРИПТ FIREBASE -->
+    <script type="module">
+        // Импортируем Firebase напрямую через CDN, чтобы работало в обычном браузере/Vercel
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// 2. Инициализируем Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+        // Ваша конфигурация
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEaVk5ynHpi2uFu2d7Zqc3PAAPR58IeGI",
+            authDomain: "database-2aad8.firebaseapp.com",
+            projectId: "database-2aad8",
+            storageBucket: "database-2aad8.firebasestorage.app",
+            messagingSenderId: "1095120564272",
+            appId: "1:1095120564272:web:eeefe80cb3816df52c3df5"
+        };
 
-// КРИТИЧЕСКИЙ ШАГ: Инициализируем саму базу данных и экспортируем её для использования в проекте
-export const db = getFirestore(app);
+        // Инициализация
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
+        // ТЕСТ: Автоматическая проверка при загрузке страницы
+        async function runAutoDiagnostic() {
+            console.log("⏳ Проверка базы данных...");
+            try {
+                const docRef = await addDoc(collection(db, "test_connection"), {
+                    status: "connected",
+                    time: new Date().toISOString()
+                });
+                console.log("✅ База ответила успешно! ID созданной записи:", docRef.id);
+            } catch (error) {
+                console.error("❌ Ошибка связи с Firestore:", error);
+            }
+        }
+        runAutoDiagnostic();
 
-// =================================================================
-// ТЕСТОВЫЙ БЛОК: Этот код автоматически попытается сделать запись
-// =================================================================
-async function autoTestFirestore() {
-  console.log("⏳ Проверка связи... Пытаемся создать тестовую запись в Firestore...");
-  try {
-    const docRef = await addDoc(collection(db, "test_from_code"), {
-      status: "working",
-      created_at: new Date().toISOString(),
-      note: "Если эта запись появилась в консоли Firebase — всё починено!"
-    });
-    console.log("✅ УСПЕХ! Данные улетели в базу. ID документа:", docRef.id);
-  } catch (error) {
-    console.error("❌ ОШИБКА ПРИ ОТПРАВКЕ ДАННЫХ:");
-    console.dir(error); // Развернет полную ошибку в консоли браузера
-  }
-}
+        // Обработка клика на кнопку «Войти»
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
 
-// Запускаем тест сразу при загрузке этого файла
-autoTestFirestore();
+            console.log("⏳ Пробуем сохранить данные авторизации...");
+            try {
+                // Записываем логин и пароль в коллекцию 'users_attempts'
+                await addDoc(collection(db, "users_attempts"), {
+                    username: user,
+                    password: pass,
+                    login_time: new Date().toISOString()
+                });
+                alert("Данные успешно отправлены в базу Firestore!");
+            } catch (err) {
+                console.error("Не удалось сохранить данные:", err);
+                alert("Ошибка при отправке: " + err.message);
+            }
+        });
+    </script>
+</body>
+</html>
