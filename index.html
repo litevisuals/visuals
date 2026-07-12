@@ -2,78 +2,251 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cyber Shield Casino</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; color: #e2e8f0; text-align: center; margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: #1e293b; padding: 30px; border-radius: 12px; border: 2px solid #38bdf8; box-shadow: 0 4px 20px rgba(56, 189, 248, 0.2); }
-        input { background: #334155; border: 1px solid #475569; color: white; padding: 10px; margin: 5px; border-radius: 6px; font-size: 16px; }
-        button { background: #0284c7; color: white; border: none; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; margin: 10px 5px; transition: 0.2s; }
-        button:hover { background: #0369a1; }
-        .hidden { display: none; }
-        .reels { font-size: 40px; background: #0f172a; padding: 15px; margin: 15px 0; border-radius: 8px; letter-spacing: 5px; }
-        .logs { background: #0f172a; text-align: left; padding: 10px; border-radius: 6px; max-height: 120px; overflow-y: auto; font-size: 13px; color: #94a3b8; }
-        .error { color: #f43f5e; font-weight: bold; }
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --primary: #38bdf8;
+            --primary-hover: #0284c7;
+            --success: #4ade80;
+            --error: #f43f5e;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90vh;
+        }
+
+        .auth-card, .game-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            padding: 32px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            border: 1px solid #334155;
+            transition: all 0.3s ease;
+        }
+
+        .game-card { max-width: 600px; }
+
+        .logo-area {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .logo-area h1 {
+            font-size: 24px;
+            margin: 10px 0 5px 0;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* Вкладки как в современных интерфейсах */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #334155;
+            margin-bottom: 24px;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            background: #0f172a;
+            border: 1px solid #475569;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+        }
+
+        button {
+            width: 100%;
+            background: var(--primary);
+            color: #0f172a;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover { background: var(--primary-hover); color: white; }
+
+        .error-msg {
+            color: var(--error);
+            font-size: 14px;
+            margin-top: 12px;
+            min-height: 20px;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Игровой интерфейс */
+        .balance-box {
+            background: #0f172a;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #334155;
+        }
+        .reels-display {
+            font-size: 44px;
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            letter-spacing: 8px;
+            border: 1px dashed var(--primary);
+        }
+        .grid-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .grid-buttons button { background: #334155; color: white; }
+        .grid-buttons button:hover { background: #475569; }
+
+        .logs-container {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: left;
+            height: 100px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>🛡️ Cyber Shield Casino 🎰</h1>
+    <!-- ОКНО ОРГАНАЙЗЕРА СЕССИИ (ВХОД / РЕГИСТРАЦИЯ) -->
+    <div class="auth-card" id="auth-card">
+        <div class="logo-area">
+            <h1>🛡️ Cyber Shield</h1>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" id="tab-login" onclick="switchTab('login')">Войти</div>
+            <div class="tab" id="tab-register" onclick="switchTab('register')">Регистрация</div>
+        </div>
 
-    <!-- Форма входа -->
-    <div id="auth-block">
-        <h3>Вход в систему</h3>
-        <input type="text" id="username" placeholder="Логин (admin)"><br>
-        <input type="password" id="password" placeholder="Пароль (admin123)"><br>
-        <button onclick="login()">Войти</button>
-        <p id="auth-err" class="error"></p>
+        <div class="input-group">
+            <label for="username">Имя пользователя</label>
+            <input type="text" id="username" placeholder="Введите логин">
+        </div>
+        <div class="input-group">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" placeholder="Введите пароль">
+        </div>
+
+        <button id="auth-btn" onclick="submitAuth()">Войти в аккаунт</button>
+        <div id="auth-err" class="error-msg"></div>
     </div>
 
-    <!-- Игровой интерфейс -->
-    <div id="game-block" class="hidden">
-        <h3>Добро пожаловать, <span id="user-display" style="color:#38bdf8"></span>!</h3>
-        <h2>Баланс: <span id="balance-display" style="color:#4ade80">0</span> $</h2>
-        <p style="color: #94a3b8">Фиксированная ставка: 200 $</p>
+    <!-- ОКНО ИГРЫ -->
+    <div class="game-card hidden" id="game-card">
+        <div class="balance-box">
+            <div style="color: var(--text-muted); font-size: 14px;">Авторизован: <b id="user-display" style="color:white"></b></div>
+            <div style="font-size: 28px; font-weight: bold; margin-top: 5px;"><span id="balance-display" style="color: var(--success)">0</span> $</div>
+        </div>
 
-        <hr style="border-color: #334155;">
+        <div class="reels-display" id="game-result">🎰 🎰 🎰</div>
+        <div id="game-status" style="font-weight: 500; min-height: 24px; margin-bottom: 15px;">Вы готовы к игре? Ставка: 200$</div>
 
-        <div>
-            <button onclick="play('slots')">🎰 Крутить Слоты</button>
+        <div class="grid-buttons">
+            <button onclick="play('slots')">🎰 Играть в Слоты</button>
             <button onclick="play('dice')">🎲 Бросить Кости</button>
         </div>
 
-        <div class="reels" id="game-result">❓ ❓ ❓</div>
-        <p id="game-status"></p>
-
-        <h4>История операций (Логи):</h4>
-        <div class="logs" id="log-box"></div>
-        <button onclick="logout()" style="background:#475569; font-size:12px; padding:5px 10px;">Выйти</button>
+        <div class="logs-container" id="log-box"></div>
+        <button onclick="logout()" style="background: transparent; color: var(--text-muted); font-size: 14px; margin-top: 15px; width: auto; padding: 5px 10px;">Выйти из профиля</button>
     </div>
-</div>
 
 <script>
-    // ТУТ УКАЖИ СВОЙ АДРЕС ИЗ NGROK ИЛИ LOCAL TUNNEL ПОСЛЕ ВЫВОДА ПЛАНШЕТА В СЕТЬ
+    // ТВОЙ АДРЕС ИЗ TERMUX (Поменяй IP на свой актуальный из ifconfig)
     const SERVER_URL = "http://192.168.1.106:5000"; 
+    let currentMode = "login";
     let sessionToken = "";
 
-    function login() {
+    function switchTab(mode) {
+        currentMode = mode;
+        document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+        document.getElementById('tab-register').classList.toggle('active', mode === 'register');
+        document.getElementById('auth-btn').innerText = mode === 'login' ? 'Войти в аккаунт' : 'Создать аккаунт';
+        document.getElementById('auth-err').innerText = "";
+    }
+
+    function submitAuth() {
         const u = document.getElementById('username').value;
         const p = document.getElementById('password').value;
+        const endpoint = currentMode === 'login' ? '/api/login' : '/api/register';
         
-        fetch(`${SERVER_URL}/api/login`, {
+        fetch(`${SERVER_URL}${endpoint}`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ username: u, password: p })
         })
-        .then(res => { if(!res.ok) throw new Error("Неверные данные"); return res.json(); })
+        .then(res => {
+            if(!res.ok) return res.json().then(e => { throw new Error(e.error) });
+            return res.json();
+        })
         .then(data => {
-            sessionToken = data.token;
-            document.getElementById('user-display').innerText = data.username;
-            document.getElementById('balance-display').innerText = data.balance;
-            
-            document.getElementById('auth-block').classList.add('hidden');
-            document.getElementById('game-block').classList.remove('hidden');
-            addLog("Успешный вход в аккаунт");
+            if (currentMode === 'register') {
+                alert('Регистрация успешна! Теперь войдите.');
+                switchTab('login');
+            } else {
+                sessionToken = data.token;
+                document.getElementById('user-display').innerText = data.username;
+                document.getElementById('balance-display').innerText = data.balance;
+                document.getElementById('auth-card').classList.add('hidden');
+                document.getElementById('game-card').classList.remove('hidden');
+                addLog("Успешная авторизация в системе");
+            }
         })
         .catch(err => document.getElementById('auth-err').innerText = err.message);
     }
@@ -83,7 +256,7 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': sessionToken // Передаем токен в заголовках защиты
+                'Authorization': sessionToken
             },
             body: JSON.stringify({ game: gameType })
         })
@@ -91,21 +264,14 @@
         .then(data => {
             document.getElementById('game-result').innerText = data.result.join(" ");
             document.getElementById('balance-display').innerText = data.balance;
-            
             const status = document.getElementById('game-status');
-            if(data.win) {
-                status.innerText = `🎉 ПЛЮС ${data.win_amount} $!`;
-                status.style.color = "#4ade80";
-            } else {
-                status.innerText = "😢 Минус ставка.";
-                status.style.color = "#94a3b8";
-            }
-            addLog(`${data.log} -> Баланс: ${data.balance}$`);
+            status.innerText = data.win ? `🎉 ВЫИГРЫШ: +${data.win_amount}$!` : "😢 Не повезло, ставка списана.";
+            status.style.color = data.win ? "var(--success)" : "var(--text-muted)";
+            addLog(`${data.log} | Баланс: ${data.balance}$`);
         })
         .catch(err => {
             document.getElementById('game-status').innerText = err.message;
-            document.getElementById('game-status').style.color = "#f43f5e";
-            addLog(`Ошибка: ${err.message}`);
+            document.getElementById('game-status').style.color = "var(--error)";
         });
     }
 
@@ -117,8 +283,8 @@
 
     function logout() {
         sessionToken = "";
-        document.getElementById('auth-block').classList.remove('hidden');
-        document.getElementById('game-block').classList.add('hidden');
+        document.getElementById('auth-card').classList.remove('hidden');
+        document.getElementById('game-card').classList.add('hidden');
     }
 </script>
 </body>
