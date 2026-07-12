@@ -208,8 +208,8 @@
     </div>
 
 <script>
-    // ТВОЙ АДРЕС ИЗ TERMUX (Поменяй IP на свой актуальный из ifconfig)
-    const SERVER_URL = "http://192.168.1.106:5000"; 
+    // ТВОЙ НОВЫЙ SECURE URL ИЗ TERMUX (Pinggy с поддержкой HTTPS)
+    const SERVER_URL = "https://aiazy-188-72-72-78.free.pinggy.net"; 
     let currentMode = "login";
     let sessionToken = "";
 
@@ -228,7 +228,11 @@
         
         fetch(`${SERVER_URL}${endpoint}`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+                'Content-Type': 'application/json',
+                // Обходим заглушку-предупреждение от бесплатного Pinggy
+                'X-Pinggy-No-Screen': 'true'
+            },
             body: JSON.stringify({ username: u, password: p })
         })
         .then(res => {
@@ -256,7 +260,9 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': sessionToken
+                'Authorization': sessionToken,
+                // Здесь тоже обходим заглушку Pinggy, чтобы игра работала
+                'X-Pinggy-No-Screen': 'true'
             },
             body: JSON.stringify({ game: gameType })
         })
