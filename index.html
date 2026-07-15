@@ -2,296 +2,184 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber Shield Casino</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Lite Codex</title>
     <style>
-        :root {
-            --bg-main: #0f172a;
-            --bg-card: #1e293b;
-            --primary: #38bdf8;
-            --primary-hover: #0284c7;
-            --success: #4ade80;
-            --error: #f43f5e;
-            --text: #f8fafc;
-            --text-muted: #94a3b8;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--tg-theme-bg-color, #0f172a);
+            color: var(--tg-theme-text-color, #e2e8f0);
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 90vh;
+            min-height: 100vh;
+            padding: 16px;
         }
-
-        .auth-card, .game-card {
-            background: var(--bg-card);
-            border-radius: 16px;
+        #not-telegram {
+            text-align: center;
+            background: var(--tg-theme-secondary-bg-color, #1e293b);
+            padding: 32px 20px;
+            border-radius: 24px;
+            max-width: 320px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        #not-telegram h2 { margin-bottom: 12px; font-size: 1.5em; }
+        #not-telegram p { margin-bottom: 20px; color: #94a3b8; }
+        .telegram-link {
+            display: inline-block;
+            background: #2b9fdb;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .app {
             width: 100%;
             max-width: 400px;
-            padding: 32px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-            border: 1px solid #334155;
-            transition: all 0.3s ease;
         }
-
-        .game-card { max-width: 600px; }
-
-        .logo-area {
-            text-align: center;
-            margin-bottom: 24px;
+        .card {
+            background: var(--tg-theme-secondary-bg-color, #1e293b);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
         }
-        .logo-area h1 {
-            font-size: 24px;
-            margin: 10px 0 5px 0;
-            color: var(--text);
-            font-weight: 600;
-        }
-
-        /* Вкладки как в современных интерфейсах */
-        .tabs {
+        .profile {
             display: flex;
-            border-bottom: 1px solid #334155;
-            margin-bottom: 24px;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
         }
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 12px 0;
-            cursor: pointer;
-            color: var(--text-muted);
-            font-weight: 500;
-            transition: 0.2s;
-            border-bottom: 2px solid transparent;
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
         }
-        .tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
+        .info { flex: 1; }
+        .name { font-weight: bold; font-size: 1.1em; }
+        .balance { color: #60a5fa; font-weight: 600; }
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .input-group label {
-            display: block;
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-        input {
-            width: 100%;
-            box-sizing: border-box;
-            background: #0f172a;
-            border: 1px solid #475569;
-            color: white;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: 0.2s;
-        }
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
-        }
-
         button {
             width: 100%;
-            background: var(--primary);
-            color: #0f172a;
-            border: none;
             padding: 14px;
-            font-size: 16px;
+            border: none;
+            border-radius: 14px;
+            font-size: 1em;
             font-weight: 600;
-            border-radius: 8px;
             cursor: pointer;
-            transition: 0.2s;
+            color: white;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        button:hover { background: var(--primary-hover); color: white; }
-
-        .error-msg {
-            color: var(--error);
-            font-size: 14px;
-            margin-top: 12px;
-            min-height: 20px;
-        }
-
-        .hidden { display: none !important; }
-
-        /* Игровой интерфейс */
-        .balance-box {
-            background: #0f172a;
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #334155;
-        }
-        .reels-display {
-            font-size: 44px;
-            background: #0f172a;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 20px 0;
-            letter-spacing: 8px;
-            border: 1px dashed var(--primary);
-        }
-        .grid-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        .grid-buttons button { background: #334155; color: white; }
-        .grid-buttons button:hover { background: #475569; }
-
-        .logs-container {
-            background: #0f172a;
-            border-radius: 8px;
-            padding: 12px;
-            text-align: left;
-            height: 100px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 15px;
-        }
+        button:active { opacity: 0.8; }
+        .btn-server { background: #3b82f6; }
+        .btn-asic { background: #8b5cf6; }
+        .btn-booster { background: #f59e0b; }
+        .btn-refresh { background: #10b981; }
+        .btn-quests { background: #6366f1; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
-
-    <!-- ОКНО ОРГАНАЙЗЕРА СЕССИИ (ВХОД / РЕГИСТРАЦИЯ) -->
-    <div class="auth-card" id="auth-card">
-        <div class="logo-area">
-            <h1>🛡️ Cyber Shield</h1>
-        </div>
-        
-        <div class="tabs">
-            <div class="tab active" id="tab-login" onclick="switchTab('login')">Войти</div>
-            <div class="tab" id="tab-register" onclick="switchTab('register')">Регистрация</div>
-        </div>
-
-        <div class="input-group">
-            <label for="username">Имя пользователя</label>
-            <input type="text" id="username" placeholder="Введите логин">
-        </div>
-        <div class="input-group">
-            <label for="password">Пароль</label>
-            <input type="password" id="password" placeholder="Введите пароль">
-        </div>
-
-        <button id="auth-btn" onclick="submitAuth()">Войти в аккаунт</button>
-        <div id="auth-err" class="error-msg"></div>
+    <!-- Заглушка для внешнего браузера -->
+    <div id="not-telegram" class="hidden">
+        <h2>📱 Откройте в Telegram</h2>
+        <p>Этот личный кабинет работает только внутри Telegram.</p>
+        <a href="https://t.me/LiteCodexBot" target="_blank" class="telegram-link">Перейти в бота</a>
     </div>
 
-    <!-- ОКНО ИГРЫ -->
-    <div class="game-card hidden" id="game-card">
-        <div class="balance-box">
-            <div style="color: var(--text-muted); font-size: 14px;">Авторизован: <b id="user-display" style="color:white"></b></div>
-            <div style="font-size: 28px; font-weight: bold; margin-top: 5px;"><span id="balance-display" style="color: var(--success)">0</span> $</div>
+    <!-- Mini App интерфейс -->
+    <div id="app" class="app hidden">
+        <!-- Профиль -->
+        <div class="card">
+            <div class="profile">
+                <div class="avatar" id="avatar">👤</div>
+                <div class="info">
+                    <div class="name" id="userName">Игрок</div>
+                    <div class="balance">💰 <span id="balance">—</span> монет</div>
+                </div>
+            </div>
         </div>
 
-        <div class="reels-display" id="game-result">🎰 🎰 🎰</div>
-        <div id="game-status" style="font-weight: 500; min-height: 24px; margin-bottom: 15px;">Вы готовы к игре? Ставка: 200$</div>
-
-        <div class="grid-buttons">
-            <button onclick="play('slots')">🎰 Играть в Слоты</button>
-            <button onclick="play('dice')">🎲 Бросить Кости</button>
+        <!-- Действия -->
+        <div class="card">
+            <div class="actions">
+                <button class="btn-server" onclick="sendAction('buy_server')">
+                    ➕ Купить сервер
+                </button>
+                <button class="btn-asic" onclick="sendAction('buy_asic')">
+                    ⛏ Купить ASIC-ферму
+                </button>
+                <button class="btn-booster" onclick="sendAction('activate_booster', {multiplier: 1.5})">
+                    ⚡ Бустер x1.5 (30 мин)
+                </button>
+                <button class="btn-booster" onclick="sendAction('activate_booster', {multiplier: 2.0})">
+                    💥 Бустер x2.0 (15 мин)
+                </button>
+                <button class="btn-refresh" onclick="sendAction('get_profile')">
+                    🔄 Обновить баланс
+                </button>
+                <button class="btn-quests" onclick="sendAction('show_quests')">
+                    📋 Задания
+                </button>
+            </div>
         </div>
-
-        <div class="logs-container" id="log-box"></div>
-        <button onclick="logout()" style="background: transparent; color: var(--text-muted); font-size: 14px; margin-top: 15px; width: auto; padding: 5px 10px;">Выйти из профиля</button>
     </div>
 
-<script>
-    // ТВОЙ НОВЫЙ SECURE URL ИЗ TERMUX (Pinggy с поддержкой HTTPS)
-    const SERVER_URL = "https://aiazy-188-72-72-78.free.pinggy.net"; 
-    let currentMode = "login";
-    let sessionToken = "";
+    <script>
+        // Проверяем, открыто ли в Telegram
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
 
-    function switchTab(mode) {
-        currentMode = mode;
-        document.getElementById('tab-login').classList.toggle('active', mode === 'login');
-        document.getElementById('tab-register').classList.toggle('active', mode === 'register');
-        document.getElementById('auth-btn').innerText = mode === 'login' ? 'Войти в аккаунт' : 'Создать аккаунт';
-        document.getElementById('auth-err').innerText = "";
-    }
+            // Показываем интерфейс
+            document.getElementById('app').classList.remove('hidden');
 
-    function submitAuth() {
-        const u = document.getElementById('username').value;
-        const p = document.getElementById('password').value;
-        const endpoint = currentMode === 'login' ? '/api/login' : '/api/register';
-        
-        fetch(`${SERVER_URL}${endpoint}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                // Обходим заглушку-предупреждение от бесплатного Pinggy
-                'X-Pinggy-No-Screen': 'true'
-            },
-            body: JSON.stringify({ username: u, password: p })
-        })
-        .then(res => {
-            if(!res.ok) return res.json().then(e => { throw new Error(e.error) });
-            return res.json();
-        })
-        .then(data => {
-            if (currentMode === 'register') {
-                alert('Регистрация успешна! Теперь войдите.');
-                switchTab('login');
-            } else {
-                sessionToken = data.token;
-                document.getElementById('user-display').innerText = data.username;
-                document.getElementById('balance-display').innerText = data.balance;
-                document.getElementById('auth-card').classList.add('hidden');
-                document.getElementById('game-card').classList.remove('hidden');
-                addLog("Успешная авторизация в системе");
+            // Данные пользователя из Telegram
+            const user = tg.initDataUnsafe?.user;
+            if (user) {
+                document.getElementById('userName').textContent = user.first_name || user.username;
+                if (user.photo_url) {
+                    document.getElementById('avatar').innerHTML = `<img src="${user.photo_url}" style="width:48px;height:48px;border-radius:50%;">`;
+                } else {
+                    document.getElementById('avatar').textContent = (user.first_name || '?')[0].toUpperCase();
+                }
             }
-        })
-        .catch(err => document.getElementById('auth-err').innerText = err.message);
-    }
 
-    function play(gameType) {
-        fetch(`${SERVER_URL}/api/play`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': sessionToken,
-                // Здесь тоже обходим заглушку Pinggy, чтобы игра работала
-                'X-Pinggy-No-Screen': 'true'
-            },
-            body: JSON.stringify({ game: gameType })
-        })
-        .then(res => { if(!res.ok) return res.json().then(e => {throw new Error(e.error)}); return res.json(); })
-        .then(data => {
-            document.getElementById('game-result').innerText = data.result.join(" ");
-            document.getElementById('balance-display').innerText = data.balance;
-            const status = document.getElementById('game-status');
-            status.innerText = data.win ? `🎉 ВЫИГРЫШ: +${data.win_amount}$!` : "😢 Не повезло, ставка списана.";
-            status.style.color = data.win ? "var(--success)" : "var(--text-muted)";
-            addLog(`${data.log} | Баланс: ${data.balance}$`);
-        })
-        .catch(err => {
-            document.getElementById('game-status').innerText = err.message;
-            document.getElementById('game-status').style.color = "var(--error)";
-        });
-    }
+            // Попытка загрузить сохранённый баланс из CloudStorage
+            tg.CloudStorage.getItem('balance', (err, value) => {
+                if (!err && value) {
+                    document.getElementById('balance').textContent = value;
+                }
+            });
 
-    function addLog(text) {
-        const box = document.getElementById('log-box');
-        box.innerHTML += `[${new Date().toLocaleTimeString()}] ${text}<br>`;
-        box.scrollTop = box.scrollHeight;
-    }
+            // Функция отправки действия боту
+            window.sendAction = function(action, params = {}) {
+                const data = JSON.stringify({ action, ...params });
+                tg.sendData(data);
+                // После отправки Mini App закроется (или можно оставить)
+            };
 
-    function logout() {
-        sessionToken = "";
-        document.getElementById('auth-card').classList.remove('hidden');
-        document.getElementById('game-card').classList.add('hidden');
-    }
-</script>
+            // Обработка ответов от бота (через события не получится, но можно обновлять CloudStorage)
+            // Бот может записать новый баланс в CloudStorage после действия, но это требует отдельной логики.
+            // Пока просто закрываем Mini App после действия.
+        } else {
+            // Открыто в обычном браузере
+            document.getElementById('not-telegram').classList.remove('hidden');
+        }
+    </script>
 </body>
 </html>
