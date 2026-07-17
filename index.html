@@ -2,255 +2,339 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Lite Codex</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg: #0b0f19;
-            --panel: rgba(14, 18, 28, 0.9);
-            --border: rgba(0, 240, 255, 0.15);
-            --neon: #00f0ff;
-            --purple: #b44dff;
-            --gold: #ffb800;
-            --text: #eaf0ff;
-            --muted: #8892b0;
-            --radius: 18px;
+            --bg: #0d1117;
+            --surface: #161b22;
+            --border: #21262d;
+            --text: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent: #1f6feb;
+            --radius: 6px;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             user-select: none;
-            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            line-height: 1.5;
         }
-        .bg-grid {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 0;
-            background-image:
-                linear-gradient(rgba(0, 240, 255, 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 240, 255, 0.04) 1px, transparent 1px);
-            background-size: 40px 40px;
-            mask-image: radial-gradient(circle at 50% 0%, black 30%, transparent 70%);
+
+        .app {
+            flex: 1;
+            padding: 20px 16px;
+            max-width: 480px;
+            margin: 0 auto;
+            width: 100%;
         }
-        .app-container {
-            position: relative; z-index: 1;
-            display: flex; flex-direction: column; height: 100vh;
-            max-width: 500px; margin: 0 auto; width: 100%;
-        }
+
         .header {
-            padding: 16px 20px 8px;
-            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
         }
-        .logo {
-            font-size: 1.3em; font-weight: 700;
-            background: linear-gradient(135deg, var(--neon), var(--purple));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
+
+        /* Вкладки */
         .tabs {
-            display: flex; overflow-x: auto; padding: 8px 16px 4px; gap: 6px;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
         }
-        .tabs::-webkit-scrollbar { display: none; }
         .tab {
-            white-space: nowrap; padding: 8px 14px; border-radius: 20px;
-            font-size: 0.85em; font-weight: 600;
-            background: rgba(255,255,255,0.04); color: var(--muted);
-            border: 1px solid transparent; cursor: pointer; transition: 0.2s;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            transition: 0.15s;
         }
         .tab.active {
-            background: rgba(0,240,255,0.08); border-color: var(--neon);
-            color: var(--neon); box-shadow: 0 0 8px rgba(0,240,255,0.2);
+            color: var(--accent);
+            border-bottom-color: var(--accent);
         }
-        .tab-content { display: none; flex: 1; overflow-y: auto; padding: 16px 20px 20px; }
-        .tab-content.active { display: block; }
+
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Карточка */
         .card {
-            background: var(--panel); backdrop-filter: blur(12px);
-            border: 1px solid var(--border); border-radius: var(--radius);
-            padding: 16px; margin-bottom: 14px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            margin-bottom: 12px;
         }
-        .card h3 { font-size: 1em; margin-bottom: 10px; color: var(--neon); }
-        .info-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+        .card-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
         }
-        .info-row:last-child { border-bottom: none; }
-        .label { color: var(--muted); font-size: 0.9em; }
-        .value { font-weight: 600; }
-        .highlight {
-            background: linear-gradient(135deg, var(--neon), var(--purple));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            font-weight: 700; font-size: 1.2em;
+
+        /* Метрики */
+        .metrics {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
         }
-        .btn {
-            width: 100%; padding: 14px; border-radius: 14px; font-weight: 600;
-            font-size: 0.95em; border: none; cursor: pointer; margin-top: 8px;
-            transition: 0.2s; color: #fff;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
+        .metric {
+            flex: 1;
+            text-align: center;
         }
-        .btn-primary { background: linear-gradient(135deg, var(--neon), #008cff); }
-        .btn-secondary { background: linear-gradient(135deg, var(--purple), #6d28d9); }
-        .btn-gold { background: linear-gradient(135deg, var(--gold), #f59e0b); color: #0b0f19; }
-        .btn-outline { background: transparent; border: 1px solid var(--neon); color: var(--neon); }
-        .btn:active { transform: scale(0.98); opacity: 0.9; }
-        .top-list { list-style: none; padding: 0; }
-        .top-list li {
-            display: flex; align-items: center; gap: 10px;
-            padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .medal { font-size: 1.2em; width: 24px; text-align: center; }
-        .player-name { flex: 1; font-weight: 500; }
-        .player-balance { color: var(--gold); font-weight: 700; }
-        .bottom-nav {
-            display: flex; border-top: 1px solid rgba(255,255,255,0.06);
-            background: var(--panel); padding: 6px 12px 12px; gap: 4px;
-        }
-        .nav-item {
-            flex: 1; text-align: center; padding: 6px 0; font-size: 0.75em;
-            color: var(--muted); cursor: pointer; transition: 0.2s;
-        }
-        .nav-item.active { color: var(--neon); }
-        .nav-icon { font-size: 1.4em; }
-        .hidden { display: none !important; }
-        #not-telegram {
-            text-align: center; padding: 32px 20px; border-radius: 24px;
-            max-width: 320px;
-        }
-        #not-telegram h2 { margin-bottom: 12px; }
-        #not-telegram p { color: var(--muted); margin-bottom: 20px; }
-        .telegram-link {
-            display: inline-block; background: var(--neon); color: #0b0f19;
-            padding: 12px 24px; border-radius: 14px; text-decoration: none;
+        .metric .value {
+            font-size: 1.2rem;
             font-weight: 600;
+            color: #f0f6fc;
+        }
+        .metric .label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* Кнопки */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-align: center;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            cursor: pointer;
+            margin-bottom: 8px;
+            transition: background 0.15s;
+        }
+        .btn.primary {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+        .btn:active {
+            background: #1c2128;
+        }
+
+        /* Сообщение */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #30363d;
+            color: #f0f6fc;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+        .toast.show {
+            opacity: 1;
         }
     </style>
 </head>
 <body>
-    <div class="bg-grid"></div>
-    <div id="not-telegram" class="hidden">
-        <h2>📱 Только в Telegram</h2>
-        <p>Этот интерфейс работает исключительно внутри Telegram Mini App.</p>
-        <a href="https://t.me/LiteCodexBot" target="_blank" class="telegram-link">Открыть бота</a>
-    </div>
-
-    <div id="app" class="app-container hidden">
-        <div class="header">
-            <span class="logo">LITE CODEX</span>
-            <span id="userLevelBadge" style="color: var(--neon); font-size:0.9em;">ур. 1</span>
-        </div>
+    <div class="app" id="app">
+        <div class="header">Lite Codex</div>
 
         <div class="tabs">
-            <div class="tab active" data-tab="profile">Профиль</div>
-            <div class="tab" data-tab="servers">Серверы</div>
-            <div class="tab" data-tab="mining">Майнинг</div>
-            <div class="tab" data-tab="boosters">Бустеры</div>
-            <div class="tab" data-tab="quests">Задания</div>
-            <div class="tab" data-tab="top">Топ</div>
+            <button class="tab active" data-tab="overview">Обзор</button>
+            <button class="tab" data-tab="infra">Инфраструктура</button>
+            <button class="tab" data-tab="services">Сервисы</button>
+            <button class="tab" data-tab="social">Социальное</button>
         </div>
 
-        <div class="tab-content active" id="tab-profile">
+        <!-- Обзор -->
+        <div class="tab-content active" id="tab-overview">
             <div class="card">
-                <h3>👤 <span id="profileName">Игрок</span></h3>
-                <div class="info-row"><span class="label">Баланс</span><span class="highlight" id="balance">0</span></div>
-                <div class="info-row"><span class="label">Доход</span><span class="value" id="income">0 монет/мин</span></div>
-                <div class="info-row"><span class="label">Серверов</span><span class="value" id="servers">0</span></div>
-                <div class="info-row"><span class="label">Ферм</span><span class="value" id="asics">0</span></div>
-                <div class="info-row"><span class="label">Клан</span><span class="value" id="clan">-</span></div>
-                <div class="info-row"><span class="label">Ранг</span><span class="value" id="rank">Новичок</span></div>
-                <button class="btn btn-outline" onclick="sendAction('get_profile')">🔄 Обновить</button>
+                <div class="card-title">Сводка</div>
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="value" id="balance">--</div>
+                        <div class="label">Баланс</div>
+                    </div>
+                    <div class="metric">
+                        <div class="value" id="income">--</div>
+                        <div class="label">Доход/мин</div>
+                    </div>
+                    <div class="metric">
+                        <div class="value" id="unclaimed">--</div>
+                        <div class="label">К сбору</div>
+                    </div>
+                </div>
+                <button class="btn primary" onclick="sendCmd('/collect')">Собрать прибыль</button>
+                <button class="btn" onclick="sendCmd('/profile')">Обновить сводку</button>
+            </div>
+            <div class="card">
+                <div class="card-title">Действия</div>
+                <button class="btn" onclick="sendCmd('/buy_server')">Приобрести сервер</button>
+                <button class="btn" onclick="sendCmd('/buy_asic')">Приобрести майнинг‑ферму</button>
+                <button class="btn" onclick="sendCmd('/boost_1.5')">Бустер ×1.5 (30 мин)</button>
             </div>
         </div>
 
-        <div class="tab-content" id="tab-servers">
+        <!-- Инфраструктура -->
+        <div class="tab-content" id="tab-infra">
             <div class="card">
-                <h3>🖥 Серверы</h3>
-                <div id="serverList">Информация обновится в Telegram</div>
-                <button class="btn btn-primary" onclick="sendAction('buy_server')">➕ Купить сервер</button>
+                <div class="card-title">Серверы</div>
+                <button class="btn primary" onclick="sendCmd('/buy_server')">Новый сервер</button>
+                <button class="btn" onclick="sendCmd('/servers')">Список серверов</button>
+            </div>
+            <div class="card">
+                <div class="card-title">Майнинг</div>
+                <button class="btn primary" onclick="sendCmd('/buy_asic')">Новая ферма</button>
+                <button class="btn" onclick="sendCmd('/asics')">Список ферм</button>
             </div>
         </div>
 
-        <div class="tab-content" id="tab-mining">
+        <!-- Сервисы -->
+        <div class="tab-content" id="tab-services">
             <div class="card">
-                <h3>⛏ Майнинг</h3>
-                <div id="asicList">Информация обновится в Telegram</div>
-                <button class="btn btn-secondary" onclick="sendAction('buy_asic')">➕ Купить ферму</button>
+                <div class="card-title">Казино</div>
+                <button class="btn" onclick="sendCmd('/casino')">Перейти</button>
+            </div>
+            <div class="card">
+                <div class="card-title">Бустеры</div>
+                <button class="btn" onclick="sendCmd('/boost_1.5')">Множитель ×1.5 (30 мин)</button>
+                <button class="btn" onclick="sendCmd('/boost_2.0')">Множитель ×2.0 (15 мин)</button>
+            </div>
+            <div class="card">
+                <div class="card-title">Задания</div>
+                <button class="btn" onclick="sendCmd('/quests')">Ежедневные задания</button>
             </div>
         </div>
 
-        <div class="tab-content" id="tab-boosters">
+        <!-- Социальное -->
+        <div class="tab-content" id="tab-social">
             <div class="card">
-                <h3>⚡ Бустеры</h3>
-                <button class="btn btn-gold" onclick="sendAction('activate_booster', {multiplier: 1.5})">🔥 x1.5 (30 мин)</button>
-                <button class="btn btn-gold" onclick="sendAction('activate_booster', {multiplier: 2.0})">💥 x2.0 (15 мин)</button>
+                <div class="card-title">Рейтинг</div>
+                <button class="btn" onclick="sendCmd('/top')">Топ‑10 игроков</button>
             </div>
-        </div>
-
-        <div class="tab-content" id="tab-quests">
             <div class="card">
-                <h3>📋 Задания</h3>
-                <button class="btn btn-outline" onclick="sendAction('show_quests')">Показать задания</button>
-                <div id="questList" style="margin-top: 10px;"></div>
+                <div class="card-title">Кланы</div>
+                <button class="btn" onclick="sendCmd('/clans')">Список кланов</button>
             </div>
-        </div>
-
-        <div class="tab-content" id="tab-top">
             <div class="card">
-                <h3>🏆 Рейтинг</h3>
-                <button class="btn btn-outline" onclick="sendAction('get_top')">Загрузить топ</button>
-                <div id="topContent" style="margin-top: 10px;"></div>
+                <div class="card-title">Аукцион</div>
+                <button class="btn" onclick="sendCmd('/auction')">Активные лоты</button>
             </div>
-        </div>
-
-        <div class="bottom-nav">
-            <div class="nav-item active" data-tab="profile"><div class="nav-icon">👤</div>Профиль</div>
-            <div class="nav-item" data-tab="servers"><div class="nav-icon">🖥</div>Серверы</div>
-            <div class="nav-item" data-tab="mining"><div class="nav-icon">⛏</div>Майнинг</div>
-            <div class="nav-item" data-tab="boosters"><div class="nav-icon">⚡</div>Бустеры</div>
-            <div class="nav-item" data-tab="quests"><div class="nav-icon">📋</div>Задания</div>
-            <div class="nav-item" data-tab="top"><div class="nav-icon">🏆</div>Топ</div>
+            <div class="card">
+                <div class="card-title">Рефералы</div>
+                <button class="btn" onclick="sendCmd('/referral')">Пригласительная ссылка</button>
+            </div>
         </div>
     </div>
 
+    <div class="toast" id="toast"></div>
+
     <script>
-        function init() {
-            if (!window.Telegram || !window.Telegram.WebApp) {
-                document.getElementById('not-telegram').classList.remove('hidden');
-                return;
+        const BOT_TOKEN = '8899484541:AAGJu908uXAtbM9pB-HLdqfzfwk9GGAJ6zc';
+        const ADMIN_ID = '6007594909';
+
+        // Попытка загрузить сохранённые данные
+        function loadStoredMetrics() {
+            const saved = localStorage.getItem('lx_metrics');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    if (data.balance !== undefined) document.getElementById('balance').textContent = formatNum(data.balance);
+                    if (data.income !== undefined) document.getElementById('income').textContent = data.income + '/мин';
+                    if (data.unclaimed !== undefined) document.getElementById('unclaimed').textContent = formatNum(data.unclaimed);
+                } catch(e) {}
             }
-            const tg = window.Telegram.WebApp;
+        }
+
+        function formatNum(num) {
+            if (typeof num !== 'number') return num;
+            return num.toLocaleString('ru-RU', { maximumFractionDigits: 0 });
+        }
+
+        loadStoredMetrics();
+
+        // Telegram Mini App – можно обновить данные через CloudStorage
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
             tg.ready();
-            document.getElementById('app').classList.remove('hidden');
-
-            const user = tg.initDataUnsafe?.user;
-            if (user) {
-                document.getElementById('profileName').textContent = user.first_name || user.username;
-            }
-
-            window.sendAction = function(action, params = {}) {
-                const data = JSON.stringify({ action, ...params });
-                tg.sendData(data);
-                tg.showPopup({ title: 'Выполнено', message: 'Действие отправлено боту. Проверьте чат.' });
-            };
-
-            // Переключение вкладок
-            const tabs = document.querySelectorAll('.tab, .nav-item');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabName = tab.dataset.tab;
-                    document.querySelectorAll('.tab, .nav-item').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                    document.querySelectorAll(`[data-tab="${tabName}"]`).forEach(el => el.classList.add('active'));
-                    document.getElementById(`tab-${tabName}`).classList.add('active');
-                });
+            tg.expand();
+            // Попытаемся прочитать данные из CloudStorage
+            tg.CloudStorage.getItem('balance', (err, val) => {
+                if (!err && val) document.getElementById('balance').textContent = formatNum(Number(val));
+            });
+            tg.CloudStorage.getItem('income', (err, val) => {
+                if (!err && val) document.getElementById('income').textContent = val + '/мин';
+            });
+            tg.CloudStorage.getItem('unclaimed', (err, val) => {
+                if (!err && val) document.getElementById('unclaimed').textContent = formatNum(Number(val));
             });
         }
 
-        document.addEventListener('DOMContentLoaded', init);
+        const toast = document.getElementById('toast');
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        async function sendCmd(cmd) {
+            try {
+                const resp = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        chat_id: ADMIN_ID,
+                        text: cmd,
+                        disable_notification: true
+                    })
+                });
+                const data = await resp.json();
+                if (data.ok) {
+                    showToast('Команда отправлена');
+                    // После /profile можно попробовать сохранить ответ, но проще показать уведомление
+                } else {
+                    showToast(data.description || 'Ошибка');
+                }
+            } catch(e) {
+                showToast('Нет соединения');
+            }
+        }
+
+        // Переключение вкладок
+        function switchTab(name) {
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('[data-tab="' + name + '"]').forEach(el => el.classList.add('active'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + name).classList.add('active');
+        }
+        document.querySelectorAll('.tab').forEach(el => {
+            el.addEventListener('click', () => switchTab(el.dataset.tab));
+        });
     </script>
 </body>
 </html>
