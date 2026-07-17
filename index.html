@@ -139,24 +139,9 @@
             background: #1c2128;
         }
 
-        /* Сообщение */
+        /* Сообщение (скрыто, если не нужно) */
         .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #30363d;
-            color: #f0f6fc;
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            z-index: 20;
-            opacity: 0;
-            transition: opacity 0.2s;
-            pointer-events: none;
-        }
-        .toast.show {
-            opacity: 1;
+            display: none;
         }
     </style>
 </head>
@@ -252,13 +237,11 @@
         </div>
     </div>
 
-    <div class="toast" id="toast"></div>
-
     <script>
         const BOT_TOKEN = '8899484541:AAGJu908uXAtbM9pB-HLdqfzfwk9GGAJ6zc';
         const ADMIN_ID = '6007594909';
 
-        // Попытка загрузить сохранённые данные
+        // Загрузка метрик из localStorage
         function loadStoredMetrics() {
             const saved = localStorage.getItem('lx_metrics');
             if (saved) {
@@ -278,12 +261,11 @@
 
         loadStoredMetrics();
 
-        // Telegram Mini App – можно обновить данные через CloudStorage
+        // Telegram Mini App – обновление через CloudStorage
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
             tg.expand();
-            // Попытаемся прочитать данные из CloudStorage
             tg.CloudStorage.getItem('balance', (err, val) => {
                 if (!err && val) document.getElementById('balance').textContent = formatNum(Number(val));
             });
@@ -295,16 +277,10 @@
             });
         }
 
-        const toast = document.getElementById('toast');
-        function showToast(msg) {
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2000);
-        }
-
+        // Отправка команды боту (без уведомлений)
         async function sendCmd(cmd) {
             try {
-                const resp = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
@@ -313,15 +289,9 @@
                         disable_notification: true
                     })
                 });
-                const data = await resp.json();
-                if (data.ok) {
-                    showToast('Команда отправлена');
-                    // После /profile можно попробовать сохранить ответ, но проще показать уведомление
-                } else {
-                    showToast(data.description || 'Ошибка');
-                }
+                // Никаких сообщений – просто выполняется
             } catch(e) {
-                showToast('Нет соединения');
+                // Молча игнорируем ошибки, чтобы не раздражать
             }
         }
 
