@@ -2,309 +2,266 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lite Codex</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@UserCatchBot – Правила и политика</title>
     <style>
-        :root {
-            --bg: #0d1117;
-            --surface: #161b22;
-            --border: #21262d;
-            --text: #c9d1d9;
-            --text-secondary: #8b949e;
-            --accent: #1f6feb;
-            --radius: 6px;
-        }
-
+        /* Общие стили */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            line-height: 1.5;
+            background: #f4f7fc;
+            color: #1e293b;
+            padding: 20px;
+            line-height: 1.7;
         }
-
-        .app {
-            flex: 1;
-            padding: 20px 16px;
-            max-width: 480px;
+        .container {
+            max-width: 800px;
             margin: 0 auto;
-            width: 100%;
+            background: white;
+            padding: 40px 35px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         }
-
+        /* Шапка */
         .header {
-            margin-bottom: 20px;
-            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 18px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .header h1 span {
+            background: #3b82f6;
+            color: white;
+            font-size: 16px;
+            border-radius: 40px;
+            padding: 2px 14px;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        .header .version {
+            font-size: 14px;
+            color: #64748b;
+        }
+        /* Заголовки разделов */
+        h2 {
+            font-size: 22px;
             font-weight: 600;
-        }
-
-        /* Вкладки */
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 20px;
-        }
-        .tab {
-            padding: 10px 16px;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            background: none;
-            border-top: none;
-            border-left: none;
-            border-right: none;
-            transition: 0.15s;
-        }
-        .tab.active {
-            color: var(--accent);
-            border-bottom-color: var(--accent);
-        }
-
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Карточка */
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 14px;
+            margin-top: 35px;
             margin-bottom: 12px;
+            color: #0f172a;
+            border-left: 5px solid #3b82f6;
+            padding-left: 16px;
         }
-        .card-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-secondary);
-            margin-bottom: 10px;
-        }
-
-        /* Метрики */
-        .metrics {
-            display: flex;
-            gap: 12px;
+        p {
             margin-bottom: 16px;
         }
-        .metric {
-            flex: 1;
-            text-align: center;
+        ul, ol {
+            padding-left: 28px;
+            margin-bottom: 20px;
         }
-        .metric .value {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #f0f6fc;
-        }
-        .metric .label {
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-            margin-top: 2px;
-        }
-
-        /* Кнопки */
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 10px 14px;
-            border-radius: var(--radius);
-            font-size: 0.85rem;
-            font-weight: 500;
-            text-align: center;
-            border: 1px solid var(--border);
-            background: var(--surface);
-            color: var(--text);
-            cursor: pointer;
+        li {
             margin-bottom: 8px;
-            transition: background 0.15s;
         }
-        .btn.primary {
-            background: var(--accent);
-            color: #fff;
-            border-color: var(--accent);
+        /* Блоки-выделения */
+        .highlight {
+            background: #fef9c3;
+            padding: 8px 18px;
+            border-radius: 12px;
+            border-left: 5px solid #eab308;
+            margin: 25px 0;
         }
-        .btn:active {
-            background: #1c2128;
+        .highlight strong {
+            color: #b45309;
         }
-
-        /* Сообщение (скрыто, если не нужно) */
-        .toast {
-            display: none;
+        .warning {
+            background: #fee2e2;
+            border-left: 5px solid #ef4444;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+        }
+        .warning strong {
+            color: #b91c1c;
+        }
+        .info {
+            background: #dbeafe;
+            border-left: 5px solid #3b82f6;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+        }
+        /* Навигация по странице (якоря) */
+        .nav {
+            background: #f1f5f9;
+            padding: 14px 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+        }
+        .nav a {
+            color: #1e293b;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+        }
+        .nav a:hover {
+            color: #3b82f6;
+            text-decoration: underline;
+        }
+        /* Подвал */
+        .footer {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #64748b;
+            text-align: center;
+        }
+        .footer a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        /* Адаптив */
+        @media (max-width: 600px) {
+            .container { padding: 24px 18px; }
+            .header h1 { font-size: 22px; }
+            .nav { flex-direction: column; gap: 6px; }
         }
     </style>
 </head>
 <body>
-    <div class="app" id="app">
-        <div class="header">Lite Codex</div>
 
-        <div class="tabs">
-            <button class="tab active" data-tab="overview">Обзор</button>
-            <button class="tab" data-tab="infra">Инфраструктура</button>
-            <button class="tab" data-tab="services">Сервисы</button>
-            <button class="tab" data-tab="social">Социальное</button>
-        </div>
+<div class="container">
 
-        <!-- Обзор -->
-        <div class="tab-content active" id="tab-overview">
-            <div class="card">
-                <div class="card-title">Сводка</div>
-                <div class="metrics">
-                    <div class="metric">
-                        <div class="value" id="balance">--</div>
-                        <div class="label">Баланс</div>
-                    </div>
-                    <div class="metric">
-                        <div class="value" id="income">--</div>
-                        <div class="label">Доход/мин</div>
-                    </div>
-                    <div class="metric">
-                        <div class="value" id="unclaimed">--</div>
-                        <div class="label">К сбору</div>
-                    </div>
-                </div>
-                <button class="btn primary" onclick="sendCmd('/collect')">Собрать прибыль</button>
-                <button class="btn" onclick="sendCmd('/profile')">Обновить сводку</button>
-            </div>
-            <div class="card">
-                <div class="card-title">Действия</div>
-                <button class="btn" onclick="sendCmd('/buy_server')">Приобрести сервер</button>
-                <button class="btn" onclick="sendCmd('/buy_asic')">Приобрести майнинг‑ферму</button>
-                <button class="btn" onclick="sendCmd('/boost_1.5')">Бустер ×1.5 (30 мин)</button>
-            </div>
-        </div>
-
-        <!-- Инфраструктура -->
-        <div class="tab-content" id="tab-infra">
-            <div class="card">
-                <div class="card-title">Серверы</div>
-                <button class="btn primary" onclick="sendCmd('/buy_server')">Новый сервер</button>
-                <button class="btn" onclick="sendCmd('/servers')">Список серверов</button>
-            </div>
-            <div class="card">
-                <div class="card-title">Майнинг</div>
-                <button class="btn primary" onclick="sendCmd('/buy_asic')">Новая ферма</button>
-                <button class="btn" onclick="sendCmd('/asics')">Список ферм</button>
-            </div>
-        </div>
-
-        <!-- Сервисы -->
-        <div class="tab-content" id="tab-services">
-            <div class="card">
-                <div class="card-title">Казино</div>
-                <button class="btn" onclick="sendCmd('/casino')">Перейти</button>
-            </div>
-            <div class="card">
-                <div class="card-title">Бустеры</div>
-                <button class="btn" onclick="sendCmd('/boost_1.5')">Множитель ×1.5 (30 мин)</button>
-                <button class="btn" onclick="sendCmd('/boost_2.0')">Множитель ×2.0 (15 мин)</button>
-            </div>
-            <div class="card">
-                <div class="card-title">Задания</div>
-                <button class="btn" onclick="sendCmd('/quests')">Ежедневные задания</button>
-            </div>
-        </div>
-
-        <!-- Социальное -->
-        <div class="tab-content" id="tab-social">
-            <div class="card">
-                <div class="card-title">Рейтинг</div>
-                <button class="btn" onclick="sendCmd('/top')">Топ‑10 игроков</button>
-            </div>
-            <div class="card">
-                <div class="card-title">Кланы</div>
-                <button class="btn" onclick="sendCmd('/clans')">Список кланов</button>
-            </div>
-            <div class="card">
-                <div class="card-title">Аукцион</div>
-                <button class="btn" onclick="sendCmd('/auction')">Активные лоты</button>
-            </div>
-            <div class="card">
-                <div class="card-title">Рефералы</div>
-                <button class="btn" onclick="sendCmd('/referral')">Пригласительная ссылка</button>
-            </div>
-        </div>
+    <!-- Шапка -->
+    <div class="header">
+        <h1>
+            @UserCatchBot
+            <span>правила</span>
+        </h1>
+        <div class="version">Обновлено: 3 августа 2026</div>
     </div>
 
-    <script>
-        const BOT_TOKEN = '8899484541:AAGJu908uXAtbM9pB-HLdqfzfwk9GGAJ6zc';
-        const ADMIN_ID = '6007594909';
+    <!-- Быстрая навигация -->
+    <div class="nav">
+        <a href="#data">📌 Данные</a>
+        <a href="#use">🔐 Использование</a>
+        <a href="#responsibility">⚠️ Ответственность</a>
+        <a href="#refund">💸 Возврат</a>
+        <a href="#contacts">📬 Контакты</a>
+    </div>
 
-        // Загрузка метрик из localStorage
-        function loadStoredMetrics() {
-            const saved = localStorage.getItem('lx_metrics');
-            if (saved) {
-                try {
-                    const data = JSON.parse(saved);
-                    if (data.balance !== undefined) document.getElementById('balance').textContent = formatNum(data.balance);
-                    if (data.income !== undefined) document.getElementById('income').textContent = data.income + '/мин';
-                    if (data.unclaimed !== undefined) document.getElementById('unclaimed').textContent = formatNum(data.unclaimed);
-                } catch(e) {}
-            }
-        }
+    <!-- Вступление -->
+    <p>
+        <strong>Привет!</strong> Этот бот помогает искать свободные имена пользователей в Telegram («юзы»).
+        Чтобы всё было честно и прозрачно, мы подготовили простые правила.
+        Пожалуйста, прочитайте их перед использованием.
+    </p>
 
-        function formatNum(num) {
-            if (typeof num !== 'number') return num;
-            return num.toLocaleString('ru-RU', { maximumFractionDigits: 0 });
-        }
+    <!-- Раздел 1: Данные -->
+    <h2 id="data">📌 Какие данные мы собираем</h2>
+    <p>
+        Для работы бота нам нужны минимальные данные от вашего аккаунта Telegram:
+    </p>
+    <ul>
+        <li><strong>Ваш Telegram ID</strong> – чтобы узнавать вас и управлять подпиской.</li>
+        <li><strong>Ваше имя пользователя</strong> (username) – для отображения в статистике (если оно есть).</li>
+        <li><strong>История команд</strong> – мы запоминаем, какие запросы вы отправляли, чтобы улучшать бота.</li>
+    </ul>
+    <p>
+        <strong>Мы НЕ собираем</strong> номера телефонов, пароли, личные сообщения или данные ваших контактов.
+    </p>
 
-        loadStoredMetrics();
+    <!-- Раздел 2: Использование данных -->
+    <h2 id="use">🔐 Как мы используем ваши данные</h2>
+    <ul>
+        <li>Для предоставления доступа к платным функциям бота.</li>
+        <li>Для технической поддержки (если вы обратитесь с вопросом).</li>
+        <li>Для анализа работы бота – например, чтобы понять, какие функции популярны.</li>
+    </ul>
+    <p>
+        Мы <strong>никогда не передаём</strong> ваши данные третьим лицам, кроме случаев, предусмотренных законом (но мы надеемся, что до этого не дойдёт).
+    </p>
+    <div class="info">
+        <p><strong>🔒 Безопасность:</strong> Все данные хранятся в защищённой базе данных. Если вы захотите удалить все свои данные – просто напишите нам в поддержку, и мы сделаем это в течение 24 часов.</p>
+    </div>
 
-        // Telegram Mini App – обновление через CloudStorage
-        const tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.ready();
-            tg.expand();
-            tg.CloudStorage.getItem('balance', (err, val) => {
-                if (!err && val) document.getElementById('balance').textContent = formatNum(Number(val));
-            });
-            tg.CloudStorage.getItem('income', (err, val) => {
-                if (!err && val) document.getElementById('income').textContent = val + '/мин';
-            });
-            tg.CloudStorage.getItem('unclaimed', (err, val) => {
-                if (!err && val) document.getElementById('unclaimed').textContent = formatNum(Number(val));
-            });
-        }
+    <!-- Раздел 3: Ответственность -->
+    <h2 id="responsibility">⚠️ Отказ от ответственности</h2>
+    <div class="warning">
+        <p><strong>Важно!</strong> Используя бота, вы принимаете следующие условия:</p>
+    </div>
+    <ul>
+        <li>
+            <strong>Бот работает «как есть» (as is).</strong> Мы делаем всё возможное, чтобы он работал стабильно, но не можем гарантировать отсутствие ошибок, сбоев или недоступности.
+        </li>
+        <li>
+            <strong>Мы не несём ответственности за любые убытки,</strong> прямые или косвенные, возникшие в результате использования или невозможности использования бота. Это касается в том числе потери времени, упущенной выгоды или невозможности зарегистрировать желаемый юзернейм.
+        </li>
+        <li>
+            <strong>Мы не гарантируем, что найденный юзернейм будет доступен для регистрации.</strong> Telegram может менять правила, блокировать имена или иметь технические ограничения – мы не можем на это повлиять.
+        </li>
+        <li>
+            <strong>За любые действия, совершённые вами с помощью бота, отвечаете только вы.</strong> Например, если вы попытаетесь зарегистрировать имя, нарушающее правила Telegram, или используете бота для спама – это ваша ответственность.
+        </li>
+        <li>
+            <strong>Потеря товара (подписки) по вашей ошибке:</strong> Если вы случайно оплатили не ту подписку, или потеряли доступ из-за того, что забыли пароль от Telegram, или по любой другой причине, связанной с вашими действиями, – мы <strong>не возвращаем</strong> средства и не восстанавливаем доступ. Пожалуйста, будьте внимательны.
+        </li>
+    </ul>
 
-        // Отправка команды боту (без уведомлений)
-        async function sendCmd(cmd) {
-            try {
-                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        chat_id: ADMIN_ID,
-                        text: cmd,
-                        disable_notification: true
-                    })
-                });
-                // Никаких сообщений – просто выполняется
-            } catch(e) {
-                // Молча игнорируем ошибки, чтобы не раздражать
-            }
-        }
+    <!-- Раздел 4: Возврат -->
+    <h2 id="refund">💸 Возврат подписки</h2>
+    <div class="highlight">
+        <p>
+            <strong>Важно:</strong> Так как подписка предоставляет мгновенный доступ к цифровому функционалу, <strong>возврат Telegram Stars не производится</strong>.
+            Пожалуйста, убедитесь, что вам нужна подписка, перед оплатой.
+        </p>
+    </div>
+    <p>
+        Исключение: если бот не работал более 24 часов подряд из-за нашей технической ошибки, мы можем предложить компенсацию в виде дополнительных дней подписки – но только по вашему обращению в поддержку.
+    </p>
 
-        // Переключение вкладок
-        function switchTab(name) {
-            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('[data-tab="' + name + '"]').forEach(el => el.classList.add('active'));
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + name).classList.add('active');
-        }
-        document.querySelectorAll('.tab').forEach(el => {
-            el.addEventListener('click', () => switchTab(el.dataset.tab));
-        });
-    </script>
+    <!-- Раздел 5: Изменения -->
+    <h2>🔄 Изменение правил</h2>
+    <p>
+        Мы можем обновлять эту страницу время от времени. Новая версия вступает в силу сразу после публикации.
+        Если вы продолжаете пользоваться ботом – значит, вы согласны с новыми условиями.
+    </p>
+
+    <!-- Раздел 6: Контакты -->
+    <h2 id="contacts">📬 Связь с нами</h2>
+    <p>
+        Если у вас есть вопросы, предложения или вы хотите удалить свои данные – напишите нам в Telegram:
+        <a href="https://t.me/ваш_username" target="_blank">@ваш_username</a>.
+        (Замените на ваш реальный контакт.)
+    </p>
+
+    <!-- Подвал -->
+    <div class="footer">
+        <p>© 2026 @UserCatchBot • Сделано с ❤️ для сообщества</p>
+        <p style="margin-top: 6px;">
+            <a href="#">Вернуться наверх ↑</a>
+        </p>
+    </div>
+
+</div>
+
 </body>
 </html>
